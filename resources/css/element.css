@@ -1,0 +1,9 @@
+@font-face {
+    -fx-font-family: "ubuntu-c-webfont";
+}
+
+.text {
+    -fx-font-family: "ubuntu-c-webfont";
+    -fx-font-size: 15pt;
+    -fx-alignment: center;
+}
