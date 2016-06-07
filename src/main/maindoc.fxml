@@ -3,23 +3,29 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.effect.GaussianBlur?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="603.0" prefWidth="755.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="517.0" prefWidth="755.0" style="-fx-background-color: rgba(100,120,240,.898);" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
    <children>
-      <MenuBar layoutX="-2.0" layoutY="2.0" prefHeight="26.0" prefWidth="755.0">
+      <MenuBar prefHeight="30.0" prefWidth="755.0">
         <menus>
-          <Menu mnemonicParsing="false" text="File" onAction="#handleExit">
+          <Menu mnemonicParsing="false" onAction="#handleExit" text="File">
             <items>
               <MenuItem mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Stegano">
               <items>
-                <MenuItem fx:id="menuitemEmbedMessage" mnemonicParsing="false" text="Embedding Message" onAction="#handleShowEmbeddingMessage" />
+                <MenuItem fx:id="menuitemEmbedMessage" mnemonicParsing="false" onAction="#handleShowEmbeddingMessage" text="Embedding Message" />
                   <MenuItem mnemonicParsing="false" text="Extract Message" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Testing">
+              <items>
+                <MenuItem mnemonicParsing="false" text="MSE - PNSR" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Feature">
@@ -33,21 +39,36 @@
             </items>
           </Menu>
         </menus>
+         <effect>
+            <GaussianBlur radius="1.25" />
+         </effect>
       </MenuBar>
-      <Text layoutX="249.0" layoutY="85.0" lineSpacing="4.0" stroke="#9a9696" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="270.13671875">
+      <Text fill="#d7d1d1" layoutX="237.0" layoutY="94.0" lineSpacing="4.0" stroke="#9a9696" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="270.13671875">
          <font>
             <Font name="System Bold" size="42.0" />
          </font>
       </Text>
-      <Text layoutX="168.0" layoutY="162.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
+      <Text layoutX="76.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font>
       </Text>
-      <Text layoutX="274.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Berbasis LSB dengan Enkripsi AES">
+      <Text layoutX="204.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Berbasis LSB dengan Enkripsi AES">
          <font>
             <Font size="15.0" />
          </font>
       </Text>
+      <Text layoutX="357.0" layoutY="287.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Oleh :" />
+      <Text layoutX="292.0" layoutY="329.0" lineSpacing="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hendro Pramana Sinaga" textAlignment="CENTER">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+      <Text layoutX="315.0" layoutY="371.0" lineSpacing="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Yusuf Saleh Lubis" textAlignment="CENTER">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+      <Text layoutX="296.0" layoutY="499.0" strokeType="OUTSIDE" strokeWidth="0.0" text="STMIK Mikroskil Medan - 2016" />
    </children>
 </AnchorPane>
