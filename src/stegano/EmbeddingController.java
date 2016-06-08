@@ -86,7 +86,9 @@ public class EmbeddingController implements Initializable {
         if (txtInputPass.getText().length() > 5) {
             btnEncrypt.setDisable(false);
         } else {
-            btnEncrypt.setDisable(true);
+            if (!(textInputMessage.getText().length() < 1)) {
+                btnEncrypt.setDisable(true);
+            }
         }
         textChiper.setText(txtInputPass.getText());
     }
