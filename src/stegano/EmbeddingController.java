@@ -12,13 +12,17 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import main.Main;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,8 +32,8 @@ import java.util.ResourceBundle;
  * Created by hendro.sinaga on 08-Jun-16.
  */
 public class EmbeddingController implements Initializable {
-    Throwable ByteNull = new Throwable();
-
+    Image imagePrev;
+    Alert alert;
     @FXML
     TextArea textInputMessage;
     @FXML
@@ -37,13 +41,23 @@ public class EmbeddingController implements Initializable {
     @FXML
     Text txtInfoMessage;
     @FXML
+    Text textInfoCoverImg;
+    @FXML
+    Text textInfoStegoImg;
+    @FXML
     PasswordField txtInputPass;
     @FXML
+    Button btnBrowseCoverImg;
+    @FXML
     Button btnEncrypt;
+    @FXML
+    Button btnMainMenu;
+    @FXML
+    ImageView imgViewCover;
 
     @FXML
     private void handleBrowseFileText(ActionEvent event) {
-        Alert alert;
+
         boolean sukses = true;
         byte[] byteTeks = null;
         String textFile = "";
@@ -94,6 +108,46 @@ public class EmbeddingController implements Initializable {
     }
 
     @FXML
+    private void handlebtnBrowseCoverImg(ActionEvent event) {
+        Image coverImg;
+        BufferedImage buffCoverImg;
+        String ex = "", imgFile = "";
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Buka Berkas Gambar");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
+
+        File fg = fc.showOpenDialog(null);
+        if (fg != null) {
+            try {
+                imgFile = fg.toURI().toURL().toString();
+                coverImg = new Image(imgFile);
+                imgViewCover.setImage(coverImg);
+                textInfoCoverImg.setText(
+                        "Nama File: " + fg.getName() + "\n"
+                        + "Lebar: " + coverImg.getWidth() + "\n"
+                        + "Tinggi: " + coverImg.getHeight()
+                );
+            } catch (MalformedURLException mue) {
+                alert = new Alert(Alert.AlertType.INFORMATION,
+                        "Gagal mengupload gambar ke aplikasi",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("Terjadi Exception PATH File");
+                alert.show();
+            } catch (Exception exc) {
+                alert = new Alert(Alert.AlertType.INFORMATION,
+                        "Terjadi kesalahan set Image",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("Terjadi Exception PATH File");
+                alert.show();
+            }
+        }
+
+    }
+
+    @FXML
     private void handleBtnMainMenu(ActionEvent event) {
         Parent p = null;
         boolean loadSukses = true;
@@ -123,6 +177,11 @@ public class EmbeddingController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        //imagePrev = new Image(getClass().getResourceAsStream("rnd_br_prev32.png"));
+        //btnMainMenu.setGraphic(new ImageView(imagePrev));
+
+
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
         textInputMessage.textProperty().addListener(new ChangeListener<String>() {
             @Override

@@ -34,11 +34,11 @@
                   <Text layoutX="22.0" layoutY="401.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass=".text" text="Chipertext :" />
                   <Text fx:id="txtInfoChipertext" layoutX="22.0" layoutY="640.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chipertext Length : - " wrappingWidth="387.732421875" />
                   <PasswordField fx:id="txtInputPass" layoutX="22.0" layoutY="337.0" onKeyReleased="#handleInputPassword" prefHeight="25.0" prefWidth="203.0" />
-                  <Button fx:id="btnMainMenu" layoutX="22.0" layoutY="720.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Main Menu" />
+                  <Button fx:id="btnMainMenu" alignment="CENTER_RIGHT" layoutX="22.0" layoutY="720.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" prefHeight="26.0" prefWidth="125.0" text="Main Menu" />
                   <TextArea fx:id="textChiper" editable="false" layoutX="22.0" layoutY="405.0" prefHeight="222.0" prefWidth="466.0" wrapText="true" />
                   <Separator layoutX="495.0" layoutY="14.0" orientation="VERTICAL" prefHeight="699.0" prefWidth="0.0" />
                   <Text layoutX="508.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cover Image" />
-                  <Button id="btnBrowseCoverImg" fx:id="btnBrowseCoverImg" alignment="CENTER_RIGHT" layoutX="688.0" layoutY="29.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Browse" textAlignment="CENTER" />
+                  <Button id="btnBrowseCoverImg" fx:id="btnBrowseCoverImg" alignment="CENTER_RIGHT" layoutX="688.0" layoutY="29.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Browse" textAlignment="CENTER" onAction="#handlebtnBrowseCoverImg" />
                   <ImageView id="imgViewCover" fx:id="imgViewCover" fitHeight="223.0" fitWidth="300.0" focusTraversable="true" layoutX="501.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: 'firebrick'; -fx-border-color: darkblue;">
                      <effect>
                         <DropShadow color="#514f4f" height="22.49" radius="11.114999999999998" width="23.97" />
@@ -59,7 +59,7 @@
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e3e5e8" height="200.0" layoutX="511.0" layoutY="411.0" stroke="BLACK" strokeType="INSIDE" width="284.0" />
                   <Button id="btnSaveStegoImg" fx:id="btnSaveStegoImg" layoutX="709.0" layoutY="629.0" mnemonicParsing="false" text="Save" />
                   <Label layoutX="759.0" layoutY="635.0" text="(.bmp)" />
-                  <Button id="btnNext" fx:id="btnNext" layoutX="872.0" layoutY="733.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Next" />
+                  <Button id="btnNext" fx:id="btnNext" alignment="BASELINE_LEFT" layoutX="828.0" layoutY="733.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" prefHeight="26.0" prefWidth="93.0" text="Next" />
                   <Text id="textInfoStegoImg" fx:id="textInfoStegoImg" layoutX="803.0" layoutY="508.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="225.7294921875" />
                   <Text id="textInfoCoverImg" fx:id="textInfoCoverImg" layoutX="796.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="199.7294921875" />
                </children>
