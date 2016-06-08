@@ -55,7 +55,8 @@ public class MainController {
                 alert.show();
             } else {
                 Main.mainStage.setTitle("Aplikasi Steganografi: Embedding Message");
-                Main.mainStage.setScene(new Scene(p));
+                Main.mainStage.setScene(new Scene(p, 1148, 640));
+                Main.mainStage.centerOnScreen();
             }
         }
 

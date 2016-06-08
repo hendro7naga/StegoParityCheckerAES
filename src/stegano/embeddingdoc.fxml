@@ -3,36 +3,36 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane id="scrolPaneEmbedding" fx:id="scrolPaneEmbedding" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="809.0" prefWidth="1148.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stegano.EmbeddingController">
+<ScrollPane id="scrolPaneEmbedding" fx:id="scrolPaneEmbedding" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1148.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stegano.EmbeddingController">
    <content>
       <VBox prefHeight="809.0" prefWidth="1133.0">
          <children>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="809.0" prefWidth="1133.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="821.0">
                <children>
                   <Text fx:id="txtLabelMessage" fill="#5e5a5a" layoutX="22.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass=".text" text="Message Text :" />
-                  <TextArea fx:id="textInputMessage" layoutX="22.0" layoutY="55.0" prefHeight="222.0" prefWidth="444.0" wrapText="true" />
-                  <Button fx:id="btnBrowseText" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="368.0" layoutY="27.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="73.0" text="Browse" textAlignment="CENTER">
+                  <TextArea fx:id="textInputMessage" layoutX="22.0" layoutY="55.0" prefHeight="222.0" prefWidth="464.0" wrapText="true" />
+                  <Button fx:id="btnBrowseText" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="368.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleBrowseFileText" prefHeight="25.0" prefWidth="73.0" text="Browse" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
                   <Label layoutX="442.0" layoutY="33.0" text="(.txt)" />
-                  <Text fx:id="txtInfoMessage" layoutX="22.0" layoutY="293.0" stroke="#c3c1c1" strokeType="OUTSIDE" strokeWidth="0.0" text="Text Length : -" wrappingWidth="109.13671875" />
+                  <Text fx:id="txtInfoMessage" layoutX="22.0" layoutY="290.0" stroke="#c3c1c1" strokeType="OUTSIDE" strokeWidth="0.0" text="Text Length : -" wrappingWidth="362.13671875" />
                   <Button fx:id="btnEncrypt" disable="true" layoutX="244.0" layoutY="337.0" mnemonicParsing="false" text="Encrypt" />
-                  <TextField fx:id="txtInputPass" accessibleRole="PASSWORD_FIELD" layoutX="22.0" layoutY="337.0" prefHeight="25.0" prefWidth="204.0" />
                   <Label layoutX="22.0" layoutY="320.0" text="Password : " />
-                  <TextArea fx:id="textChiper" layoutX="22.0" layoutY="405.0" prefHeight="222.0" prefWidth="444.0" wrapText="true" />
                   <Text layoutX="22.0" layoutY="401.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass=".text" text="Chipertext :" />
-                  <Text fx:id="txtInfoChipertext" layoutX="22.0" layoutY="647.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chipertext Length : - " />
+                  <Text fx:id="txtInfoChipertext" layoutX="22.0" layoutY="640.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chipertext Length : - " wrappingWidth="387.732421875" />
+                  <PasswordField fx:id="txtInputPass" layoutX="22.0" layoutY="337.0" onKeyReleased="#handleInputPassword" prefHeight="25.0" prefWidth="203.0" />
                   <Button fx:id="btnMainMenu" layoutX="22.0" layoutY="720.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Main Menu" />
+                  <TextArea fx:id="textChiper" editable="false" layoutX="22.0" layoutY="405.0" prefHeight="222.0" prefWidth="466.0" wrapText="true" />
                   <Separator layoutX="495.0" layoutY="14.0" orientation="VERTICAL" prefHeight="699.0" prefWidth="0.0" />
                </children>
             </AnchorPane>

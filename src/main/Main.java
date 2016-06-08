@@ -19,6 +19,7 @@ public class Main extends Application{
         Parent root = FXMLLoader.load(getClass().getResource("maindoc.fxml"));
         primaryStage.setTitle("Aplikasi Steganografi");
         primaryStage.setScene(new Scene(root, 756, 485));
+        primaryStage.centerOnScreen();
         Main.mainStage = primaryStage;
         primaryStage.show();
     }
