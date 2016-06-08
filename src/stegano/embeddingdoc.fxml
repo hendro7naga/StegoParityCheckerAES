@@ -11,6 +11,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Text?>
 
 <ScrollPane id="scrolPaneEmbedding" fx:id="scrolPaneEmbedding" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1148.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stegano.EmbeddingController">
@@ -46,6 +47,9 @@
                   <Label layoutX="766.0" layoutY="36.0" text="(.bmp)" />
                   <Button fx:id="btnEmbedMessage" layoutX="694.0" layoutY="285.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="107.0" text="Embed Message" />
                   <Separator layoutX="497.0" layoutY="367.0" prefHeight="0.0" prefWidth="432.0" />
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e3e5e8" height="200.0" layoutX="508.0" layoutY="66.0" stroke="BLACK" strokeType="INSIDE" width="284.0" />
+                  <Label layoutX="508.0" layoutY="320.0" text="Time : " />
+                  <Text fx:id="textTimer" layoutX="543.0" layoutY="333.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00:00" wrappingWidth="118.13671875" />
                </children>
             </AnchorPane>
          </children>
