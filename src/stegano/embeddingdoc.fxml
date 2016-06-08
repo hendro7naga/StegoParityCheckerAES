@@ -38,18 +38,30 @@
                   <TextArea fx:id="textChiper" editable="false" layoutX="22.0" layoutY="405.0" prefHeight="222.0" prefWidth="466.0" wrapText="true" />
                   <Separator layoutX="495.0" layoutY="14.0" orientation="VERTICAL" prefHeight="699.0" prefWidth="0.0" />
                   <Text layoutX="508.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cover Image" />
-                  <Button fx:id="btnBrowseImage" alignment="CENTER_RIGHT" layoutX="688.0" layoutY="29.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Browse" textAlignment="CENTER" />
-                  <ImageView fitHeight="223.0" fitWidth="300.0" focusTraversable="true" layoutX="501.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: 'firebrick'; -fx-border-color: darkblue;">
+                  <Button id="btnBrowseCoverImg" fx:id="btnBrowseCoverImg" alignment="CENTER_RIGHT" layoutX="688.0" layoutY="29.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Browse" textAlignment="CENTER" />
+                  <ImageView id="imgViewCover" fx:id="imgViewCover" fitHeight="223.0" fitWidth="300.0" focusTraversable="true" layoutX="501.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: 'firebrick'; -fx-border-color: darkblue;">
                      <effect>
                         <DropShadow color="#514f4f" height="22.49" radius="11.114999999999998" width="23.97" />
                      </effect>
                   </ImageView>
                   <Label layoutX="766.0" layoutY="36.0" text="(.bmp)" />
-                  <Button fx:id="btnEmbedMessage" layoutX="694.0" layoutY="285.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="107.0" text="Embed Message" />
+                  <Button fx:id="btnEmbedMessage" layoutX="665.0" layoutY="285.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="136.0" text="Embed Message" />
                   <Separator layoutX="497.0" layoutY="367.0" prefHeight="0.0" prefWidth="432.0" />
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e3e5e8" height="200.0" layoutX="508.0" layoutY="66.0" stroke="BLACK" strokeType="INSIDE" width="284.0" />
                   <Label layoutX="508.0" layoutY="320.0" text="Time : " />
                   <Text fx:id="textTimer" layoutX="543.0" layoutY="333.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00:00" wrappingWidth="118.13671875" />
+                  <Text layoutX="513.0" layoutY="390.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stego Image" />
+                  <ImageView id="imgViewStego" fx:id="imgViewStego" fitHeight="223.0" fitWidth="300.0" focusTraversable="true" layoutX="503.0" layoutY="399.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: 'firebrick'; -fx-border-color: darkblue;">
+                     <effect>
+                        <DropShadow color="#514f4f" height="22.49" radius="11.114999999999998" width="23.97" />
+                     </effect>
+                  </ImageView>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e3e5e8" height="200.0" layoutX="511.0" layoutY="411.0" stroke="BLACK" strokeType="INSIDE" width="284.0" />
+                  <Button id="btnSaveStegoImg" fx:id="btnSaveStegoImg" layoutX="709.0" layoutY="629.0" mnemonicParsing="false" text="Save" />
+                  <Label layoutX="759.0" layoutY="635.0" text="(.bmp)" />
+                  <Button id="btnNext" fx:id="btnNext" layoutX="872.0" layoutY="733.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Next" />
+                  <Text id="textInfoStegoImg" fx:id="textInfoStegoImg" layoutX="803.0" layoutY="508.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="225.7294921875" />
+                  <Text id="textInfoCoverImg" fx:id="textInfoCoverImg" layoutX="796.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="199.7294921875" />
                </children>
             </AnchorPane>
          </children>
