@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import main.Main;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.ResourceBundle;
  */
 public class EncryptController implements Initializable {
     private Alert alert;
+    private final int MAX_CHAR_PASS = 32;
     @FXML
     Label lblInfoChiper;
     @FXML
@@ -41,6 +43,20 @@ public class EncryptController implements Initializable {
             alert.show();
         } else {
             AESKeyExpansion(itextPass.getText());
+        }
+    }
+
+    @FXML
+    private void handleInputPass(KeyEvent key) {
+        if (itextPass.getText().length() >= MAX_CHAR_PASS) {
+            alert = new Alert(Alert.AlertType.ERROR,
+                    "Maksimal pass 32 Karakter",
+                    ButtonType.OK);
+            alert.setTitle("Informasi Aplikasi");
+            alert.setHeaderText("Password Input");
+            alert.show();
+            itextPass.setText(itextPass.getText().substring(0, MAX_CHAR_PASS));
+            itextPass.positionCaret(MAX_CHAR_PASS);
         }
     }
 

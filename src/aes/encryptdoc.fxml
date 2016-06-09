@@ -15,7 +15,7 @@
             <AnchorPane prefHeight="593.0" prefWidth="736.0" style="-fx-background-color: dimgrey;">
                <children>
                   <Label layoutX="14.0" layoutY="31.0" text="Password : " />
-                  <TextField id="itextPass" fx:id="itextPass" layoutX="14.0" layoutY="55.0" prefHeight="33.0" prefWidth="264.0" />
+                  <TextField id="itextPass" fx:id="itextPass" layoutX="14.0" layoutY="55.0" prefHeight="33.0" prefWidth="264.0" onKeyPressed="#handleInputPass" />
                   <Button id="btnEncrypt" fx:id="btnEncrypt" layoutX="287.0" layoutY="59.0" mnemonicParsing="false" onAction="#handlebtnEncrypt" text="Encrypt" />
                   <Label layoutX="14.0" layoutY="120.0" text="Info :" />
                   <TextArea id="txtareaChiper" fx:id="txtareaChiper" editable="false" layoutX="14.0" layoutY="137.0" prefHeight="362.0" prefWidth="624.0" wrapText="true" />
