@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
@@ -33,6 +36,13 @@
               <MenuItem mnemonicParsing="false" text="Noise Insertion" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="AES256">
+              <items>
+                  <MenuItem fx:id="menuitemEncrypt" mnemonicParsing="false" onAction="#handleShowAESEncrypt" text="Encrypt" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                <MenuItem mnemonicParsing="false" text="Decrypt" />
+              </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="About">
             <items>
               <MenuItem mnemonicParsing="false" text="About App" />
@@ -42,18 +52,24 @@
          <effect>
             <GaussianBlur radius="1.25" />
          </effect>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
       </MenuBar>
-      <Text fill="#d7d1d1" layoutX="197.0" layoutY="100.0" lineSpacing="4.0" stroke="#9a9696" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="319.13671875">
+      <Text fill="#d7d1d1" layoutX="197.0" layoutY="100.0" lineSpacing="4.0" opacity="0.93" stroke="#9a9696" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="319.13671875">
          <font>
             <Font name="System Bold" size="42.0" />
          </font>
+         <effect>
+            <InnerShadow color="#900505" />
+         </effect>
       </Text>
-      <Text layoutX="36.0" layoutY="194.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
+      <Text layoutX="65.0" layoutY="194.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font>
       </Text>
-      <Text layoutX="164.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Berbasis LSB dengan Enkripsi AES">
+      <Text layoutX="193.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Berbasis LSB dengan Enkripsi AES">
          <font>
             <Font size="15.0" />
          </font>

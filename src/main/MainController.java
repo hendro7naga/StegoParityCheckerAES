@@ -61,4 +61,29 @@ public class MainController {
         }
 
     }
+
+    @FXML
+    private void handleShowAESEncrypt(ActionEvent event) {
+        Parent p = null;
+        boolean loadSukses = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("aes/encryptdoc.fxml"));
+        } catch (IOException ex) {
+            loadSukses = false;
+        }
+        finally {
+            if (!loadSukses || p == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Gagal membuka scene encryption fxml",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("File tidak ditemukan");
+                alert.show();
+            } else {
+                Main.mainStage.setTitle("Aplikasi Steganografi: AES256 Encryption");
+                Main.mainStage.setScene(new Scene(p, 738, 595));
+                Main.mainStage.centerOnScreen();
+            }
+        }
+    }
 }
