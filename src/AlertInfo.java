@@ -5,17 +5,9 @@ import javafx.scene.control.ButtonType;
  * Created by hendro.sinaga on 10-Jun-16.
  */
 public class AlertInfo {
-    private static AlertInfo ourInstance = new AlertInfo();
     private static Alert alert;
 
-    public static AlertInfo getInstance() {
-        return ourInstance;
-    }
-
-    private AlertInfo() {
-    }
-
-    public void showAlertInfoMessage(String alertTitle,
+    public static void showAlertInfoMessage(String alertTitle,
                                     String alertHeader,
                                     String alertMessage,
                                     ButtonType buttonType) {
@@ -27,7 +19,7 @@ public class AlertInfo {
         alert.show();
     }
 
-    public void showAlertWarningMessage(String alertTitle,
+    public static void showAlertWarningMessage(String alertTitle,
                                         String alertHeader,
                                         String alertMessage,
                                         ButtonType buttonType) {
@@ -39,7 +31,7 @@ public class AlertInfo {
         alert.show();
     }
 
-    public void showAlertErrorMessage(String alertTitle,
+    public static void showAlertErrorMessage(String alertTitle,
                                         String alertHeader,
                                         String alertMessage,
                                         ButtonType buttonType) {
