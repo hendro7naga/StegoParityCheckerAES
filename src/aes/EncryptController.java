@@ -1,6 +1,5 @@
 package aes;
 
-import com.sun.xml.internal.fastinfoset.util.CharArray;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +13,6 @@ import main.Main;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -23,6 +21,7 @@ import java.util.ResourceBundle;
  */
 public class EncryptController implements Initializable {
     private Alert alert;
+
     private final int MAX_CHAR_PASS = 32;
     @FXML
     Label lblInfoChiper;
@@ -34,6 +33,7 @@ public class EncryptController implements Initializable {
     @FXML
     private void handlebtnEncrypt(ActionEvent event)
     {
+
         if (itextPass.getText().length() < 2) {
             alert = new Alert(Alert.AlertType.WARNING,
                     "Password tidak boleh kosong.\nMinimum 3 karakter",
@@ -44,6 +44,7 @@ public class EncryptController implements Initializable {
         } else {
             AESKeyExpansion(itextPass.getText());
         }
+
     }
 
     @FXML
@@ -58,6 +59,7 @@ public class EncryptController implements Initializable {
             itextPass.setText(itextPass.getText().substring(0, MAX_CHAR_PASS));
             itextPass.positionCaret(MAX_CHAR_PASS);
         }
+
     }
 
     @FXML
