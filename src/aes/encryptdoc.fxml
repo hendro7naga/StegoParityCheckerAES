@@ -18,7 +18,7 @@
                   <TextField id="itextPass" fx:id="itextPass" layoutX="14.0" layoutY="55.0" prefHeight="33.0" prefWidth="264.0" onKeyPressed="#handleInputPass" />
                   <Button id="btnEncrypt" fx:id="btnEncrypt" layoutX="287.0" layoutY="59.0" mnemonicParsing="false" onAction="#handlebtnEncrypt" text="Encrypt" />
                   <Label layoutX="14.0" layoutY="120.0" text="Info :" />
-                  <TextArea id="txtareaChiper" fx:id="txtareaChiper" editable="false" layoutX="14.0" layoutY="137.0" prefHeight="362.0" prefWidth="624.0" wrapText="true" />
+                  <TextArea id="txtareaChiper" fx:id="txtareaChiper" editable="false" layoutX="14.0" layoutY="137.0" prefHeight="362.0" prefWidth="635.0" wrapText="false" />
                   <Button id="btnMainMenu" fx:id="btnMainMenu" layoutX="14.0" layoutY="544.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Main Menu" />
                   <Label id="lblInfoChiper" fx:id="lblInfoChiper" layoutX="14.0" layoutY="506.0" prefHeight="26.0" prefWidth="357.0" style="-fx-border-color: darkslategray; -fx-background-color: ghostwhite; -fx-border-width: 1;" text="Length: " />
                </children>

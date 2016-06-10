@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import kripto.AESH;
 import main.Main;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.ResourceBundle;
  */
 public class EncryptController implements Initializable {
     private Alert alert;
+    AESH aesInstance = AESH.getInstance();
 
     private final int MAX_CHAR_PASS = 32;
     @FXML
@@ -92,15 +94,15 @@ public class EncryptController implements Initializable {
 
     private void AESKeyExpansion(String pass)
     {
-        List<ArrayList<Integer>> listKunci = new ArrayList<>();
+        List<ArrayList<Integer>> listKunci;
         int[][] arrPassInt = new int[8][4];
         int indeks = 0;
-        String teks = "";
+        String teks = "\n";
 
         char[] arrPassChar = pass.toCharArray();
 
         try {
-            for (int x = 0; x < 8; x += 1) {
+            /*for (int x = 0; x < 8; x += 1) {
                 ArrayList<Integer> sub = new ArrayList<>();
                 for (int i = 0; i < 4; i += 1) {
                     if (indeks < arrPassChar.length) {
@@ -111,16 +113,31 @@ public class EncryptController implements Initializable {
                     }
                 }
                 listKunci.add(sub);
+            }*/
+            boolean statusEnkripsi = aesInstance.encrypt(pass);
+            if (statusEnkripsi) {
+                listKunci = (AESH.getListKunci());
+                //int counterIndeks = 0;
+                for (int x = 0; x < listKunci.size(); x += 1) {
+                    teks += x + ") : ";
+                    for (int y = 0; y < listKunci.get(x).size(); y += 1) {
+                        //teks += listKunci.get(x).get(y) + " ";
+                        teks += Integer.toHexString(listKunci.get(x).get(y)) + " ";
+                    }
+                    teks += " \n";
+                }
+            } else {
+                listKunci = new ArrayList<>();
             }
 
-            for (int x = 0; x < listKunci.size(); x += 1) {
+            /*for (int x = 0; x < listKunci.size(); x += 1) {
                 for (int y = 0; y < listKunci.get(x).size(); y += 1) {
-                    teks += "Ascii (" + (char)listKunci.get(x).get(y).intValue() + ") => ";
-                    teks += listKunci.get(x).get(y) + " => " + Integer.toHexString(listKunci.get(x).get(y));
-                    teks += "\t";
+                    teks += ">" + x + ": Ascii (" + (char)listKunci.get(x).get(y).intValue() + ") => ";
+                    teks += listKunci.get(x).get(y) + "  hex => " + Integer.toHexString(listKunci.get(x).get(y));
+                    teks += "      ";
                 }
                 teks += " \n";
-            }
+            }*/
 
             txtareaChiper.setText(teks);
             lblInfoChiper.setText("Panjang Kunci (Pass): " + pass.length() + " Length list: " + listKunci.size());
