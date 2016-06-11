@@ -95,9 +95,11 @@ public class EncryptController implements Initializable {
     private void AESKeyExpansion(String pass)
     {
         List<ArrayList<Integer>> listKunci;
+        List<ArrayList<Integer>> listPesan;
         int[][] arrPassInt = new int[8][4];
         int indeks = 0;
         String teks = "\n";
+        String pesan = "kriptografiaesha";
 
         char[] arrPassChar = pass.toCharArray();
 
@@ -114,9 +116,10 @@ public class EncryptController implements Initializable {
                 }
                 listKunci.add(sub);
             }*/
-            boolean statusEnkripsi = aesInstance.encrypt(pass);
+            boolean statusEnkripsi = aesInstance.encrypt(pesan, pass);
             if (statusEnkripsi) {
                 listKunci = (AESH.getListKunci());
+                listPesan = (AESH.getListPesan());
                 //int counterIndeks = 0;
                 for (int x = 0; x < listKunci.size(); x += 1) {
                     teks += x + ") : ";
@@ -126,6 +129,16 @@ public class EncryptController implements Initializable {
                     }
                     teks += " \n";
                 }
+
+                teks += "\n \n ============== Pesan(Hexa) ===============\n";
+                for (int x = 0; x < listPesan.size(); x += 1) {
+                    teks += x + ") : ";
+                    for (int y = 0; y < listPesan.get(x).size(); y += 1) {
+                        teks += Integer.toHexString(listPesan.get(x).get(y)) + " ";
+                    }
+                    teks += " \n \n";
+                }
+
             } else {
                 listKunci = new ArrayList<>();
             }
@@ -147,7 +160,7 @@ public class EncryptController implements Initializable {
                     "Terjadi exception pada saat konversi string-char-integer",
                     ButtonType.OK);
             alert.setTitle("Informasi Aplikasi");
-            alert.setHeaderText("Proses Konversi Char");
+            alert.setHeaderText("EncryptControll.Java : Proses Konversi Char");
             alert.show();
         }
     }

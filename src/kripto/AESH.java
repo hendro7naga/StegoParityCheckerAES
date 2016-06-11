@@ -60,11 +60,13 @@ public class AESH {
     private static final int N_OF_ROUND = 14;
     private static final int N_OF_WORD = 60;
 
-    private static int iterator;
-    private static boolean statusProses;
-    private static boolean keyHasCreated = false;
+    static int iterator;
+    static int indexOfWord;
+    static boolean statusProses;
+    static boolean keyHasCreated = false;
 
-    private static List<ArrayList<Integer>> listKunci;
+    static List<ArrayList<Integer>> listKunci;
+    static List<ArrayList<Integer>> listPesan;
 
     public static AESH getInstance() {
         return ourInstance;
@@ -72,13 +74,41 @@ public class AESH {
 
     private AESH() {
         listKunci = new ArrayList<>();
+        listPesan = new ArrayList<>();
+        indexOfWord = 0;
     }
 
-    public boolean encrypt(String kunci) {
+    static int getIterator() {
+        return iterator;
+    }
+    static int getIndexOfWord() {
+        return indexOfWord;
+    }
+    static boolean getStatusProses() {
+        return statusProses;
+    }
+    static boolean getKeyHasCreated() {
+        return keyHasCreated;
+    }
+
+    public boolean encrypt(String pesan, String kunci) {
         statusProses = true;
         if (!AESH.keyHasCreated) {
             keyExpansion(kunci);
             AESH.keyHasCreated = true;
+        }
+        indexOfWord = 0;
+
+        if (initPesan(pesan)) {
+            statusProses = true;
+            if (addRoundKey(ourInstance, true)) {
+                subBytePesan();
+                shiftRow();
+            } else {
+                statusProses = false;
+            }
+        } else {
+            statusProses = false;
         }
         return statusProses;
     }
@@ -157,10 +187,90 @@ public class AESH {
         } catch (Exception e) {
             statusProses = false;
             AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
-                    "Kesalahan di KeyExpansion",
-                    "Terjadi kesalahan pada proses keyExpansion",
+                    "Kesalahan di InitKey",
+                    "Terjadi kesalahan pada proses Inisialisasi Key",
                     ButtonType.OK);
         }
+    }
+
+    private boolean initPesan(String pesan) {
+        boolean statusProses = true;
+        char[] arrPesanChar = pesan.toCharArray();
+        int indeks = 0;
+        try {
+            for (int x = 0; x < N_OF_COL; x += 1) {
+                ArrayList<Integer> sub = new ArrayList<>();
+                for (int y = 0; y < N_OF_COL; y += 1) {
+                    if (indeks < arrPesanChar.length) {
+                        sub.add((int)arrPesanChar[indeks]);
+                        indeks += 1;
+                    }
+                    else sub.add(0);
+                }
+                listPesan.add(sub);
+            }
+        } catch (Exception ex) {
+            statusProses = false;
+            AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                    "Kesalahan Inisialisasi Pesan",
+                    "Terjadi kesalahan pada proses Inisialisasi pesan",
+                    ButtonType.OK);
+        }
+        return statusProses;
+    }
+
+    /***
+     * Fungsi addRoundKey digunakan pada proses Encrypt dan Decrypt.\n
+     * Untuk membedakan proses tergantung pada nilai parameter boolean enkripProses.\n
+     * Set nilai enkripProses true untuk proses enkripsi, proses dekrip sebaliknya.
+     * @param obj Object Reference AESH
+     * @param enkripProses Penanda untuk proses encrypt atau decrypt
+     */
+    private boolean addRoundKey(AESH obj, boolean enkripProses) {
+        int wc = indexOfWord - 3;
+        boolean prosesStatus = true;
+        for (int i = 0; i < listPesan.size(); i += 1) {
+            try {
+                ArrayList<Integer> tmpPesan = new ArrayList<>();
+                //ArrayList<Integer> tmpKunci = new ArrayList<>();
+                int[] tmpKunci = new int[N_OF_COL];
+                byte iterasikunci = 0;
+                //pengambilan pesan Wi
+                tmpPesan.addAll(listPesan.get(i));
+                ArrayList<Integer> kunciWi = (enkripProses) ? listKunci.get(indexOfWord) : listKunci.get(wc);
+                for (int n = 0; n < N_OF_COL; n += 1)
+                    tmpKunci[n] = kunciWi.get(n);
+                /*for (Integer num :
+                        (enkripProses) ? listKunci.get(indexOfWord) : listKunci.get(wc)
+                        ) {
+                    tmpKunci[iterasikunci] = num;
+                }*/
+            /*tmpKunci.addAll(
+                    (enkripProses) ? AESH.listKunci.get(AESH.indexOfWord) : AESH.listKunci.get(wc)
+            );*/
+                ArrayList<Integer> retPesan = new ArrayList<>();
+                retPesan.addAll(
+                        exOR(tmpPesan, tmpKunci)
+                );
+                for (int x = 0; x < N_OF_COL; x += 1) {
+                    listPesan.get(i).set(x, retPesan.get(x));
+                }
+                if (enkripProses) {
+                    indexOfWord += 1;
+                } else {
+                    indexOfWord -= 1;
+                    wc += 1;
+                }
+            /*for (Integer num : AESH.listPesan.get(i)) {
+                tmpPesan.add(num);
+            }*/
+            } catch (Exception ex) {
+                prosesStatus = false;
+            }
+            if (!prosesStatus)
+                break;
+        }
+        return prosesStatus;
     }
 
     private ArrayList<Integer> rotateWord(ArrayList<Integer> w) {
@@ -192,6 +302,62 @@ public class AESH {
         }
         return tmp;
     }
+
+    private void subBytePesan() {
+        for (int x = 0; x < N_OF_COL; x += 1) {
+            ArrayList<Integer> tmpW = substitudeWord(listPesan.get(x), SBOX);
+            for (int y = 0; y < N_OF_COL; y += 1) {
+                listPesan.get(x).set(y, tmpW.get(y));
+            }
+        }
+    }
+
+    private void shiftRow() { //masih salah
+        short shift = 1;
+        while (shift < N_OF_COL) {
+            int[] tmp = new int[shift];
+            for (short i = 0; i < shift; i += 1) {
+                tmp[i] = listPesan.get(i).get(shift);
+            }
+            /*
+            for (int i=0; i<shift; i+=1) {
+				for (int j=0; j<3; j+=1) {
+					listData.get(j).set(shift, listData.get(j+1).get(shift));
+				}
+			}
+            * */
+            for (short i = 0; i < shift; i += 1) {
+                for (short col = 0; col < N_OF_COL - 1; col += 1) {
+                    listPesan.get(col).set(shift,
+                                            listPesan.get(col + 1).get(shift));
+                }
+            }
+            for (short i = shift, indeks = N_OF_COL - 1; i > 0; i -= 1) {
+                listPesan.get(indeks).set(shift, tmp[i - 1]);
+                indeks -= 1;
+            }
+            shift += 1;
+        }
+    }
+
+    private static int gfMul(int num1, int num2)
+    {
+        int res = 0;
+        while (num2 > 0)
+        {
+            if ((num2 & 1) == 1)
+            {
+                res ^= num1;
+            }
+            num1 <<= 1;
+            if ((num1 & 1 << 8) == 1 << 8)
+                num1 ^= 0x00011B;
+            num2 >>= 1;
+        }
+        return res;
+    }
+
+    public static List<ArrayList<Integer>> getListPesan() {return listPesan; }
 
     public static List<ArrayList<Integer>> getListKunci() {
         return listKunci;
