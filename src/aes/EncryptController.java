@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import kripto.AESH;
+import kripto.HAES256;
 import main.Main;
 
 import java.io.IOException;
@@ -116,9 +117,11 @@ public class EncryptController implements Initializable {
                 }
                 listKunci.add(sub);
             }*/
-            boolean statusEnkripsi = aesInstance.encrypt(pesan, pass);
+            //boolean statusEnkripsi = aesInstance.encrypt(pesan, pass);
+            boolean statusEnkripsi = HAES256.encrypt(pesan, pass);
             if (statusEnkripsi) {
-                listKunci = (AESH.getListKunci());
+                //pertama
+                /*listKunci = (AESH.getListKunci());
                 listPesan = (AESH.getListPesan());
                 //int counterIndeks = 0;
                 for (int x = 0; x < listKunci.size(); x += 1) {
@@ -138,7 +141,24 @@ public class EncryptController implements Initializable {
                     }
                     teks += " \n \n";
                 }
-
+                */
+                //kedua
+                int[][] arrKunci = HAES256.getArrKunci();
+                teks += "\n Kunci \n";
+                for (int x = 0; x < arrKunci.length; x += 1) {
+                    for (int y = 0; y < arrKunci[x].length; y += 1) {
+                        teks += Integer.toHexString(arrKunci[x][y]) + "    ";
+                    }
+                    teks += "\n";
+                }
+                teks += "\n \n ================Pesan============== \n";
+                int[][] arrPesan = HAES256.getArrPesan();
+                for (int x = 0; x < arrPesan.length; x += 1) {
+                    for (int y = 0; y < arrPesan[x].length; y += 1) {
+                        teks += Integer.toHexString(arrPesan[x][y]) + "   ";
+                    }
+                    teks += "\n";
+                }
             } else {
                 listKunci = new ArrayList<>();
             }
@@ -153,7 +173,7 @@ public class EncryptController implements Initializable {
             }*/
 
             txtareaChiper.setText(teks);
-            lblInfoChiper.setText("Panjang Kunci (Pass): " + pass.length() + " Length list: " + listKunci.size());
+            lblInfoChiper.setText("Panjang Kunci (Pass): " + pass.length() + " Length list: ");
         }
         catch (Exception exceptonc) {
             alert = new Alert(Alert.AlertType.ERROR,
