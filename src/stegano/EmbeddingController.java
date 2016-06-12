@@ -18,6 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import main.Main;
+import main.MainController;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,12 +28,13 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
-
+import kelas.AlertInfo;
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
 public class EmbeddingController implements Initializable {
     Image imagePrev;
+    String imgPath = "";
     Alert alert;
     @FXML
     TextArea textInputMessage;
@@ -53,7 +55,7 @@ public class EmbeddingController implements Initializable {
     @FXML
     Button btnMainMenu;
     @FXML
-    ImageView imgViewCover;
+    ImageView imgViewCover, imgViewStego;
 
     @FXML
     private void handleBrowseFileText(ActionEvent event) {
@@ -120,8 +122,8 @@ public class EmbeddingController implements Initializable {
         File fg = fc.showOpenDialog(null);
         if (fg != null) {
             try {
-                imgFile = fg.toURI().toURL().toString();
-                coverImg = new Image(imgFile);
+                imgPath = fg.toURI().toURL().toString();
+                coverImg = new Image(imgPath);
                 imgViewCover.setImage(coverImg);
                 textInfoCoverImg.setText(
                         "Nama File: " + fg.getName() + "\n"
@@ -180,6 +182,15 @@ public class EmbeddingController implements Initializable {
 
         //imagePrev = new Image(getClass().getResourceAsStream("rnd_br_prev32.png"));
         //btnMainMenu.setGraphic(new ImageView(imagePrev));
+        try {
+            imgViewCover.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+            imgViewStego.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+        } catch (MalformedURLException e) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Kesalahan Akeses File",
+                    "File tidak terdeteksi",
+                    ButtonType.OK);
+        }
 
 
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
