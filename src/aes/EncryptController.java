@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
  * Created by hendro.sinaga on 09-Jun-16.
  */
 public class EncryptController implements Initializable {
+    public static int[] encryptResult;
+    public static String encryptResultInString = "";
     private Alert alert;
     AESH aesInstance = AESH.getInstance();
 
@@ -31,7 +33,7 @@ public class EncryptController implements Initializable {
     @FXML
     TextField itextPass;
     @FXML
-    TextArea txtareaChiper;
+    TextArea txtareaChiper, teksChiper;
 
     @FXML
     private void handlebtnEncrypt(ActionEvent event)
@@ -105,43 +107,8 @@ public class EncryptController implements Initializable {
         char[] arrPassChar = pass.toCharArray();
 
         try {
-            /*for (int x = 0; x < 8; x += 1) {
-                ArrayList<Integer> sub = new ArrayList<>();
-                for (int i = 0; i < 4; i += 1) {
-                    if (indeks < arrPassChar.length) {
-                        sub.add((int)arrPassChar[indeks]);
-                        indeks += 1;
-                    } else {
-                        sub.add(0);
-                    }
-                }
-                listKunci.add(sub);
-            }*/
-            //boolean statusEnkripsi = aesInstance.encrypt(pesan, pass);
             boolean statusEnkripsi = HAES256.encrypt(pesan, pass);
             if (statusEnkripsi) {
-                //pertama
-                /*listKunci = (AESH.getListKunci());
-                listPesan = (AESH.getListPesan());
-                //int counterIndeks = 0;
-                for (int x = 0; x < listKunci.size(); x += 1) {
-                    teks += x + ") : ";
-                    for (int y = 0; y < listKunci.get(x).size(); y += 1) {
-                        //teks += listKunci.get(x).get(y) + " ";
-                        teks += Integer.toHexString(listKunci.get(x).get(y)) + " ";
-                    }
-                    teks += " \n";
-                }
-
-                teks += "\n \n ============== Pesan(Hexa) ===============\n";
-                for (int x = 0; x < listPesan.size(); x += 1) {
-                    teks += x + ") : ";
-                    for (int y = 0; y < listPesan.get(x).size(); y += 1) {
-                        teks += Integer.toHexString(listPesan.get(x).get(y)) + " ";
-                    }
-                    teks += " \n \n";
-                }
-                */
                 //kedua
                 int[][] arrKunci = HAES256.getArrKunci();
                 teks += "\n Kunci \n";
@@ -153,24 +120,62 @@ public class EncryptController implements Initializable {
                 }
                 teks += "\n \n ================Pesan============== \n";
                 int[][] arrPesan = HAES256.getArrPesan();
+                encryptResult = HAES256.getEncryptResult1D();
                 for (int x = 0; x < arrPesan.length; x += 1) {
                     for (int y = 0; y < arrPesan[x].length; y += 1) {
                         teks += Integer.toHexString(arrPesan[x][y]) + "   ";
                     }
                     teks += "\n";
                 }
-            } else {
-                listKunci = new ArrayList<>();
-            }
-
-            /*for (int x = 0; x < listKunci.size(); x += 1) {
-                for (int y = 0; y < listKunci.get(x).size(); y += 1) {
-                    teks += ">" + x + ": Ascii (" + (char)listKunci.get(x).get(y).intValue() + ") => ";
-                    teks += listKunci.get(x).get(y) + "  hex => " + Integer.toHexString(listKunci.get(x).get(y));
-                    teks += "      ";
+                teks += "\n Result in 1 arr: \n";
+                for (int i = 0; i < 4; i += 1) {
+                    //teks += Integer.toHexString(encryptResult[i]);
+                    for (int j = 0; j < 4; j += 1) {
+                        teks += Integer.toHexString(arrPesan[j][i]);
+                    }
                 }
-                teks += " \n";
-            }*/
+                teks += "\n \n Result in char: \n";
+                for (int i = 0; i < 4; i += 1) {
+                    //teks += Integer.toHexString(encryptResult[i]);
+                    for (int j = 0; j < 4; j += 1) {
+                        teks += Character.toString((char)arrPesan[j][i]);
+                        encryptResultInString += Character.toString((char)arrPesan[j][i]);
+                    }
+                }
+                teks += "\n\nResult dalam string: " + encryptResultInString;
+
+                teks += "\n\n Result in int: \n";
+                char[] pesanChiper = encryptResultInString.toCharArray();
+                for (int i = 0; i < pesanChiper.length; i += 1) {
+                    teks += Integer.toHexString((int)pesanChiper[i]) + " ";
+                }
+
+                boolean resdecrypt = HAES256.decrypt(encryptResultInString, pass);
+                if (resdecrypt) {
+                    String tmpChiper = "\nProses Chiper Decrypt: \n";
+                    int[][] arrChipers = HAES256.getArrChiper();
+                    int[] chiper1D = HAES256.getDecryptResult1D();
+                    for (int x = 0; x < arrChipers.length; x += 1) {
+                        for (int y = 0; y < arrChipers[x].length; y += 1) {
+                            tmpChiper += Integer.toHexString(arrChipers[x][y]) + "   ";
+                        }
+                        tmpChiper += "\n";
+                    }
+
+                    tmpChiper += "\nPesan Ori decrypt: ";
+
+                    for (int x = 0; x < arrChipers.length; x += 1) {
+                        for (int y = 0; y < arrChipers[x].length; y += 1) {
+                            tmpChiper += Character.toString((char)arrChipers[y][x]);
+                        }
+                    }
+
+                    teksChiper.setText(tmpChiper);
+                }
+
+            } else {
+
+            }
 
             txtareaChiper.setText(teks);
             lblInfoChiper.setText("Panjang Kunci (Pass): " + pass.length() + " Length list: ");

@@ -60,16 +60,18 @@ public class HAES256 {
 
     static int[][] arrKunci;
     static int[][] arrPesan;
+    static int[][] arrChiper;
 
     public static HAES256 getInstance() {
         return ourInstance;
     }
 
     private HAES256() {
-        indexOfWord = 0;
+        AESH.indexOfWord = 0;
         keyHasCreated = false;
         arrKunci = new int[N_OF_COL][(N_OF_ROUND + 1) * N_OF_COL];
         arrPesan = new int[N_OF_COL][N_OF_COL];
+        arrChiper = new int[N_OF_COL][N_OF_COL];
     }
 
     public static boolean isKeyHasCreated() {
@@ -83,18 +85,40 @@ public class HAES256 {
     public static int[][] getArrPesan() {
         return arrPesan;
     }
+    public static int[][] getArrChiper() { return arrChiper; }
+
+    public static int[] getEncryptResult1D() {
+        int[] tmp = new int[16];
+        int indeks = 0;
+        for (int i = 0; i < N_OF_COL; i += 1) {
+            for (int j = 0; j < N_OF_COL; j += 1) {
+                tmp[indeks] = arrPesan[j][i];
+            }
+        }
+        return tmp;
+    }
+
+    public static int[] getDecryptResult1D() {
+        int[] tmp = new int[16];
+        int indeks = 0;
+        for (int i = 0; i < N_OF_COL; i += 1) {
+            for (int j = 0; j < N_OF_COL; j += 1) {
+                tmp[indeks] = arrChiper[j][i];
+            }
+        }
+        return tmp;
+    }
 
     public static boolean encrypt(String pesan, String kunci) {
         statusProses = true;
         if (!keyHasCreated) {
             boolean result = keyExpansion(kunci);
             if (!result) {
-                //throw new Exception("Error: Kesalahan pada Key Expansion");
                 statusProses = false;
                 throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion");
             }
         }
-        indexOfWord = 0;
+        AESH.indexOfWord = 0;
         if (statusProses) {
             boolean resKonversiPesan = toArray2D(arrPesan, pesan);
             if (resKonversiPesan) {
@@ -114,6 +138,39 @@ public class HAES256 {
             }
         }
         return  statusProses;
+    }
+
+    public static boolean decrypt(String chiper, String kunci) {
+        statusProses = true;
+        AESH.indexOfWord = 0;
+        if (!keyHasCreated) {
+            boolean result = keyExpansion(kunci);
+            if (!result) {
+                statusProses = false;
+                throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion Decrypt");
+            }
+        }
+
+        if (statusProses) {
+            AESH.indexOfWord = 59;
+            boolean resKonversiPesan = toArray2D(arrChiper, chiper);
+            if (resKonversiPesan) {
+                addRoundKeys(arrChiper, arrKunci, false);
+
+                for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
+                    invShiftRow(arrChiper);
+                    subBytePesan(arrChiper, INVERSE_SBOX);
+                    addRoundKeys(arrChiper, arrKunci, false);
+                    invMixColumns(arrChiper);
+                }
+                invShiftRow(arrChiper);
+                subBytePesan(arrChiper, INVERSE_SBOX);
+                addRoundKeys(arrChiper, arrKunci, false);
+            } else {
+                statusProses = false;
+            }
+        }
+        return statusProses;
     }
 
     private static boolean keyExpansion(String kunci) {
@@ -208,6 +265,32 @@ public class HAES256 {
         }
     }
 
+    private static void invShiftRow(int[][] state)
+    {
+        short shift = 1;
+        int[] tmp;
+        while (shift < 4)
+        {
+            tmp = new int[shift];
+            for (short i = 0, indeks = 3; i < shift; i += 1)
+            {
+                tmp[i] = state[shift][indeks];
+                indeks -= 1;
+            }
+            for (short i = 0; i < shift; i += 1)
+            {
+                for (short col = 3; col > 0; col -= 1)
+                    state[shift][col] = state[shift][col - 1];
+            }
+            for (short i = 0, col = shift; i < shift; i += 1)
+            {
+                state[shift][i] = tmp[col - 1];
+                col -= 1;
+            }
+            shift += 1;
+        }
+    }
+
     /*private static void mixColumns(int[][] s) {
         // 's' is the main State matrix, 'ss' is a temp matrix of the same dimensions as 's'.
         int[][] ss = new int[4][4];
@@ -227,6 +310,29 @@ public class HAES256 {
     {
         int[] temp = new int[4];
         int[][] mc = { { 2, 3, 1, 1 }, { 1, 2, 3, 1 }, { 1, 1, 2, 3 }, { 3, 1, 1, 2 } };
+        for (int col = 0; col < 4; col++)
+        {
+            int res;
+            for (int i = 0; i < 4; i++)
+            {
+                res = 0;
+                for (int j = 0; j < 4; j++)
+                {
+                    res ^= GF_8(mc[i][j], arr[j][col]);
+                }
+                temp[i] = res;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                arr[i][col] = temp[i];
+            }
+        }
+    }
+
+    private static void invMixColumns(int[][] arr)
+    {
+        int[] temp = new int[4];
+        int[][] mc = { { 14, 11, 13, 9 }, { 9, 14, 11, 13 }, { 13, 9, 14, 11 }, { 11, 13, 9, 14 } };
         for (int col = 0; col < 4; col++)
         {
             int res;
