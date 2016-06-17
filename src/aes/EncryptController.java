@@ -17,13 +17,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
+import kelas.KonversiData;
 /**
  * Created by hendro.sinaga on 09-Jun-16.
  */
 public class EncryptController implements Initializable {
     public static int[] encryptResult;
     public static String encryptResultInString = "";
+    public static  int arrPesan[], arrKeys[];
     private Alert alert;
     AESH aesInstance = AESH.getInstance();
 
@@ -107,7 +108,11 @@ public class EncryptController implements Initializable {
         char[] arrPassChar = pass.toCharArray();
 
         try {
+            //pertama
+            /*EncryptController.arrPesan = KonversiData.stringToIntArr1D(pesan);
+            EncryptController.arrKeys = KonversiData.stringToIntArr1D(pass);
             boolean statusEnkripsi = HAES256.encrypt(pesan, pass);
+            //boolean statusEnkripsi = HAES256.encrypt(arrPesan, arrKeys);
             if (statusEnkripsi) {
                 //kedua
                 int[][] arrKunci = HAES256.getArrKunci();
@@ -119,11 +124,11 @@ public class EncryptController implements Initializable {
                     teks += "\n";
                 }
                 teks += "\n \n ================Pesan============== \n";
-                int[][] arrPesan = HAES256.getArrPesan();
-                encryptResult = HAES256.getEncryptResult1D();
-                for (int x = 0; x < arrPesan.length; x += 1) {
-                    for (int y = 0; y < arrPesan[x].length; y += 1) {
-                        teks += Integer.toHexString(arrPesan[x][y]) + "   ";
+                int[][] arrPesanHasil = HAES256.getArrPesan();
+                //encryptResult = HAES256.getEncryptResult1D();
+                for (int x = 0; x < arrPesanHasil.length; x += 1) {
+                    for (int y = 0; y < arrPesanHasil[x].length; y += 1) {
+                        teks += Integer.toHexString(arrPesanHasil[x][y]) + "   ";
                     }
                     teks += "\n";
                 }
@@ -131,15 +136,15 @@ public class EncryptController implements Initializable {
                 for (int i = 0; i < 4; i += 1) {
                     //teks += Integer.toHexString(encryptResult[i]);
                     for (int j = 0; j < 4; j += 1) {
-                        teks += Integer.toHexString(arrPesan[j][i]);
+                        teks += Integer.toHexString(arrPesanHasil[j][i]);
                     }
                 }
                 teks += "\n \n Result in char: \n";
                 for (int i = 0; i < 4; i += 1) {
                     //teks += Integer.toHexString(encryptResult[i]);
                     for (int j = 0; j < 4; j += 1) {
-                        teks += Character.toString((char)arrPesan[j][i]);
-                        encryptResultInString += Character.toString((char)arrPesan[j][i]);
+                        teks += Character.toString((char)arrPesanHasil[j][i]);
+                        encryptResultInString += Character.toString((char)arrPesanHasil[j][i]);
                     }
                 }
                 teks += "\n\nResult dalam string: " + encryptResultInString;
@@ -175,6 +180,52 @@ public class EncryptController implements Initializable {
 
             } else {
 
+            }*/
+            //kedua
+            EncryptController.arrPesan = KonversiData.stringToIntArr1D(pesan);
+            EncryptController.arrKeys = KonversiData.stringToIntArr1D(pass);
+            teks += "Pesan Asli : \n";
+            for (int i = 0; i < arrPesan.length; i += 1) {
+                teks += "" + Integer.toHexString(arrPesan[i]) + " ";
+            }
+            if (HAES256.encryptDataInteger(EncryptController.arrPesan, EncryptController.arrKeys)) {
+                int[][] arrKunciRes = HAES256.getArrKunci();
+                teks += "\n Kunci \n";
+                for (int x = 0; x < arrKunciRes.length; x += 1) {
+                    for (int y = 0; y < arrKunciRes[x].length; y += 1) {
+                        teks += Integer.toHexString(arrKunciRes[x][y]) + "    ";
+                    }
+                    teks += "\n";
+                }
+                int[][] arrHasilEnkrip = HAES256.getArrPesan();
+                teks += "\n\nPesan: \n";
+                for (int x = 0; x < arrHasilEnkrip.length; x += 1) {
+                    for (int y = 0; y < arrHasilEnkrip[x].length; y += 1) {
+                        teks += Integer.toHexString(arrHasilEnkrip[x][y]) + "    ";
+                    }
+                    teks += "\n";
+                }
+                int[] hasilEnkrip1D = KonversiData.arr2DToIntArr1D(HAES256.getArrPesan());
+                teks += "\n\nPesan 1 Dimensi: \n";
+                for (int i = 0; i < hasilEnkrip1D.length; i += 1) {
+                    teks += Integer.toHexString(hasilEnkrip1D[i]) + "  ";
+                }
+                HAES256.ReInitProps();
+                boolean dekripStatus = HAES256.decryptDataInteger(hasilEnkrip1D, EncryptController.arrKeys);
+
+                if (dekripStatus) {
+                    String teksDekrip = "Dekrip:\n";
+                    int[] hasilDekrip1D = KonversiData.arr2DToIntArr1D(HAES256.getArrChiper());
+                    for (int i = 0; i < hasilDekrip1D.length; i += 1) {
+                        teksDekrip += Character.toString((char)hasilDekrip1D[i]);
+                    }
+                    teksChiper.setText(teksDekrip);
+                } else {
+                    teksChiper.setText("Dekripsi Gagal...");
+                }
+
+            } else {
+                teks += "Enkripsi Gagal....";
             }
 
             txtareaChiper.setText(teks);
