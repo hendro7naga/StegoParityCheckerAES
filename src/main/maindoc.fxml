@@ -43,6 +43,11 @@
                 <MenuItem mnemonicParsing="false" text="Decrypt" />
               </items>
             </Menu>
+            <Menu mnemonicParsing="false" text="KriptoAES256">
+              <items>
+                <MenuItem fx:id="menuitemEncryptDecrypt" mnemonicParsing="false" text="Encrypt / Decrypt" onAction="#handleShowKriptoEncryptDecrypt" />
+              </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="About">
             <items>
               <MenuItem mnemonicParsing="false" text="About App" />

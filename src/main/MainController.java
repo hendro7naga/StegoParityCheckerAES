@@ -94,6 +94,31 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleShowKriptoEncryptDecrypt(ActionEvent event) {
+        Parent p = null;
+        boolean loadSukses = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("aes/kriptodoc.fxml"));
+        } catch (IOException ex) {
+            loadSukses = false;
+        }
+        finally {
+            if (!loadSukses || p == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Gagal membuka scene kriptodoc fxml",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("File tidak ditemukan");
+                alert.show();
+            } else {
+                Main.mainStage.setTitle("Aplikasi Steganografi: KriptoAES256 Encrypt-Decrypt");
+                Main.mainStage.setScene(new Scene(p, 1150, 669));
+                Main.mainStage.centerOnScreen();
+            }
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         String info = "";

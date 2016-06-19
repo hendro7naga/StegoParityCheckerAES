@@ -1,5 +1,7 @@
 package kelas;
 
+import java.util.ArrayList;
+
 /**
  * Created by hendro.sinaga on 17-Jun-16.
  */
@@ -23,6 +25,14 @@ public class KonversiData {
                 indeks += 1;
             }
             //teks += "\n";
+        }
+        return tmp;
+    }
+
+    public static int[] arraylist1DToArr1D(ArrayList<Integer> source) {
+        int[] tmp = new int[source.size()];
+        for (int i = 0; i < source.size(); i += 1) {
+            tmp[i] = source.get(i);
         }
         return tmp;
     }

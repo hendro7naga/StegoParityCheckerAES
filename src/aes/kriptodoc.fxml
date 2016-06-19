@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="669.0" prefWidth="1154.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aes.KriptoController">
+   <content>
+      <VBox prefHeight="667.0" prefWidth="1152.0">
+         <children>
+            <AnchorPane prefHeight="668.0" prefWidth="773.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="26.0" prefHeight="17.0" prefWidth="137.0" text="Teks Pesan:" />
+                  <TextArea fx:id="txtareaPesan" layoutX="14.0" layoutY="43.0" prefHeight="200.0" prefWidth="510.0" wrapText="true" />
+                  <Label layoutX="14.0" layoutY="263.0" text="Kunci:" />
+                  <TextField fx:id="txtInputKunci" layoutX="14.0" layoutY="280.0" prefHeight="31.0" prefWidth="362.0" />
+                  <Button fx:id="btnEncrypt" layoutX="468.0" layoutY="280.0" mnemonicParsing="false" onAction="#handleBtnEncrypt" text="Encrypt" />
+                  <Label layoutX="14.0" layoutY="317.0" text="Teks Chiper:" />
+                  <TextArea fx:id="txtareaChiper" layoutX="14.0" layoutY="334.0" editable="false" prefHeight="200.0" prefWidth="510.0" wrapText="true" />
+                  <Button fx:id="btnBackToMainMenu" layoutX="14.0" layoutY="622.0" mnemonicParsing="false" onAction="#handleBtnMainMenu" text="Menu Utama" />
+                  <TextField fx:id="txtInputKunciDecrypt" layoutX="546.0" layoutY="43.0" prefHeight="33.0" prefWidth="311.0" />
+                  <Label layoutX="546.0" layoutY="26.0" prefHeight="17.0" prefWidth="151.0" text="Kunci:" />
+                  <Button fx:id="btnDecrypt" layoutX="869.0" layoutY="47.0" mnemonicParsing="false" onAction="#handleBtnDecrypt" text="Decrypt" />
+                  <TextArea fx:id="txtareaHasilDecrypt" editable="false" layoutX="546.0" layoutY="96.0" prefHeight="249.0" prefWidth="544.0" />
+               </children>
+            </AnchorPane>
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>
