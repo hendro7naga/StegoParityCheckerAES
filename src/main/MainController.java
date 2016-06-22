@@ -124,7 +124,7 @@ public class MainController implements Initializable {
         Parent p = null;
         boolean loadSukses = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("ujigambardoc.fxml"));
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("main/ujigambardoc.fxml"));
         } catch (IOException ex) {
             loadSukses = false;
         }
