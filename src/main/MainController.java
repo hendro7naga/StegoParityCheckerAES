@@ -119,6 +119,31 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
+    public void handleShowViewImage(ActionEvent event) {
+        Parent p = null;
+        boolean loadSukses = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("ujigambardoc.fxml"));
+        } catch (IOException ex) {
+            loadSukses = false;
+        }
+        finally {
+            if (!loadSukses || p == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Gagal membuka scene ujigambardoc fxml",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("File tidak ditemukan");
+                alert.show();
+            } else {
+                Main.mainStage.setTitle("Aplikasi Steganografi: UjiGambar");
+                Main.mainStage.setScene(new Scene(p, 795, 615));
+                Main.mainStage.centerOnScreen();
+            }
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         String info = "";

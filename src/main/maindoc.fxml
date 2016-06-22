@@ -45,7 +45,12 @@
             </Menu>
             <Menu mnemonicParsing="false" text="KriptoAES256">
               <items>
-                <MenuItem fx:id="menuitemEncryptDecrypt" mnemonicParsing="false" text="Encrypt / Decrypt" onAction="#handleShowKriptoEncryptDecrypt" />
+                <MenuItem fx:id="menuitemEncryptDecrypt" mnemonicParsing="false" onAction="#handleShowKriptoEncryptDecrypt" text="Encrypt / Decrypt" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Test Image">
+              <items>
+                <MenuItem id="menuitemViewImage" fx:id="menuitemViewImage" onAction="#handleShowViewImage" mnemonicParsing="false" text="View" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="About">
