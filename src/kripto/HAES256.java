@@ -53,88 +53,89 @@ public class HAES256 {
     private static final int N_OF_ROUND = 14;
     private static final int N_OF_WORD = 60;
 
-    static int iterator;
-    static int indexOfWord;
-    static boolean statusProses;
-    static boolean keyHasCreated = false;
+    int iterator;
+    int indexOfWord;
+    boolean statusProses;
+    boolean keyHasCreated = false;
 
-    static int[][] arrKunci;
-    static int[][] arrPesan;
-    static int[][] arrChiper;
+    int[][] arrKunci;
+    int[][] arrPesan;
+    int[][] arrChiper;
 
     public static HAES256 getInstance() {
         return ourInstance;
     }
 
     private HAES256() {
-        AESH.indexOfWord = 0;
-        keyHasCreated = false;
-        arrKunci = new int[N_OF_COL][(N_OF_ROUND + 1) * N_OF_COL];
-        arrPesan = new int[N_OF_COL][N_OF_COL];
-        arrChiper = new int[N_OF_COL][N_OF_COL];
+        this.indexOfWord = 0;
+        this.keyHasCreated = false;
+        this.iterator = 0;
+        this.arrKunci = new int[N_OF_COL][(N_OF_ROUND + 1) * N_OF_COL];
+        this.arrPesan = new int[N_OF_COL][N_OF_COL];
+        this.arrChiper = new int[N_OF_COL][N_OF_COL];
     }
 
-    public static void ReInitProps() {
-        AESH.indexOfWord = 0;
-        keyHasCreated = false;
-        arrKunci = new int[N_OF_COL][(N_OF_ROUND + 1) * N_OF_COL];
-        arrPesan = new int[N_OF_COL][N_OF_COL];
-        arrChiper = new int[N_OF_COL][N_OF_COL];
+    public void ReInitProps() {
+        this.indexOfWord = 0;
+        this.keyHasCreated = false;
+        this.arrKunci = new int[N_OF_COL][(N_OF_ROUND + 1) * N_OF_COL];
+        this.arrPesan = new int[N_OF_COL][N_OF_COL];
+        this.arrChiper = new int[N_OF_COL][N_OF_COL];
     }
 
-    public static boolean isKeyHasCreated() {
-        return keyHasCreated;
+    public boolean isKeyHasCreated() {
+        return this.keyHasCreated;
     }
 
-    public static int[][] getArrKunci() {
-        return arrKunci;
+    public int[][] getArrKunci() {
+        return this.arrKunci;
     }
 
-    public static int[][] getArrPesan() {
+    public int[][] getArrPesan() {
         return arrPesan;
     }
-    public static int[][] getArrChiper() { return arrChiper; }
+    public int[][] getArrChiper() { return arrChiper; }
 
-    public static int[] getEncryptResult1D() {
+    public int[] getEncryptResult1D() {
         int[] tmp = new int[16];
         int indeks = 0;
         for (int i = 0; i < N_OF_COL; i += 1) {
             for (int j = 0; j < N_OF_COL; j += 1) {
-                tmp[indeks] = arrPesan[j][i];
+                tmp[indeks] = this.arrPesan[j][i];
             }
         }
         return tmp;
     }
 
-    public static int[] getDecryptResult1D() {
+    public int[] getDecryptResult1D() {
         int[] tmp = new int[16];
         int indeks = 0;
         for (int i = 0; i < N_OF_COL; i += 1) {
             for (int j = 0; j < N_OF_COL; j += 1) {
-                tmp[indeks] = arrChiper[j][i];
+                tmp[indeks] = this.arrChiper[j][i];
             }
         }
         return tmp;
     }
 
-    public static boolean encrypt(String pesan, String kunci) {
-        statusProses = true;
-        if (!keyHasCreated) {
-            boolean result = keyExpansion(kunci);
+    public boolean encrypt(String pesan, String kunci) {
+        this.statusProses = true;
+        if (!this.keyHasCreated) {
+            boolean result = this.keyExpansion(kunci);
             if (!result) {
                 statusProses = false;
                 throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion");
             }
         }
-        AESH.indexOfWord = 0;
+        this.indexOfWord = 0;
         if (statusProses) {
-            boolean resKonversiPesan = toArray2D(arrPesan, pesan);
+            boolean resKonversiPesan = toArray2D(this.arrPesan, pesan);
             if (resKonversiPesan) {
-                addRoundKeys(arrPesan, arrKunci, true);
+                addRoundKeys(this.arrPesan, this.arrKunci, true);
                 for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
-                    subBytePesan(arrPesan, SBOX);
-                    shiftRow(arrPesan);
-                    mixColumns(arrPesan);
+                    subBytePesan(this.arrPesan, SBOX);
+                    shiftRow(this.arrPesan);
+                    mixColumns(this.arrPesan);
                     addRoundKeys(arrPesan, arrKunci, true);
                 }
                 subBytePesan(arrPesan, SBOX);
@@ -148,108 +149,108 @@ public class HAES256 {
         return  statusProses;
     }
 
-    public static boolean encryptDataInteger(int[] pesan, int[] kunci) {
-        statusProses = true;
-        if (!keyHasCreated) {
+    public boolean encryptDataInteger(int[] pesan, int[] kunci) {
+        this.statusProses = true;
+        if (!this.keyHasCreated) {
             //boolean result = keyExpansion(kunci);
             if (!keyExpansion(kunci)) {
-                statusProses = false;
+                this.statusProses = false;
                 throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion");
             }
         }
-        AESH.indexOfWord = 0;
-        if (statusProses) {
-            boolean resKonversiPesan = toArray2D(arrPesan, pesan);
+        this.indexOfWord = 0;
+        if (this.statusProses) {
+            boolean resKonversiPesan = toArray2D(this.arrPesan, pesan);
             if (resKonversiPesan) {
-                addRoundKeys(arrPesan, arrKunci, true);
+                addRoundKeys(this.arrPesan, this.arrKunci, true);
                 for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
-                    subBytePesan(arrPesan, SBOX);
-                    shiftRow(arrPesan);
-                    mixColumns(arrPesan);
-                    addRoundKeys(arrPesan, arrKunci, true);
+                    subBytePesan(this.arrPesan, SBOX);
+                    shiftRow(this.arrPesan);
+                    mixColumns(this.arrPesan);
+                    addRoundKeys(this.arrPesan, this.arrKunci, true);
                 }
-                subBytePesan(arrPesan, SBOX);
-                shiftRow(arrPesan);
-                addRoundKeys(arrPesan, arrKunci, true);
+                subBytePesan(this.arrPesan, SBOX);
+                shiftRow(this.arrPesan);
+                addRoundKeys(this.arrPesan, this.arrKunci, true);
 
             } else {
-                statusProses = false;
+                this.statusProses = false;
             }
         }
-        return statusProses;
+        return this.statusProses;
     }
 
-    public static boolean decrypt(String chiper, String kunci) {
-        statusProses = true;
-        AESH.indexOfWord = 0;
-        if (!keyHasCreated) {
+    public boolean decrypt(String chiper, String kunci) {
+        this.statusProses = true;
+        this.indexOfWord = 0;
+        if (!this.keyHasCreated) {
             boolean result = keyExpansion(kunci);
             if (!result) {
-                statusProses = false;
+                this.statusProses = false;
                 throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion Decrypt");
             }
         }
 
-        if (statusProses) {
-            AESH.indexOfWord = 59;
-            boolean resKonversiPesan = toArray2D(arrChiper, chiper);
+        if (this.statusProses) {
+            this.indexOfWord = 59;
+            boolean resKonversiPesan = toArray2D(this.arrChiper, chiper);
             if (resKonversiPesan) {
-                addRoundKeys(arrChiper, arrKunci, false);
+                addRoundKeys(this.arrChiper, this.arrKunci, false);
 
                 for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
-                    invShiftRow(arrChiper);
-                    subBytePesan(arrChiper, INVERSE_SBOX);
-                    addRoundKeys(arrChiper, arrKunci, false);
-                    invMixColumns(arrChiper);
+                    invShiftRow(this.arrChiper);
+                    subBytePesan(this.arrChiper, INVERSE_SBOX);
+                    addRoundKeys(this.arrChiper, this.arrKunci, false);
+                    invMixColumns(this.arrChiper);
                 }
-                invShiftRow(arrChiper);
-                subBytePesan(arrChiper, INVERSE_SBOX);
-                addRoundKeys(arrChiper, arrKunci, false);
+                invShiftRow(this.arrChiper);
+                subBytePesan(this.arrChiper, INVERSE_SBOX);
+                addRoundKeys(this.arrChiper, this.arrKunci, false);
             } else {
-                statusProses = false;
+                this.statusProses = false;
             }
         }
-        return statusProses;
+        return this.statusProses;
     }
 
-    public static boolean decryptDataInteger(int[] chiper, int[] kunci) {
-        statusProses = true;
+    public boolean decryptDataInteger(int[] chiper, int[] kunci) {
+        this.statusProses = true;
         AESH.indexOfWord = 0;
-        if (!keyHasCreated) {
+        if (!this.keyHasCreated) {
             //boolean result = keyExpansion(kunci);
             if (!keyExpansion(kunci)) {
-                statusProses = false;
+                this.statusProses = false;
                 throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion Decrypt");
             }
         }
 
         if (statusProses) {
-            AESH.indexOfWord = 59;
-            boolean resKonversiPesan = toArray2D(arrChiper, chiper);
+            this.indexOfWord = 59;
+            boolean resKonversiPesan = toArray2D(this.arrChiper, chiper);
             if (resKonversiPesan) {
-                addRoundKeys(arrChiper, arrKunci, false);
+                addRoundKeys(this.arrChiper, this.arrKunci, false);
 
-                for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
-                    invShiftRow(arrChiper);
-                    subBytePesan(arrChiper, INVERSE_SBOX);
-                    addRoundKeys(arrChiper, arrKunci, false);
-                    invMixColumns(arrChiper);
+                for (byte ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
+                    invShiftRow(this.arrChiper);
+                    subBytePesan(this.arrChiper, INVERSE_SBOX);
+                    addRoundKeys(this.arrChiper, this.arrKunci, false);
+                    invMixColumns(this.arrChiper);
                 }
-                invShiftRow(arrChiper);
-                subBytePesan(arrChiper, INVERSE_SBOX);
-                addRoundKeys(arrChiper, arrKunci, false);
+                invShiftRow(this.arrChiper);
+                subBytePesan(this.arrChiper, INVERSE_SBOX);
+                addRoundKeys(this.arrChiper, this.arrKunci, false);
             } else {
-                statusProses = false;
+                this.statusProses = false;
             }
         }
-        return statusProses;
+        return this.statusProses;
     }
 
-    private static boolean keyExpansion(String kunci) {
+    private boolean keyExpansion(String kunci) {
         boolean proses = true;
-        if (toArray2D(arrKunci, kunci)) {
+        if (toArray2D(this.arrKunci, kunci)) {
             //proses mendapatkan w8 - w59
-            iterator = N_OF_KEY; //untuk iterasi w8 - w59
+            this.iterator = N_OF_KEY; //untuk iterasi w8 - w59
             while (iterator < N_OF_COL * (N_OF_ROUND + 1)) {
                 int[] temp = getWord(arrKunci, iterator - 1);
                 if (iterator % N_OF_KEY == 0) //jika habis dibagi 8
@@ -273,52 +274,52 @@ public class HAES256 {
         return  proses;
     }
 
-    private static boolean keyExpansion(int[] kunci) {
+    private boolean keyExpansion(int[] kunci) {
         boolean proses = true;
-        if (toArray2D(arrKunci, kunci)) {
+        if (toArray2D(this.arrKunci, kunci)) {
             //proses mendapatkan w8 - w59
-            iterator = N_OF_KEY; //untuk iterasi w8 - w59
-            while (iterator < N_OF_COL * (N_OF_ROUND + 1)) {
-                int[] temp = getWord(arrKunci, iterator - 1);
-                if (iterator % N_OF_KEY == 0) //jika habis dibagi 8
+            this.iterator = N_OF_KEY; //untuk iterasi w8 - w59
+            while (this.iterator < N_OF_COL * (N_OF_ROUND + 1)) {
+                int[] temp = getWord(this.arrKunci, this.iterator - 1);
+                if (this.iterator % N_OF_KEY == 0) //jika habis dibagi 8
                 {
                     temp = substitudeWord(rotateWord(temp), SBOX);
                     temp = XOR(temp, new int[] {RCON[iterator / N_OF_KEY], 0x00, 0x00, 0x00});
                 }
-                else if (iterator % N_OF_KEY == 4) //jika habis dibagi 4
+                else if (this.iterator % N_OF_KEY == 4) //jika habis dibagi 4
                 {
                     temp = substitudeWord(temp, SBOX);
                 }
-                temp = XOR(getWord(arrKunci, iterator - N_OF_KEY), temp);
+                temp = XOR(getWord(this.arrKunci, this.iterator - N_OF_KEY), temp);
                 for (short i = 0; i < 4; i += 1)
-                    arrKunci[i][iterator] = temp[i];
-                iterator += 1;
+                    this.arrKunci[i][this.iterator] = temp[i];
+                this.iterator += 1;
             } //end while
-            keyHasCreated = true;
+            this.keyHasCreated = true;
         } else {
             proses = false;
         }
         return  proses;
     }
 
-    private static void addRoundKeys(int[][] state, int[][] keys, boolean encryptProcess) // proses round enkrip dekrip
+    private void addRoundKeys(int[][] state, int[][] keys, boolean encryptProcess) // proses round enkrip dekrip
     {
         int[] tmpState;
         int[] tmpKeys;
-        int wc = AESH.indexOfWord - 3;
+        int wc = this.indexOfWord - 3;
         for (short i = 0; i < state.length; i += 1)
         {
             tmpState = getWord(state, i);
-            tmpKeys  = encryptProcess ? getWord(keys, AESH.indexOfWord) : getWord(keys, wc); //ubah
+            tmpKeys  = encryptProcess ? getWord(keys, this.indexOfWord) : getWord(keys, wc); //ubah
             tmpState = XOR(tmpState, tmpKeys);
 
             for (short j = 0; j < state[0].length; j += 1)
                 state[j][i] = tmpState[j];
             if (encryptProcess)
-                AESH.indexOfWord += 1;
+                this.indexOfWord += 1;
             else
             {
-                AESH.indexOfWord -= 1;
+                this.indexOfWord -= 1;
                 wc += 1;
             }
         }
@@ -329,7 +330,7 @@ public class HAES256 {
      * @param state merupakan array dua dimensi dari pesan
      * @param sb merupakan array dua dimensi dari SBOX
      */
-    private static void subBytePesan(int[][] state, int[][] sb)
+    private void subBytePesan(int[][] state, int[][] sb)
     {
         int[] tmp;
         for (int i = 0; i < state[0].length; i += 1) //ketentuan panjang kolom
@@ -342,7 +343,7 @@ public class HAES256 {
         }
     }
 
-    private static void shiftRow(int[][] state) //fungsi untuk shift row
+    private void shiftRow(int[][] state) //fungsi untuk shift row
     {
         short shift = 1;
         int[] tmp;
@@ -365,7 +366,7 @@ public class HAES256 {
         }
     }
 
-    private static void invShiftRow(int[][] state)
+    private void invShiftRow(int[][] state)
     {
         short shift = 1;
         int[] tmp;
@@ -406,7 +407,7 @@ public class HAES256 {
         System.arraycopy(ss, 0, s, 0, ss.length);
     }*/
 
-    private static void mixColumns(int[][] arr)
+    private void mixColumns(int[][] arr)
     {
         int[] temp = new int[4];
         int[][] mc = { { 2, 3, 1, 1 }, { 1, 2, 3, 1 }, { 1, 1, 2, 3 }, { 3, 1, 1, 2 } };
@@ -429,7 +430,7 @@ public class HAES256 {
         }
     }
 
-    private static void invMixColumns(int[][] arr)
+    private void invMixColumns(int[][] arr)
     {
         int[] temp = new int[4];
         int[][] mc = { { 14, 11, 13, 9 }, { 9, 14, 11, 13 }, { 13, 9, 14, 11 }, { 11, 13, 9, 14 } };
@@ -452,7 +453,7 @@ public class HAES256 {
         }
     }
 
-    public static int GF_8(int number1, int number2)
+    public int GF_8(int number1, int number2)
     {
         int res = 0;
         while (number2 >= 1)
@@ -470,7 +471,7 @@ public class HAES256 {
         return res;
     }
 
-    private static Integer GMul(int a, int b) { // Galois Field (256) Multiplication of two Bytes
+    private Integer GMul(int a, int b) { // Galois Field (256) Multiplication of two Bytes
         Integer p = 0;
         Integer counter;
         Integer hi_bit_set;
@@ -488,7 +489,7 @@ public class HAES256 {
         return p;
     }
 
-    private static int[] getWord(int[][] w, int indeks)
+    private int[] getWord(int[][] w, int indeks)
     {
         int[] tmp = new int[4];
         for (short i = 0; i < 4; i += 1)
@@ -498,7 +499,7 @@ public class HAES256 {
         return tmp;
     }
 
-    private static int[] substitudeWord(int[] words, int[][] sb)
+    private int[] substitudeWord(int[] words, int[][] sb)
     {
         int[] tmp = new int[N_OF_COL];
 
@@ -511,7 +512,7 @@ public class HAES256 {
         return tmp;
     }
 
-    private static int[] rotateWord(int[] w)
+    private int[] rotateWord(int[] w)
     {
         int[] tmp = w;
         int first = w[0];
@@ -522,7 +523,7 @@ public class HAES256 {
         return tmp;
     }
 
-    private static int[] XOR(int[] words, int[] anothers)
+    private int[] XOR(int[] words, int[] anothers)
     {
         int[] tmp = new int[N_OF_COL];
         for (int i = 0; i < N_OF_COL; i += 1)
@@ -532,7 +533,7 @@ public class HAES256 {
         return tmp;
     }
 
-    private static boolean toArray2D(int[][] target, String source) //fungsi untuk mengubah array 1 dimensi ke 2 dimensi
+    private boolean toArray2D(int[][] target, String source) //fungsi untuk mengubah array 1 dimensi ke 2 dimensi
     {
         char[] arrSource = source.toCharArray();
         int indeks = 0;
@@ -559,7 +560,7 @@ public class HAES256 {
         return status;
     }
 
-    private static boolean toArray2D(int[][] target, int[] source) {
+    private boolean toArray2D(int[][] target, int[] source) {
         int[] arrSource = source;
         int indeks = 0;
         boolean status = true;

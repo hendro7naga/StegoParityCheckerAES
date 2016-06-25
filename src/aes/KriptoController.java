@@ -91,18 +91,21 @@ public class KriptoController {
             }
 
             dataEncrypt = new ArrayList<>();
-            HAES256.ReInitProps();
+            HAES256 haes256 = HAES256.getInstance();
+
+            //HAES256.ReInitProps();
+            haes256.ReInitProps();
             for (int i = 0; i < dataPesan.size(); i += 1) {
                 ArrayList<Integer> subData = new ArrayList<>();
                 try {
-                    if (HAES256.encryptDataInteger(
+                    if (haes256.encryptDataInteger(
                             KonversiData.arraylist1DToArr1D(dataPesan.get(i)),
                             kunciEncrypt
                             )) {
                         /*subData.addAll(
                                 subData.addAll(KonversiData.arr2DToIntArr1D(HAES256.getArrPesan()))
                         );*/
-                        for (Integer val : KonversiData.arr2DToIntArr1D(HAES256.getArrPesan())) {
+                        for (Integer val : KonversiData.arr2DToIntArr1D(haes256.getArrPesan())) {
                             subData.add(val);
                         }
                         dataEncrypt.add(subData);
@@ -132,25 +135,6 @@ public class KriptoController {
                 txtareaChiper.setText(hasilEnkrip);
             }
 
-            /*String isiTeksChiper = "";
-            isiTeksChiper += "Panjang Teks Asli : " + panjangTeks + "\n";
-            isiTeksChiper += "Size DataPesan : " + dataPesan.size() + "\n";
-            isiTeksChiper += "Panjang DataPesan keseluruhan: " + len + "\n";
-
-            String dataKonversi = "";
-            for (ArrayList<Integer> data: dataPesan) {
-                for (int i = 0; i < data.size(); i += 1) {
-                    dataKonversi += Character.toString((char)data.get(i).intValue());
-                }
-            }
-
-            isiTeksChiper += "\n\nIsi Pesan dari integer ke string: \n";
-            isiTeksChiper += dataKonversi;*/
-
-            //
-
-            //txtareaChiper.setText(isiTeksChiper);
-
         }
     }
 
@@ -168,15 +152,16 @@ public class KriptoController {
                 kunciDecrypt[i] = (int)arrCharKunci[i];
             }
             dataDecrypt = new ArrayList<>();
-            HAES256.ReInitProps();
+            HAES256 haes256 = HAES256.getInstance();
+            haes256.ReInitProps();
             for (int i = 0; i < dataEncrypt.size(); i += 1) {
                 ArrayList<Integer> subData = new ArrayList<>();
                 try {
-                    if (HAES256.decryptDataInteger(
+                    if (haes256.decryptDataInteger(
                             KonversiData.arraylist1DToArr1D(dataEncrypt.get(i)),
                             kunciDecrypt
                     )) {
-                        for (Integer val : KonversiData.arr2DToIntArr1D(HAES256.getArrChiper())) {
+                        for (Integer val : KonversiData.arr2DToIntArr1D(haes256.getArrChiper())) {
                             subData.add(val);
                         }
                         dataDecrypt.add(subData);

@@ -115,8 +115,10 @@ public class EncryptController implements Initializable {
             for (int i = 0; i < arrPesan.length; i += 1) {
                 teks += "" + Integer.toHexString(arrPesan[i]) + " ";
             }
-            if (HAES256.encryptDataInteger(EncryptController.arrPesan, EncryptController.arrKeys)) {
-                int[][] arrKunciRes = HAES256.getArrKunci();
+            HAES256 haes256 = HAES256.getInstance();
+            haes256.ReInitProps();
+            if (haes256.encryptDataInteger(EncryptController.arrPesan, EncryptController.arrKeys)) {
+                int[][] arrKunciRes = haes256.getArrKunci();
                 teks += "\n Kunci \n";
                 for (int x = 0; x < arrKunciRes.length; x += 1) {
                     for (int y = 0; y < arrKunciRes[x].length; y += 1) {
@@ -124,7 +126,7 @@ public class EncryptController implements Initializable {
                     }
                     teks += "\n";
                 }
-                int[][] arrHasilEnkrip = HAES256.getArrPesan();
+                int[][] arrHasilEnkrip = haes256.getArrPesan();
                 teks += "\n\nPesan: \n";
                 for (int x = 0; x < arrHasilEnkrip.length; x += 1) {
                     for (int y = 0; y < arrHasilEnkrip[x].length; y += 1) {
@@ -132,17 +134,17 @@ public class EncryptController implements Initializable {
                     }
                     teks += "\n";
                 }
-                int[] hasilEnkrip1D = KonversiData.arr2DToIntArr1D(HAES256.getArrPesan());
+                int[] hasilEnkrip1D = KonversiData.arr2DToIntArr1D(haes256.getArrPesan());
                 teks += "\n\nPesan 1 Dimensi: \n";
                 for (int i = 0; i < hasilEnkrip1D.length; i += 1) {
                     teks += Integer.toHexString(hasilEnkrip1D[i]) + "  ";
                 }
-                HAES256.ReInitProps();
-                boolean dekripStatus = HAES256.decryptDataInteger(hasilEnkrip1D, EncryptController.arrKeys);
+                haes256.ReInitProps();
+                boolean dekripStatus = haes256.decryptDataInteger(hasilEnkrip1D, EncryptController.arrKeys);
 
                 if (dekripStatus) {
                     String teksDekrip = "Dekrip:\n";
-                    int[] hasilDekrip1D = KonversiData.arr2DToIntArr1D(HAES256.getArrChiper());
+                    int[] hasilDekrip1D = KonversiData.arr2DToIntArr1D(haes256.getArrChiper());
                     for (int i = 0; i < hasilDekrip1D.length; i += 1) {
                         teksDekrip += Character.toString((char)hasilDekrip1D[i]);
                     }
