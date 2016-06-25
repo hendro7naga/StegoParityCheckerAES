@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import kelas.AlertInfo;
 
 import javax.imageio.ImageIO;
+import javax.imageio.plugins.bmp.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -61,11 +62,7 @@ public class UjiGambar {
                 bufferedImage = SwingFXUtils.fromFXImage(image, null);
                 graphics = bufferedImage.getGraphics();
                 int blue = graphics.getColor().getBlue();
-                /*int argb = bufferedImage.getRGB(0,0);
-                int r = (argb)&0xFF;
-                int g = (argb>>8)&0xFF;
-                int b = (argb>>16)&0xFF;
-                int a = (argb>>24)&0xFF;*/
+
 
                 teks += "Nama File: " + fio.getName() + "\n"
                         + "Lebar: " + bufferedImage.getWidth() + "\n"
@@ -133,8 +130,17 @@ public class UjiGambar {
 
         File fis = fcs.showSaveDialog(null);
         if (fis != null) {
+            String selected_desc = fcs.getSelectedExtensionFilter().getDescription();
+            String extension = "bmp";
+            boolean sukses = true;
+            if (fis.getName().endsWith(".bmp"))
+                extension = "bmp";
+            else if (fis.getName().endsWith(".jpg"))
+                extension = "jpg";
+            else
+                extension = "bmp";
             try {
-                boolean res = ImageIO.write(bufferedImage, "bmp", fis);
+                boolean res = ImageIO.write(bufferedImage, extension, fis);
             } catch (Exception e) {
                 AlertInfo.showAlertErrorMessage("Informasi Kesalahan",
                         "Penyimpanan Gambar Gagal",
