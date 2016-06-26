@@ -71,16 +71,30 @@ public class UjiGambar {
                 teks += "Info Piksel:";
                 teks += "\n===========================\n";
                 //teks += "Pixel 0,0: " + r + "," + g + "," + b + "\n";
+                teks += "Pixel Gambar: \n";
 
                 for (int x = 0; x < 20; x += 1) {
                     for (int y = 0, lines = 0; y < 20; y += 1) {
                         int argb = bufferedImage.getRGB(x,y);
-                        //int argb = pixelReader.getArgb(x,y);
-                        int r = (argb)&0xFF;
+                        /*int r = (argb)&0xFF;
                         int g = (argb>>8)&0xFF;
                         int b = (argb>>16)&0xFF;
-                        //int a = (argb>>24)&0xFF;
-                        teks += "[" + x + "," + y +"]: " + r + "," + g + "," + b + "  ";
+                        int a = (argb>>24)&0xFF;*/
+                        int a = (argb>>24)&0x000000FF;
+                        int r = (argb>>16)&0x000000FF;
+                        int g = (argb>>8)&0x000000FF;
+                        int b = (argb)&0x000000FF;
+                        teks += "[" + x + "," + y +"]: " + r + "," + g + "," + b + "  " + a + "\n";
+                        int argb2 = (a << 24) | (r << 16) | (g << 8) | b;
+                        /*int r2 = (argb2)&0xFF;
+                        int g2 = (argb2>>8)&0xFF;
+                        int b2 = (argb2>>16)&0xFF;
+                        int a2 = (argb2>>24)&0xFF;*/
+                        int a2 = (argb2>>24)&0x000000FF;
+                        int r2 = (argb2>>16)&0x000000FF;
+                        int g2 = (argb2>>8)&0x000000FF;
+                        int b2 = (argb2)&0x000000FF;
+                        teks += "[" + x + "," + y +"]: " + r2 + "," + g2 + "," + b2 + "  " + a2 + "\n";
                         if (lines == 5) {
                             lines = 0;
                             teks += "\n";

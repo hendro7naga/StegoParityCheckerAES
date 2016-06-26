@@ -4,8 +4,8 @@ import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -17,43 +17,59 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import kelas.KonversiData;
 import main.Main;
 import main.MainController;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
 import kelas.AlertInfo;
+import kripto.HAES256;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
+
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
 public class EmbeddingController implements Initializable {
-    Image imagePrev;
-    String imgPath = "";
+    BufferedImage stegoImage = null;
+    Image coverImage;
+    String imgPath = "", imgProperty = "", bitDepthImg = "";
+    BigInteger primeNumber = new BigInteger("0", 10);
+    char[] pesanArrChar;
+    List<ArrayList<Integer>> dataPesan = null;
+    List<ArrayList<Integer>> dataEncrypt = null;
+    int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
+    int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1;
+    int[] rgbDataOfImage = null;
+    final int NK = 32;
+    final int NK_ON_BYTE = 256;
+    boolean isBmp24Bit = false;
+    boolean enkripProsesSukses = false;
     Alert alert;
     @FXML
-    TextArea textInputMessage;
+    TextArea textInputMessage, textChiper;
     @FXML
-    TextArea textChiper;
-    @FXML
-    Text txtInfoMessage;
-    @FXML
-    Text textInfoCoverImg;
-    @FXML
-    Text textInfoStegoImg;
+    Text txtInfoMessage,textInfoStegoImg, textInfoCoverImg;
     @FXML
     PasswordField txtInputPass;
     @FXML
-    Button btnBrowseCoverImg;
-    @FXML
-    Button btnEncrypt;
-    @FXML
-    Button btnMainMenu;
+    Button btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
     @FXML
     ImageView imgViewCover, imgViewStego;
 
@@ -99,22 +115,39 @@ public class EmbeddingController implements Initializable {
 
     @FXML
     private void handleInputPassword(KeyEvent handler) {
-        if (txtInputPass.getText().length() > 5) {
+        if (txtInputPass.getText().length() > 4) {
             btnEncrypt.setDisable(false);
         } else {
             if (!(textInputMessage.getText().length() < 1)) {
                 btnEncrypt.setDisable(true);
             }
         }
-        textChiper.setText(txtInputPass.getText());
+    }
+
+    @FXML
+    private void handleBtnEncrypt(ActionEvent event) {
+        if (textInputMessage.getText().length() < 3 || txtInputPass.getText().length() < 4) {
+            btnBrowseCoverImg.setDisable(true);
+        } else {
+            int n = textInputMessage.getText().length();
+            nOfChiperLenOnByte = n + ((16 - (n % 16)) % 16);
+            nOfChiperLenOnByte *= 8;
+            if (doEncrypt()) {
+                btnBrowseCoverImg.setDisable(false);
+            }
+        }
     }
 
     @FXML
     private void handlebtnBrowseCoverImg(ActionEvent event) {
-        Image coverImg;
-        BufferedImage buffCoverImg;
-        String ex = "", imgFile = "";
-
+        //Image coverImg;
+        primeNumber = new BigInteger("0", 10);
+        this.btnSaveStegoImg.setDisable(true);
+        this.btnEmbedMessage.setDisable(true);
+        this.isBmp24Bit = false;
+        this.rgbDataOfImage = null;
+        BufferedImage buffCoverImg = null;
+        boolean initImage = false;
         FileChooser fc = new FileChooser();
         fc.setTitle("Buka Berkas Gambar");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
@@ -123,30 +156,168 @@ public class EmbeddingController implements Initializable {
         if (fg != null) {
             try {
                 imgPath = fg.toURI().toURL().toString();
-                coverImg = new Image(imgPath);
-                imgViewCover.setImage(coverImg);
+                coverImage = new Image(imgPath);
+                buffCoverImg = SwingFXUtils.fromFXImage(coverImage, null);
+                imgViewCover.setImage(coverImage);
                 textInfoCoverImg.setText(
                         "Nama File: " + fg.getName() + "\n"
-                        + "Lebar: " + coverImg.getWidth() + "\n"
-                        + "Tinggi: " + coverImg.getHeight()
+                        + "Lebar: " + coverImage.getWidth() + "\n"
+                        + "Tinggi: " + coverImage.getHeight()
                 );
+                initImage = true;
+
             } catch (MalformedURLException mue) {
                 alert = new Alert(Alert.AlertType.INFORMATION,
                         "Gagal mengupload gambar ke aplikasi",
                         ButtonType.OK);
                 alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("Terjadi Exception PATH File");
+                alert.setHeaderText("Terjadi Exception ketika mengakses File");
                 alert.show();
             } catch (Exception exc) {
                 alert = new Alert(Alert.AlertType.INFORMATION,
-                        "Terjadi kesalahan set Image",
+                        "Terjadi kesalahan : " + exc.getMessage(),
                         ButtonType.OK);
                 alert.setTitle("Informasi Aplikasi");
                 alert.setHeaderText("Terjadi Exception PATH File");
                 alert.show();
             }
+
+            if (initImage) {
+                try {
+                    ImageInputStream imageInputStream = ImageIO.createImageInputStream(fg);
+                    Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+                    if (readers.hasNext()) {
+                        imageInputStream.flush();
+                        ImageReader imageReader = readers.next();
+                        imageReader.setInput(imageInputStream, true);
+                        IIOMetadata metadata = imageReader.getImageMetadata(0);
+
+                        String[] names = metadata.getMetadataFormatNames();
+                        int lennames = names.length;
+                        this.imgProperty = "";
+                        for (int i = 0; i < lennames; i += 1) {
+                            Node node = metadata.getAsTree(names[i]);
+                            displayMetadata(node, this.imgProperty);
+                        }
+                        if (this.imgProperty.contains("bitDepth=8")) {
+                            this.bitDepthImg = "8";
+                        }
+                        else if (this.imgProperty.contains("BitsPerSample value=8 8 8")) {
+                            this.bitDepthImg = "24";
+                            this.isBmp24Bit = true;
+                            this.coverImgWidth = buffCoverImg.getWidth();
+                            this.coverImgHeight = buffCoverImg.getHeight();
+                            this.coverImgType = buffCoverImg.getType();
+                        }
+                        else if (this.imgProperty.contains("BitsPerSample value=8 8 8") ||
+                                this.imgProperty.contains("BitsPerSample value=8 88")) {
+                            this.bitDepthImg = "32";
+                        }
+                    }
+                    textInfoCoverImg.setText(
+                            textInfoCoverImg.getText() + "\n" +
+                                    "Bit Depth: " + this.bitDepthImg
+                    );
+                } catch (Exception exceptionReadProperty) {
+                    AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                            "Pembacaan Properti Gambar",
+                            "Terjadi exception ketika membaca properti gambar",
+                            ButtonType.OK);
+                }
+            }
+
+            if (this.isBmp24Bit) {
+                int np = this.coverImgWidth * this.coverImgHeight;
+                this.rgbDataOfImage = new int[buffCoverImg.getWidth() * buffCoverImg.getHeight()];
+                String npOnBinary = Integer.toBinaryString(np);
+                this.xnm = npOnBinary.length();
+                //this.nOfChiperLenOnByte = textChiper.getText().length() * 8;
+                this.nOfPixelForEmbedding = this.xnm + this.nOfChiperLenOnByte + NK_ON_BYTE;
+                for (int i = ((np % 2 == 0) ? np - 1 : np); i > 0; i -= 2) {
+                    this.primeNumber = new BigInteger(i + "", 10);
+                    if (primeNumber.isProbablePrime(1)) {
+                        break;
+                    }
+                }
+
+                if (this.primeNumber.intValue() > this.nOfPixelForEmbedding) {
+                    try {
+                        int indeks = 0;
+                        for (int x = 0; x < buffCoverImg.getWidth(); x += 1) {
+                            for (int y = 0; y < buffCoverImg.getHeight(); y += 1) {
+                                this.rgbDataOfImage[indeks] = buffCoverImg.getRGB(x, y);
+                                indeks += 1;
+                            }
+                        }
+                        this.btnEmbedMessage.setDisable(false);
+                    } catch (Exception except) {
+                        AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                                "Membaca Data RGB Gambar",
+                                "Terjadi kesalahan ketika membaca data RGB Stego Image",
+                                ButtonType.OK
+                        );
+                    }
+                }
+                textChiper.appendText(
+                        "\nJumlah Pixel yang dibutuhkan: " + this.nOfPixelForEmbedding + "\n"
+                );
+            } else {
+                AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                        "Validasi Awal Stego Image",
+                        "Stego Image tidak mendukung.\n" +
+                        "Bit Depth Stego Image harus 24 dan berformat .bmp",
+                        ButtonType.OK);
+            }
+
         }
 
+    }
+
+    @FXML
+    private void handleBtnEmbedMessage(ActionEvent event) {
+        boolean konversiMsg = false, konversiKunci = false;
+        char[] arrKunci = txtInputPass.getText().toCharArray();
+        String infoLengMsgInBinary = "";
+        String msgInBinary = "";
+        String kunciInBinary = "";
+        String msgLengthInfoInBinary = KonversiData.paddingInLeftBinaryString(
+                                        Integer.toBinaryString(this.nOfChiperLenOnByte),
+                                        this.xnm
+                                    );
+        try {
+            for (ArrayList<Integer> data: this.dataEncrypt) {
+                for (int i = 0; i < data.size(); i += 1) {
+                    msgInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString(data.get(i)),8);
+                }
+            }
+            for (int i = 0; i < arrKunci.length; i += 1) {
+                kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
+            }
+            kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
+            this.textChiper.appendText(
+                    "\n\nChipertext in binary: \n" + msgInBinary + "\n" +
+                    "Length MsgInBinary: " + msgInBinary.length()
+                    + "\nUkuran rgbData: " + this.rgbDataOfImage.length
+            );
+            konversiMsg = true;
+            konversiKunci = true;
+        } catch (Exception except) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Konversi Msg to binary",
+                    "Terjadi kesalahan ketika proses konversi chipertext ke dalam notasi binary",
+                    ButtonType.OK
+            );
+        }
+
+        if (konversiMsg && konversiKunci) {
+            this.textChiper.appendText(
+                    "\nKunci in biner: " + kunciInBinary
+                    + "\nUkuran kunci: " + kunciInBinary.length()
+                    + "\nNumberOfMessage: " + this.nOfChiperLenOnByte
+                    + "\nXNM: " + this.xnm
+                    + "\nMsgLengthInfoInBinary: " + msgLengthInfoInBinary
+            );
+        }
     }
 
     @FXML
@@ -174,6 +345,128 @@ public class EmbeddingController implements Initializable {
         else {
             Main.mainStage.setTitle("Aplikasi Steganografi");
             Main.mainStage.setScene(new Scene(p));
+        }
+    }
+
+    private boolean doEncrypt() {
+        this.dataPesan = new ArrayList<>();
+        this.pesanArrChar = textInputMessage.getText().toCharArray();
+        char[] kunciArrChar = txtInputPass.getText().toCharArray();
+        int[] kunciEncrypt = new int[kunciArrChar.length];
+        boolean prosesPotong = true;
+        this.enkripProsesSukses = false;
+        int indeksStart = 0;
+        int panjangTeks = this.textInputMessage.getText().length();
+        HAES256 haes256 = HAES256.getInstance();
+
+        try {
+            for (short i = 0; i < kunciArrChar.length; i += 1) {
+                kunciEncrypt[i] = (int)kunciArrChar[i];
+            }
+
+            while (prosesPotong) {
+                ArrayList<Integer> tmpPesan = new ArrayList<>();
+                String subs = "";
+                if (indeksStart + 16 >= this.textInputMessage.getText().length()) {
+                    subs = this.textInputMessage.getText(indeksStart, panjangTeks);
+                    prosesPotong = false;
+                }
+                else {
+                    subs = this.textInputMessage.getText(indeksStart, indeksStart + 16);
+                }
+                char[] tmpChar = subs.toCharArray();
+                for (int i = 0; i < tmpChar.length; i += 1) {
+                    tmpPesan.add((int)tmpChar[i]);
+                }
+                dataPesan.add(tmpPesan);
+                indeksStart += 16;
+            }
+            this.dataEncrypt = new ArrayList<>();
+
+            for (int i = 0; i < this.dataPesan.size(); i += 1) {
+                ArrayList<Integer> subData = new ArrayList<>();
+                try {
+                    if (haes256.encryptDataInteger(
+                            KonversiData.arraylist1DToArr1D(this.dataPesan.get(i)),
+                            kunciEncrypt
+                    )) {
+                        for (Integer val : KonversiData.arr2DToIntArr1D(haes256.getArrPesan())) {
+                            subData.add(val);
+                        }
+                        this.dataEncrypt.add(subData);
+                    } else {
+                        throw new Exception("Kesalahan proses enkripsi");
+                    }
+                    this.enkripProsesSukses = true;
+                } catch (Exception ex) {
+                    AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                            "Proses Enkripsi AES-256",
+                            "Terjadi kesalahan proses: \n" + ex.getMessage(),
+                            ButtonType.OK);
+                    this.enkripProsesSukses = false;
+                }
+                /*if (!this.enkripProsesSukses) {
+                    btnBrowseCoverImg.setDisable(true);
+                    break;
+                }*/
+            }
+
+        } catch (Exception except) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Embedding",
+                    "Proses Enkripsi",
+                    "Terjadi kesalahan pada proses enkrispi.\n" +
+                    "Error detail: " + except.getMessage(),
+                    ButtonType.OK
+            );
+        }
+
+        if (this.enkripProsesSukses) {
+            String hasilEnkrip = "";
+            for (ArrayList<Integer> val : dataEncrypt) {
+                for (int i = 0; i < val.size(); i += 1) {
+                    hasilEnkrip += Character.toString((char)val.get(i).intValue());
+                }
+            }
+            textChiper.setText(hasilEnkrip);
+            btnBrowseCoverImg.setDisable(false);
+        }
+        return this.enkripProsesSukses;
+
+    }
+
+    public void displayMetadata(Node root, String t) {
+        displayMetadata(root, 0, t);
+    }
+
+    void indent(int level) {
+        for (int i = 0; i < level; i++) {
+            imgProperty += "  ";
+        }
+    }
+
+    void displayMetadata(Node node, int level, String t) {
+        indent(level); // emit open tag
+        imgProperty += "<" + node.getNodeName();
+        NamedNodeMap map = node.getAttributes();
+        if (map != null) { // print attribute values
+            int length = map.getLength();
+            for (int i = 0; i < length; i++) {
+                Node attr = map.item(i);
+                imgProperty += " " + attr.getNodeName() + "=" + attr.getNodeValue() + "";
+            }
+        }
+
+        Node child = node.getFirstChild();
+        if (child != null) {
+            imgProperty += ">";
+            while (child != null) { // emit child tags recursively
+                displayMetadata(child, level + 1, imgProperty);
+                child = child.getNextSibling();
+            }
+            indent(level); // emit close tag
+            imgProperty += "</" + node.getNodeName() + ">";
+        } else {
+            imgProperty += "/>";
         }
     }
 
