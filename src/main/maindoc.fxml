@@ -23,7 +23,7 @@
             <Menu mnemonicParsing="false" text="Stegano">
               <items>
                 <MenuItem fx:id="menuitemEmbedMessage" mnemonicParsing="false" onAction="#handleShowEmbeddingMessage" text="Embedding Message" />
-                  <MenuItem mnemonicParsing="false" text="Extract Message" />
+                  <MenuItem fx:id="menuitemExtractMessage" mnemonicParsing="false" onAction="#handleShowExtractionMessage" text="Extract Message" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Testing">

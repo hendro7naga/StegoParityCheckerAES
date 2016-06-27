@@ -66,7 +66,31 @@ public class MainController implements Initializable {
                 Main.mainStage.centerOnScreen();
             }
         }
+    }
 
+    @FXML
+    private void handleShowExtractionMessage(ActionEvent actionEvent) {
+        Parent p = null;
+        boolean loadSukses = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/extractiondoc.fxml"));
+        } catch (IOException ex) {
+            loadSukses = false;
+        }
+        finally {
+            if (!loadSukses || p == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Gagal membuka scene extraction fxml",
+                        ButtonType.OK);
+                alert.setTitle("Informasi Aplikasi");
+                alert.setHeaderText("File tidak ditemukan");
+                alert.show();
+            } else {
+                Main.mainStage.setTitle("Aplikasi Steganografi: Extraction Message");
+                Main.mainStage.setScene(new Scene(p, 870, 625));
+                Main.mainStage.centerOnScreen();
+            }
+        }
     }
 
     @FXML

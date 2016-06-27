@@ -274,7 +274,7 @@ public class EmbeddingController implements Initializable {
 
     @FXML
     private void handleBtnEmbedMessage(ActionEvent event) {
-        boolean konversiMsg = false, konversiKunci = false;
+        boolean konversiMsg = false, konversiKunci = false, penyisipan = false;
         char[] arrKunci = txtInputPass.getText().toCharArray();
         String msgInBinary = "";
         String kunciInBinary = "";
@@ -309,6 +309,177 @@ public class EmbeddingController implements Initializable {
 
         if (konversiMsg && konversiKunci) {
             this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
+
+            try {
+                int pixelIterator = 1;
+                BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
+                byte siklusRGB = 1;
+
+                //for untuk sisip informasi panjang pesan
+                for (int i = 0; i < msgLengthInfoInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(msgLengthInfoInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                                                         this.primeNumber);
+                    //int argb = this.rgbDataOfImage[random.intValue()];
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                } //end for untuk sisip informasi panjang pesan
+
+                //for untuk sisi kunci
+                for (int i = 0; i < kunciInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(kunciInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                                                         this.primeNumber);
+                    //int argb = this.rgbDataOfImage[random.intValue()];
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                } //END FOR SISI KUNCI
+
+                //For untuk sisip pesan chiper
+                for (int i = 0; i < msgInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(msgInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                                                         this.primeNumber);
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                }
+                penyisipan = true;
+            } catch (Exception exceptionEmbedding) {
+                penyisipan = false;
+                AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                        "Embedding Proses",
+                        "Terjadi kesalahan saat proses penyisipan pesan" +
+                        "Detail error: " + exceptionEmbedding.getMessage(),
+                        ButtonType.OK
+                );
+            }
+
+            if (penyisipan && createStegoImage()) {
+                imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
+                btnSaveStegoImg.setDisable(false);
+            }
+
             this.textChiper.appendText(
                     "\nKunci in biner: " + kunciInBinary
                     + "\nUkuran kunci: " + kunciInBinary.length()
@@ -316,6 +487,39 @@ public class EmbeddingController implements Initializable {
                     + "\nXNM: " + this.xnm
                     + "\nMsgLengthInfoInBinary: " + msgLengthInfoInBinary
                     + "\nGemodNumber: " + this.gemodNumber
+            );
+        }
+    }
+
+    @FXML
+    private void handleBtnSaveStegoImg(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Buka Berkas Gambar");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
+        boolean res = false;
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            //String selected_desc = fileChooser.getSelectedExtensionFilter().getDescription();
+            String extension = "bmp";
+            boolean sukses = true;
+            if (file.getName().endsWith(".bmp"))
+                extension = "bmp";
+            else
+                extension = "bmp";
+            try {
+                res = ImageIO.write(this.stegoImage, extension, file);
+            } catch (Exception e) {
+                AlertInfo.showAlertErrorMessage("Informasi Kesalahan",
+                        "Penyimpanan Gambar Gagal",
+                        "Gagal menyimpan gambar ke direktori",
+                        ButtonType.OK);
+            }
+        }
+        if (res) {
+            AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                    "Penyimpanan Stego Image",
+                    "Proses menyimpan stego image ke direktori berhasil dilakukan",
+                    ButtonType.OK
             );
         }
     }
@@ -346,6 +550,22 @@ public class EmbeddingController implements Initializable {
             Main.mainStage.setTitle("Aplikasi Steganografi");
             Main.mainStage.setScene(new Scene(p));
         }
+    }
+
+    private boolean createStegoImage() {
+        boolean proses = false;
+        this.stegoImage = new BufferedImage(this.coverImgWidth, this.coverImgHeight, this.coverImgType);
+        int indeks = 0;
+        try {
+            for (int x = 0; x < this.coverImgWidth; x += 1) {
+                for (int y = 0; y < this.coverImgHeight; y += 1) {
+                    this.stegoImage.setRGB(x, y, this.rgbDataOfImage[indeks]);
+                    indeks += 1;
+                }
+            }
+            proses = true;
+        } catch (Exception e) { this.stegoImage = null; }
+        return proses;
     }
 
     private boolean doEncrypt() {
