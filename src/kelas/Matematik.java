@@ -1,6 +1,8 @@
 package kelas;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by hendro.sinaga on 27-Jun-16.
@@ -46,7 +48,59 @@ public class Matematik {
                 proses += 1;
             }
         }
-
         return gemodStatus;
+    }
+
+    private static List<Integer> primeFactors(int numbers) {
+        int n = numbers;
+        List<Integer> factors = new ArrayList<>();
+        for (int i = 2; i <= n / i; i++) {
+            while (n % i == 0) {
+                if (!factors.contains(i)) {
+                    factors.add(i);
+                }
+                n /= i;
+            }
+        }
+        if (n > 1) {
+            factors.add(n);
+        }
+        return factors;
+    }
+
+    private static int findGemodNumber(int numberToTest, int yourPrimesNumbers) {
+        //BigInteger primesNum = new BigInteger(yourPrimesNumbers + "", 10);
+        BigInteger modNums = new BigInteger(yourPrimesNumbers + "", 10);
+        int result = yourPrimesNumbers;
+        int numbers = numberToTest;
+        BigInteger test = new BigInteger(numbers + "", 10);
+        List<Integer> faktorPrima = primeFactors(yourPrimesNumbers - 1);
+
+        for (int i = 0; i < faktorPrima.size(); i += 1) {
+            BigInteger pangkat = new BigInteger((yourPrimesNumbers -1) / faktorPrima.get(i) + "", 10);
+            BigInteger hasilMod = test.modPow(pangkat, modNums);
+            if (hasilMod.intValue() == 1) {
+                result = yourPrimesNumbers;
+                break;
+            } else {
+                result = hasilMod.intValue();
+            }
+        }
+
+        return result;
+    }
+
+    public static int gemodFinder(int primesNumber) {
+        int bilPrima = primesNumber;
+        int bilTest = bilPrima - 1;
+        int hasilBilangan = bilPrima;
+        for (int bilangan = bilTest; bilangan > 1; bilangan -= 1) {
+            int hasilnya = findGemodNumber(bilangan, bilPrima);
+            if (hasilnya != bilPrima) {
+                hasilBilangan = bilangan;
+                break;
+            }
+        }
+        return hasilBilangan;
     }
 }

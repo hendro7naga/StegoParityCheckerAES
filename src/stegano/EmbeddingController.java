@@ -17,7 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import kelas.KonversiData;
 import main.Main;
 import main.MainController;
 import org.w3c.dom.NamedNodeMap;
@@ -35,8 +34,8 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.ArrayList;
 import java.util.List;
-import kelas.AlertInfo;
 import kripto.HAES256;
+import kelas.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -55,7 +54,7 @@ public class EmbeddingController implements Initializable {
     List<ArrayList<Integer>> dataPesan = null;
     List<ArrayList<Integer>> dataEncrypt = null;
     int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
-    int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1;
+    int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1;
     int[] rgbDataOfImage = null;
     final int NK = 32;
     final int NK_ON_BYTE = 256;
@@ -277,7 +276,6 @@ public class EmbeddingController implements Initializable {
     private void handleBtnEmbedMessage(ActionEvent event) {
         boolean konversiMsg = false, konversiKunci = false;
         char[] arrKunci = txtInputPass.getText().toCharArray();
-        String infoLengMsgInBinary = "";
         String msgInBinary = "";
         String kunciInBinary = "";
         String msgLengthInfoInBinary = KonversiData.paddingInLeftBinaryString(
@@ -310,12 +308,14 @@ public class EmbeddingController implements Initializable {
         }
 
         if (konversiMsg && konversiKunci) {
+            this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
             this.textChiper.appendText(
                     "\nKunci in biner: " + kunciInBinary
                     + "\nUkuran kunci: " + kunciInBinary.length()
                     + "\nNumberOfMessage: " + this.nOfChiperLenOnByte
                     + "\nXNM: " + this.xnm
                     + "\nMsgLengthInfoInBinary: " + msgLengthInfoInBinary
+                    + "\nGemodNumber: " + this.gemodNumber
             );
         }
     }
