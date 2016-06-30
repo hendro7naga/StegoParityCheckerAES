@@ -158,10 +158,12 @@ public class EmbeddingController implements Initializable {
                 coverImage = new Image(imgPath);
                 buffCoverImg = SwingFXUtils.fromFXImage(coverImage, null);
                 imgViewCover.setImage(coverImage);
+                imgViewCover.setFitWidth(imgViewCover.getFitWidth());
                 textInfoCoverImg.setText(
                         "Nama File: " + fg.getName() + "\n"
                         + "Lebar: " + coverImage.getWidth() + "\n"
-                        + "Tinggi: " + coverImage.getHeight()
+                        + "Tinggi: " + coverImage.getHeight() + "\n"
+                        + "Ukuran: " + (fg.length() / 1024) + " KB\n"
                 );
                 initImage = true;
 
@@ -215,7 +217,7 @@ public class EmbeddingController implements Initializable {
                     }
                     textInfoCoverImg.setText(
                             textInfoCoverImg.getText() + "\n" +
-                                    "Bit Depth: " + this.bitDepthImg
+                                    "Bit Depth: " + this.bitDepthImg + "\n"
                     );
                 } catch (Exception exceptionReadProperty) {
                     AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
@@ -256,10 +258,17 @@ public class EmbeddingController implements Initializable {
                                 ButtonType.OK
                         );
                     }
+                } else {
+                    AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
+                            "Perhatian",
+                            "Image yang Anda input untuk disisipi pesan tidak sanggup menampung pesan Anda.\n"
+                            + "Harap upload ulang image yang lebih besar.",
+                            ButtonType.OK
+                    );
                 }
-                textChiper.appendText(
+                /*textChiper.appendText(
                         "\nJumlah Pixel yang dibutuhkan: " + this.nOfPixelForEmbedding + "\n"
-                );
+                );*/
             } else {
                 AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
                         "Validasi Awal Stego Image",
@@ -292,11 +301,11 @@ public class EmbeddingController implements Initializable {
                 kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
             }
             kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
-            this.textChiper.appendText(
+            /*this.textChiper.appendText(
                     "\n\nChipertext in binary: \n" + msgInBinary + "\n" +
                     "Length MsgInBinary: " + msgInBinary.length()
                     + "\nUkuran rgbData: " + this.rgbDataOfImage.length
-            );
+            );*/
             konversiMsg = true;
             konversiKunci = true;
         } catch (Exception except) {
@@ -480,14 +489,14 @@ public class EmbeddingController implements Initializable {
                 btnSaveStegoImg.setDisable(false);
             }
 
-            this.textChiper.appendText(
+            /*this.textChiper.appendText(
                     "\nKunci in biner: " + kunciInBinary
                     + "\nUkuran kunci: " + kunciInBinary.length()
                     + "\nNumberOfMessage: " + this.nOfChiperLenOnByte
                     + "\nXNM: " + this.xnm
                     + "\nMsgLengthInfoInBinary: " + msgLengthInfoInBinary
                     + "\nGemodNumber: " + this.gemodNumber
-            );
+            );*/
         }
     }
 
