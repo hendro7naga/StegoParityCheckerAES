@@ -5,7 +5,10 @@ import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,6 +19,7 @@ import kelas.KonversiData;
 import kelas.Matematik;
 import kelas.ParityChecker;
 import kripto.HAES256;
+import main.Main;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -24,7 +28,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,6 +52,7 @@ public class ExtractionController implements Initializable {
     int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
     int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1, np;
     final int NK_ON_BYTE = 256;
+    char[] arrCharTeksOri;
     boolean isBmp24 = false, kunciSama = false;
     @FXML
     Label lblInfoStego;
@@ -100,6 +105,7 @@ public class ExtractionController implements Initializable {
                     lblInfoStego.getText() + "\n"
                             + "Width: " + this.stegoImage.getWidth() + "\n"
                             + "Height: " + this.stegoImage.getHeight() + "\n"
+                            + "Ukuran: " + (file.length() / 1024) + " KB\n"
             );
             try {
                 ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
@@ -156,11 +162,11 @@ public class ExtractionController implements Initializable {
                             break;
                         }
                     }
-                    this.textAreaOri.setText(
+                    /*this.textAreaOri.setText(
                             "np: " + np + "\n"
                             + "XnM: " + this.xnm + "\n"
                             + "BilanganPrima: " + this.primeNumber + "\n"
-                    );
+                    );*/
 
                     if (this.primeNumber.intValue() > this.nOfPixelForEmbedding) {
                         try {
@@ -273,7 +279,7 @@ public class ExtractionController implements Initializable {
             String strKunci = "";
             boolean potonglagi = true;
             int indeks = 0;
-            this.textAreaOri.appendText("\nDeretan nilaiInteger kunci: \n");
+            //this.textAreaOri.appendText("\nDeretan nilaiInteger kunci: \n");
             while (potonglagi) {
                 int tmpBil;
                 if (indeks + 8 >= binerKunci.length()) {
@@ -285,12 +291,12 @@ public class ExtractionController implements Initializable {
                 }
                 if (tmpBil != 0) {
                     strKunci += Character.toString((char)tmpBil);
-                    this.textAreaOri.appendText(tmpBil + " ");
+                    //this.textAreaOri.appendText(tmpBil + " ");
                 }
                 indeks += 8;
             }
 
-            this.textAreaOri.appendText(
+            /*this.textAreaOri.appendText(
                     "\nBilanganGemod: " + this.gemodNumber +
                     "\nPanjangPesan: " + panjangPesan
                     +"\nBinerHurufPertama: " + binerKunci.substring(0, 8)
@@ -300,15 +306,15 @@ public class ExtractionController implements Initializable {
                     +"\nKuncidariPasswordField: " + this.txtInputPass.getText()
                     +"\nPanjangStrKunci: " + strKunci.length()
                     +"\nPanjangKunciPasswordField: " + this.txtInputPass.getText().length()
-            );
+            );*/
 
-            this.textAreaOri.appendText("\n");
+            //this.textAreaOri.appendText("\n");
             this.kunciSama = false;
             char[] arrKunciTersimpan = strKunci.toCharArray();
             char[] arrKunciInput = this.txtInputPass.getText().toCharArray();
             if (arrKunciTersimpan.length == arrKunciInput.length) {
                 boolean tmpPersamaan = true;
-                this.textAreaOri.appendText("\nPanjangKunci input dan tersimpan sama\n");
+                //this.textAreaOri.appendText("\nPanjangKunci input dan tersimpan sama\n");
                 for (int i = 0; i < arrKunciInput.length; i += 1) {
                     if (arrKunciInput[i] != arrKunciTersimpan[i]) {
                         tmpPersamaan = false;
@@ -318,8 +324,7 @@ public class ExtractionController implements Initializable {
                 this.kunciSama = tmpPersamaan;
             }
             if (this.kunciSama) {
-                this.textAreaOri.appendText("\nKunci input dan tersimpan sama\n");
-
+                //this.textAreaOri.appendText("\nKunci input dan tersimpan sama\n");
                 this.chiperTextInBiner = "";
                 for (int i = 0; i < panjangPesan; i += 1) {
                     BigInteger randoms = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
@@ -356,10 +361,10 @@ public class ExtractionController implements Initializable {
             );
         }
         if (this.chiperTextInBiner.length() >= 16) {
-            this.textAreaOri.appendText(
+            /*this.textAreaOri.appendText(
                     "\nDataPesanInBiner: " + "\n" + this.chiperTextInBiner + "\n"
                     +"Panjang dataPesanInBiner: " + this.chiperTextInBiner.length() + "\n"
-            );
+            );*/
             doExtractMessage();
         }
     }
@@ -481,19 +486,75 @@ public class ExtractionController implements Initializable {
                     hasilDekrip += Character.toString((char)val.get(i).intValue());
                 }
             }
-            this.textAreaOri.appendText("\n\n=============================" +
-                    "\nPesan Ori: " + hasilDekrip
-            );
+            this.arrCharTeksOri = hasilDekrip.toCharArray();
+            this.textAreaOri.appendText(hasilDekrip);
         }
     }
 
     @FXML
     private void handleBtnSaveText(ActionEvent actionEvent) {
-        //
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Teks File (.txt)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Berkas Teks", "*.txt"));
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            saveFile(String.valueOf(this.arrCharTeksOri), file);
+        }
+
     }
 
     @FXML private void handleMainMenu(ActionEvent actionEvent) {
-        //
+        Parent p = null;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
+        } catch (IOException handleMainMenuException) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Extraction",
+                    "Load Main Menu",
+                    "Gagal memanggil document main menu",
+                    ButtonType.OK
+            );
+        }
+        if (p != null) {
+            Main.mainStage.setTitle("Aplikasi Steganografi");
+            Main.mainStage.setScene(new Scene(p));
+            Main.mainStage.centerOnScreen();
+        }
+    }
+
+    private void saveFile(String teks, File file) {
+        try {
+
+            FileWriter fileWriter = new FileWriter(file);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            //fileWriter.write(teks);
+            //fileWriter.close();
+            /*PrintWriter printWriter = new PrintWriter(new FileWriter(file));
+            printWriter.print(this.textAreaOri.getText());
+            */
+            for (int i = 0; i < this.arrCharTeksOri.length; i += 1) {
+                if ((int)this.arrCharTeksOri[i] == 10) {
+                    bufferedWriter.newLine();
+                } else {
+                    bufferedWriter.write(arrCharTeksOri[i]);
+                }
+            }
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            fileWriter.close();
+            //printWriter.close();
+            AlertInfo.showAlertInfoMessage("Informasi Aplikasi: Extraction",
+                    "Penyimpanan Berkas .txt",
+                    "Penyimpanan data teks .txt ke direktori berhasil dilakukan.",
+                    ButtonType.OK
+            );
+        } catch (IOException ioexception) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Penyimpanan Berkas .txt",
+                    "Terjadi kesalahan ketika proses penyimpanan berkas .txt ke direktori",
+                    ButtonType.OK
+            );
+        }
     }
 
     public void displayMetadata(Node root, String t) {
