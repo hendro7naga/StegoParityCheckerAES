@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import kelas.AlertInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,6 +91,30 @@ public class MainController implements Initializable {
                 Main.mainStage.setScene(new Scene(p, 870, 625));
                 Main.mainStage.centerOnScreen();
             }
+        }
+    }
+
+    @FXML
+    private void handleShowImperceptibilityScene(ActionEvent actionEvent) {
+        Parent p = null;
+        boolean sceneLoaded = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/imperceptibilitydoc.fxml"));
+        } catch (IOException ex) {
+            sceneLoaded = false;
+        }
+        if (!sceneLoaded || p == null) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Load imperceptibility scene",
+                    "Gagal membuka imperceptibility scene",
+                    ButtonType.OK
+            );
+        }
+        else {
+            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Imperceptibility");
+            Main.mainStage.setScene(new Scene(p, 775, 605));
+            Main.mainStage.centerOnScreen();
         }
     }
 

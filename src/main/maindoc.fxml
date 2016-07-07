@@ -28,14 +28,10 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Testing">
               <items>
-                <MenuItem mnemonicParsing="false" text="MSE - PNSR" />
+                  <MenuItem fx:id="menuitemImperceptibility" mnemonicParsing="false" text="Imperceptibility" onAction="#handleShowImperceptibilityScene" />
+                  <MenuItem fx:id="menuitemNoiseInsertion" mnemonicParsing="false" text="Noise Insertion" />
               </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="Feature">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Noise Insertion" />
-            </items>
-          </Menu>
             <Menu mnemonicParsing="false" text="AES256">
               <items>
                   <MenuItem fx:id="menuitemEncrypt" mnemonicParsing="false" onAction="#handleShowAESEncrypt" text="Encrypt" />
@@ -50,7 +46,7 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Test Image">
               <items>
-                <MenuItem id="menuitemViewImage" fx:id="menuitemViewImage" onAction="#handleShowViewImage" mnemonicParsing="false" text="View" />
+                <MenuItem id="menuitemViewImage" fx:id="menuitemViewImage" mnemonicParsing="false" onAction="#handleShowViewImage" text="View" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="About">
