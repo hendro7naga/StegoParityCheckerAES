@@ -29,7 +29,7 @@ import java.util.Random;
  */
 public class UjiGambar {
     Image image = null;
-    BufferedImage bufferedImageOut = null;
+    BufferedImage bufferedImageNoise = null;
     BufferedImage bufferedImage;
     Image imagePrev;
     String imgPath = "";
@@ -162,7 +162,7 @@ public class UjiGambar {
     }
 
     private void addGaussianNoise() {
-        Double presentaseNoise = new Double(90/100);
+        Double presentaseNoise = new Double(50);
         Random gaussianDistribution = new Random();
         Double distribution = gaussianDistribution.nextGaussian();
 
@@ -176,28 +176,31 @@ public class UjiGambar {
             }*/
             this.textareaInfoImgOri.appendText("\n\nNilai noise: \n");
             int lines = 8;
-            for (int x = 0; x < this.bufferedImage.getWidth(); x += 1) {
-                for (int y = 0; y < this.bufferedImage.getHeight(); y += 1) {
-                    int rgb = this.bufferedImage.getRGB(x, y);
-                    int r = (rgb>>16)&0x000000FF;
-                    int g = (rgb>>8)&0x000000FF;
-                    int b = (rgb)&0x000000FF;
-                    int gray = (r + g + b) / 3;
-                    Double getNoise = presentaseNoise * distribution;
-                    int withNoise = Math.round((255 + r + g + b) + getNoise.floatValue());
-                    //int withNoise = Math.round(gray + getNoise.floatValue());
-                    this.bufferedImage.setRGB(
-                            x,
-                            y,
-                            ((255 << 24) | (withNoise << 16) | (withNoise << 8) | withNoise)
-                    );
-                    /*this.bufferedImage.setRGB(x,
-                                              y,
-                                              withNoise
-                    );*/
-                    dataNoise.add(withNoise);
-                }
-            }
+//            for (int x = 0; x < this.bufferedImage.getWidth(); x += 1) {
+//                for (int y = 0; y < this.bufferedImage.getHeight(); y += 1) {
+//                    int rgb = this.bufferedImage.getRGB(x, y);
+//                    int r = (rgb>>16)&0x000000FF;
+//                    int g = (rgb>>8)&0x000000FF;
+//                    int b = (rgb)&0x000000FF;
+//                    int gray = (r + g + b) / 3;
+//                    Double getNoise = presentaseNoise * distribution;
+//                    int withNoise = Math.round((255 + r + g + b) + getNoise.floatValue());
+//                    r = (r + Math.round(getNoise) > 255) ? 255 : (r + Math.round(getNoise) < 0) ? 0 : (int)(r + Math.round(getNoise));
+//                    g = (g + Math.round(getNoise) > 255) ? 255 : (g + Math.round(getNoise) < 0) ? 0 : (int)(g + Math.round(getNoise));
+//                    b = (b + Math.round(getNoise) > 255) ? 255 : (b + Math.round(getNoise) < 0) ? 0 : (int)(b + Math.round(getNoise));
+//                    //int withNoise = Math.round(gray + getNoise.floatValue());
+//                    this.bufferedImage.setRGB(
+//                            x,
+//                            y,
+//                            ((255 << 24) | (r << 16) | (g << 8) | b)
+//                    );
+//                    /*this.bufferedImage.setRGB(x,
+//                                              y,
+//                                              withNoise
+//                    );*/
+//                    dataNoise.add(withNoise);
+//                }
+//            }
             /*for (int i = 0; i < dataNoise.size(); i += 1) {
                 this.textareaInfoImgOri.appendText("" + dataNoise.get(i) + " ");
                 lines -= 1;
@@ -206,7 +209,9 @@ public class UjiGambar {
                     lines = 8;
                 }
             }*/
-            imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImage, null));
+            //imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImage, null));
+            this.bufferedImageNoise = noiseSaltAndPepper(this.bufferedImage, 10);
+            imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImageNoise, null));
             AlertInfo.showAlertInfoMessage(
                     "Informasi Aplikasi",
                     "Penambahan Gaussian Noise",
@@ -259,6 +264,28 @@ public class UjiGambar {
             }
         }
 
+    }
+
+    private BufferedImage noiseSaltAndPepper(BufferedImage imageOri, int noiseProbabilitas) {
+        BufferedImage temp = imageOri;
+        Random rnd = new Random();
+        int width = imageOri.getWidth();
+        int height = imageOri.getHeight();
+        int prob = (int) (width * height * noiseProbabilitas * 0.01);
+        for (int i = 0; i < prob; i += 1) {
+            int x1 = rnd.nextInt(imageOri.getWidth() - 1);
+            int y1 = rnd.nextInt(imageOri.getHeight() - 1);
+            int random = rnd.nextInt(20) + 1;
+            if (random <= 10) {
+                temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
+            }
+            else {
+                temp.setRGB(x1, y1, ((255 << 24) | (255 << 16) | (255 << 8) | 255));
+            }
+        }
+        this.textareaInfoImgOri.appendText("\nNilai prob: " + prob + "\n");
+
+        return  temp;
     }
 
 }
