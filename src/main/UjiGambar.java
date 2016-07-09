@@ -14,6 +14,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import kelas.AlertInfo;
+import kelas.PengolahanCitra;
 
 import javax.imageio.ImageIO;
 import javax.imageio.plugins.bmp.*;
@@ -210,7 +211,7 @@ public class UjiGambar {
                 }
             }*/
             //imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImage, null));
-            this.bufferedImageNoise = noiseSaltAndPepper(this.bufferedImage, 10);
+            this.bufferedImageNoise = PengolahanCitra.addSaltAndPepperNoise(this.bufferedImage, 10);
             imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImageNoise, null));
             AlertInfo.showAlertInfoMessage(
                     "Informasi Aplikasi",
@@ -264,28 +265,6 @@ public class UjiGambar {
             }
         }
 
-    }
-
-    private BufferedImage noiseSaltAndPepper(BufferedImage imageOri, int noiseProbabilitas) {
-        BufferedImage temp = imageOri;
-        Random rnd = new Random();
-        int width = imageOri.getWidth();
-        int height = imageOri.getHeight();
-        int prob = (int) (width * height * noiseProbabilitas * 0.01);
-        for (int i = 0; i < prob; i += 1) {
-            int x1 = rnd.nextInt(imageOri.getWidth() - 1);
-            int y1 = rnd.nextInt(imageOri.getHeight() - 1);
-            int random = rnd.nextInt(20) + 1;
-            if (random <= 10) {
-                temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
-            }
-            else {
-                temp.setRGB(x1, y1, ((255 << 24) | (255 << 16) | (255 << 8) | 255));
-            }
-        }
-        this.textareaInfoImgOri.appendText("\nNilai prob: " + prob + "\n");
-
-        return  temp;
     }
 
 }

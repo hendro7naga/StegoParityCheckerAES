@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import kelas.AlertInfo;
+import kelas.PengolahanCitra;
 import main.Main;
 
 import java.awt.image.BufferedImage;
@@ -111,10 +112,12 @@ public class ImperceptibilityControl {
             }
         }
         if (prosesCalculate) {
-            Double mse = calculateMSE(this.imageOri, this.imageStego);
-            Double psnr = calculatePSNR(mse);
-            this.txtfieldMSE.setText(mse + "");
-            this.txtfieldPSNR.setText(psnr + "");
+            Double mse = PengolahanCitra.calculateMSE(this.imageOri, this.imageStego);
+            if (mse > Double.MIN_VALUE) {
+                Double psnr = PengolahanCitra.calculatePSNR(mse);
+                this.txtfieldMSE.setText(mse + "");
+                this.txtfieldPSNR.setText(psnr + "");
+            }
         }
 
 
@@ -143,59 +146,6 @@ public class ImperceptibilityControl {
             Main.mainStage.setScene(new Scene(p, 756, 485));
             Main.mainStage.centerOnScreen();
         }
-    }
-
-    private double calculateMSE(BufferedImage ori, BufferedImage stego) {
-        double temp = 0;
-        double mseR = 0, mseG = 0, mseB = 0;
-        try {
-            for (int x = 0; x < ori.getWidth(); x += 1) {
-                for (int y = 0; y < ori.getHeight(); y += 1) {
-                    int rgb = ori.getRGB(x, y);
-                    int r = (rgb>>16)&0x000000FF;
-                    int g = (rgb>>8)&0x000000FF;
-                    int b = (rgb)&0x000000FF;
-                    int rgbStego = stego.getRGB(x, y);
-                    int rs = (rgbStego>>16)&0x000000FF;
-                    int gs = (rgbStego>>8)&0x000000FF;
-                    int bs = (rgbStego)&0x000000FF;
-                    /*mseR += Math.pow( (((ori.getRGB(x, y) >> 16) & 0x000000FF) - ((stego.getRGB(x, y) >> 16) & 0x000000FF)), 2);
-                    mseG += Math.pow( (((ori.getRGB(x, y) >> 8) & 0x000000FF) - ((stego.getRGB(x, y) >> 8) & 0x000000FF)), 2);
-                    mseB += Math.pow( (((ori.getRGB(x, y)) & 0x000000FF) - ((stego.getRGB(x, y)) & 0x000000FF)), 2);*/
-                    mseR += Math.pow((r - rs), 2);
-                    mseG += Math.pow((g - gs), 2);
-                    mseB += Math.pow((b - bs), 2);
-                }
-            }
-            mseR = mseR / (ori.getWidth() * ori.getHeight());
-            mseG = mseG / (ori.getWidth() * ori.getHeight());
-            mseB = mseB / (ori.getWidth() * ori.getHeight());
-            temp = (mseR + mseG + mseB) / 3;
-        }
-        catch (ArrayIndexOutOfBoundsException arrindexout) {
-            AlertInfo.showAlertErrorMessage(
-                    "Informasi Aplikasi",
-                    "Array Index Out Of Bound",
-                    "Array Index tidak valid",
-                    ButtonType.OK
-            );
-            temp = 0;
-        }
-        catch (Exception e) {
-            AlertInfo.showAlertErrorMessage(
-                    "Informasi Aplikasi",
-                    "MSE - PSNR",
-                    "Terjadi kesalahan ketika menghitung nilai MSE - PSNR",
-                    ButtonType.OK
-            );
-            temp = 0;
-        }
-        return temp;
-    }
-
-    private double calculatePSNR(double mse) {
-        double temp = 10 * Math.log10( Math.pow(255, 2) / mse );
-        return temp;
     }
 
 }
