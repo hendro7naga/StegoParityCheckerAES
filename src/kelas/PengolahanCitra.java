@@ -1,6 +1,9 @@
 package kelas;
 
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -15,16 +18,20 @@ public class PengolahanCitra {
         int width = imageOri.getWidth();
         int height = imageOri.getHeight();
         int prob = (int) (width * height * noiseProbabilitas * 0.01);
-        for (int i = 0; i < prob; i += 1) {
-            int x1 = rnd.nextInt(imageOri.getWidth() - 1);
-            int y1 = rnd.nextInt(imageOri.getHeight() - 1);
-            int random = rnd.nextInt(10) + 1;
-            if (random <= 10) {
-                temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
+        try {
+            for (int i = 0; i < prob; i += 1) {
+                int x1 = rnd.nextInt(width - 1);
+                int y1 = rnd.nextInt(height - 1);
+                int random = rnd.nextInt(10) + 1;
+                if (random <= 5) {
+                    temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
+                }
+                else {
+                    //temp.setRGB(x1, y1, ((255 << 24) | (255 << 16) | (255 << 8) | 255));
+                }
             }
-            else {
-                temp.setRGB(x1, y1, ((255 << 24) | (255 << 16) | (255 << 8) | 255));
-            }
+        } catch (Exception e) {
+            temp = null;
         }
         return  temp;
     }
@@ -77,6 +84,49 @@ public class PengolahanCitra {
     public static double calculatePSNR(double mse) {
         double temp = 10 * Math.log10( Math.pow(255, 2) / mse );
         return temp;
+    }
+
+    public static class ImageInfo {
+        private static String imgProperty = "";
+
+        public static String displayMetadata(Node root, String t) {
+            ImageInfo.imgProperty = "";
+            ImageInfo.displayMetadata(root, 0, t);
+            return ImageInfo.imgProperty;
+        }
+
+        static  void indent(int level) {
+            for (int i = 0; i < level; i++) {
+                ImageInfo.imgProperty += "  ";
+            }
+        }
+
+        static void displayMetadata(Node node, int level, String t) {
+            indent(level); // emit open tag
+            ImageInfo.imgProperty += "<" + node.getNodeName();
+            NamedNodeMap map = node.getAttributes();
+            if (map != null) { // print attribute values
+                int length = map.getLength();
+                for (int i = 0; i < length; i++) {
+                    Node attr = map.item(i);
+                    ImageInfo.imgProperty += " " + attr.getNodeName() + "=" + attr.getNodeValue() + "";
+                }
+            }
+
+            Node child = node.getFirstChild();
+            if (child != null) {
+                ImageInfo.imgProperty += ">";
+                while (child != null) { // emit child tags recursively
+                    displayMetadata(child, level + 1, ImageInfo.imgProperty);
+                    child = child.getNextSibling();
+                }
+                indent(level); // emit close tag
+                ImageInfo.imgProperty += "</" + node.getNodeName() + ">";
+            } else {
+                ImageInfo.imgProperty += "/>";
+            }
+        }
+
     }
 
 }

@@ -14,10 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
-import kelas.AlertInfo;
-import kelas.KonversiData;
-import kelas.Matematik;
-import kelas.ParityChecker;
+import kelas.*;
 import kripto.HAES256;
 import main.Main;
 import org.w3c.dom.NamedNodeMap;
@@ -121,7 +118,7 @@ public class ExtractionController implements Initializable {
                     this.imgProperty = "";
                     for (int i = 0; i < lennames; i += 1) {
                         Node node = metadata.getAsTree(names[i]);
-                        displayMetadata(node, this.imgProperty);
+                        this.imgProperty = PengolahanCitra.ImageInfo.displayMetadata(node, this.imgProperty);
                     }
                     if (this.imgProperty.contains("bitDepth=8")) {
                         this.bitDepthImg = "8";
@@ -554,42 +551,6 @@ public class ExtractionController implements Initializable {
                     "Terjadi kesalahan ketika proses penyimpanan berkas .txt ke direktori",
                     ButtonType.OK
             );
-        }
-    }
-
-    public void displayMetadata(Node root, String t) {
-        displayMetadata(root, 0, t);
-    }
-
-    void indent(int level) {
-        for (int i = 0; i < level; i++) {
-            imgProperty += "  ";
-        }
-    }
-
-    void displayMetadata(Node node, int level, String t) {
-        indent(level); // emit open tag
-        imgProperty += "<" + node.getNodeName();
-        NamedNodeMap map = node.getAttributes();
-        if (map != null) { // print attribute values
-            int length = map.getLength();
-            for (int i = 0; i < length; i++) {
-                Node attr = map.item(i);
-                imgProperty += " " + attr.getNodeName() + "=" + attr.getNodeValue() + "";
-            }
-        }
-
-        Node child = node.getFirstChild();
-        if (child != null) {
-            imgProperty += ">";
-            while (child != null) { // emit child tags recursively
-                displayMetadata(child, level + 1, imgProperty);
-                child = child.getNextSibling();
-            }
-            indent(level); // emit close tag
-            imgProperty += "</" + node.getNodeName() + ">";
-        } else {
-            imgProperty += "/>";
         }
     }
 

@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="517.0" prefWidth="787.0" style="-fx-background-color: rgba(100,120,240,.898);" xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="517.0" prefWidth="787.0" style="-fx-background-color: rgba(100,120,240,.898);" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
    <children>
       <MenuBar prefHeight="30.0" prefWidth="787.0">
         <menus>
@@ -28,8 +28,8 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Testing">
               <items>
-                  <MenuItem fx:id="menuitemImperceptibility" mnemonicParsing="false" text="Imperceptibility" onAction="#handleShowImperceptibilityScene" />
-                  <MenuItem fx:id="menuitemNoiseInsertion" mnemonicParsing="false" text="Noise Insertion" />
+                  <MenuItem fx:id="menuitemImperceptibility" mnemonicParsing="false" onAction="#handleShowImperceptibilityScene" text="Imperceptibility" />
+                  <MenuItem fx:id="menuitemRobustness" mnemonicParsing="false" text="Robustness" onAction="#handleShowRobustnessScene" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="AES256">

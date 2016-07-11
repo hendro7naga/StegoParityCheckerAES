@@ -119,6 +119,30 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void handleShowRobustnessScene(ActionEvent actionEvent) {
+        Parent p = null;
+        boolean sceneLoaded = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/robustnessdoc.fxml"));
+        } catch (IOException ex) {
+            sceneLoaded = false;
+        }
+        if (!sceneLoaded || p == null) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Load Robustness scene",
+                    "Gagal membuka Robustness scene",
+                    ButtonType.OK
+            );
+        }
+        else {
+            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Robustness");
+            Main.mainStage.setScene(new Scene(p, 1064, 620));
+            Main.mainStage.centerOnScreen();
+        }
+    }
+
+    @FXML
     private void handleShowAESEncrypt(ActionEvent event) {
         Parent p = null;
         boolean loadSukses = true;

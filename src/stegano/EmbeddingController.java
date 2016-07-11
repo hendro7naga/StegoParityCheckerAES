@@ -198,7 +198,8 @@ public class EmbeddingController implements Initializable {
                         this.imgProperty = "";
                         for (int i = 0; i < lennames; i += 1) {
                             Node node = metadata.getAsTree(names[i]);
-                            displayMetadata(node, this.imgProperty);
+                            //displayMetadata(node, this.imgProperty);
+                            this.imgProperty = PengolahanCitra.ImageInfo.displayMetadata(node, this.imgProperty);
                         }
                         if (this.imgProperty.contains("bitDepth=8")) {
                             this.bitDepthImg = "8";
@@ -661,42 +662,6 @@ public class EmbeddingController implements Initializable {
         }
         return this.enkripProsesSukses;
 
-    }
-
-    public void displayMetadata(Node root, String t) {
-        displayMetadata(root, 0, t);
-    }
-
-    void indent(int level) {
-        for (int i = 0; i < level; i++) {
-            imgProperty += "  ";
-        }
-    }
-
-    void displayMetadata(Node node, int level, String t) {
-        indent(level); // emit open tag
-        imgProperty += "<" + node.getNodeName();
-        NamedNodeMap map = node.getAttributes();
-        if (map != null) { // print attribute values
-            int length = map.getLength();
-            for (int i = 0; i < length; i++) {
-                Node attr = map.item(i);
-                imgProperty += " " + attr.getNodeName() + "=" + attr.getNodeValue() + "";
-            }
-        }
-
-        Node child = node.getFirstChild();
-        if (child != null) {
-            imgProperty += ">";
-            while (child != null) { // emit child tags recursively
-                displayMetadata(child, level + 1, imgProperty);
-                child = child.getNextSibling();
-            }
-            indent(level); // emit close tag
-            imgProperty += "</" + node.getNodeName() + ">";
-        } else {
-            imgProperty += "/>";
-        }
     }
 
     @Override
