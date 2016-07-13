@@ -1,3 +1,4 @@
 *.jar
+/jdbc-driver/*.jar
 /lib/*.jar
 ~/*.jar
