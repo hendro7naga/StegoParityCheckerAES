@@ -17,9 +17,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import main.AppControll;
 import main.Main;
 import main.MainController;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.awt.image.BufferedImage;
@@ -48,17 +48,17 @@ import javax.imageio.stream.ImageInputStream;
 public class EmbeddingController implements Initializable {
     BufferedImage stegoImage = null;
     Image coverImage;
-    String imgPath = "", imgProperty = "", bitDepthImg = "";
+    String imgPath = "", imgOriName = "", imgStegoName = "", imgProperty = "", bitDepthImg = "";
     BigInteger primeNumber = new BigInteger("0", 10);
     char[] pesanArrChar;
     List<ArrayList<Integer>> dataPesan = null;
     List<ArrayList<Integer>> dataEncrypt = null;
-    int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
+    int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1, textLength = 0;
     int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1;
     int[] rgbDataOfImage = null;
     final int NK = 32;
     final int NK_ON_BYTE = 256;
-    boolean isBmp24Bit = false;
+    boolean isBmp24Bit = false, hasData = false;
     boolean enkripProsesSukses = false;
     Alert alert;
     @FXML
@@ -66,7 +66,7 @@ public class EmbeddingController implements Initializable {
     @FXML
     Text txtInfoMessage,textInfoStegoImg, textInfoCoverImg;
     @FXML
-    PasswordField txtInputPass;
+    TextField txtInputPass;
     @FXML
     Button btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
     @FXML
@@ -74,7 +74,7 @@ public class EmbeddingController implements Initializable {
 
     @FXML
     private void handleBrowseFileText(ActionEvent event) {
-
+        hasData = false;
         boolean sukses = true;
         byte[] byteTeks = null;
         String textFile = "";
@@ -88,6 +88,7 @@ public class EmbeddingController implements Initializable {
             try {
                 byteTeks = Files.readAllBytes(Paths.get(fileTeks.getPath()));
                 textInputMessage.setText(new String(byteTeks));
+                this.textLength = textInputMessage.getLength();
             } catch (IOException ex) {
                 alert = new Alert(Alert.AlertType.ERROR,
                                 "Berkas tidak dapat diakses dan dibaca.\nDetail Error: " + ex.getMessage(),
@@ -115,7 +116,19 @@ public class EmbeddingController implements Initializable {
     @FXML
     private void handleInputPassword(KeyEvent handler) {
         if (txtInputPass.getText().length() > 4) {
-            btnEncrypt.setDisable(false);
+            if (btnEncrypt.isDisable()) {
+                btnEncrypt.setDisable(false);
+            }
+            if (txtInputPass.getText().length() > 32) {
+                AlertInfo.showAlertWarningMessage(
+                        "Informasi Aplikasi: Embedding",
+                        "Panjang Kunci",
+                        "Panjang Kunci maksimal 32 karakter",
+                        ButtonType.OK
+                );
+                txtInputPass.setText(txtInputPass.getText().substring(0, 32));
+                txtInputPass.positionCaret(32);
+            }
         } else {
             if (!(textInputMessage.getText().length() < 1)) {
                 btnEncrypt.setDisable(true);
@@ -166,7 +179,7 @@ public class EmbeddingController implements Initializable {
                         + "Ukuran: " + (fg.length() / 1024) + " KB\n"
                 );
                 initImage = true;
-
+                this.imgOriName = fg.getName();
             } catch (MalformedURLException mue) {
                 alert = new Alert(Alert.AlertType.INFORMATION,
                         "Gagal mengupload gambar ke aplikasi",
@@ -267,9 +280,7 @@ public class EmbeddingController implements Initializable {
                             ButtonType.OK
                     );
                 }
-                /*textChiper.appendText(
-                        "\nJumlah Pixel yang dibutuhkan: " + this.nOfPixelForEmbedding + "\n"
-                );*/
+
             } else {
                 AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
                         "Validasi Awal Stego Image",
@@ -302,11 +313,7 @@ public class EmbeddingController implements Initializable {
                 kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
             }
             kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
-            /*this.textChiper.appendText(
-                    "\n\nChipertext in binary: \n" + msgInBinary + "\n" +
-                    "Length MsgInBinary: " + msgInBinary.length()
-                    + "\nUkuran rgbData: " + this.rgbDataOfImage.length
-            );*/
+
             konversiMsg = true;
             konversiKunci = true;
         } catch (Exception except) {
@@ -488,16 +495,8 @@ public class EmbeddingController implements Initializable {
             if (penyisipan && createStegoImage()) {
                 imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
                 btnSaveStegoImg.setDisable(false);
+                this.hasData = true;
             }
-
-            /*this.textChiper.appendText(
-                    "\nKunci in biner: " + kunciInBinary
-                    + "\nUkuran kunci: " + kunciInBinary.length()
-                    + "\nNumberOfMessage: " + this.nOfChiperLenOnByte
-                    + "\nXNM: " + this.xnm
-                    + "\nMsgLengthInfoInBinary: " + msgLengthInfoInBinary
-                    + "\nGemodNumber: " + this.gemodNumber
-            );*/
         }
     }
 
@@ -518,6 +517,7 @@ public class EmbeddingController implements Initializable {
                 extension = "bmp";
             try {
                 res = ImageIO.write(this.stegoImage, extension, file);
+                this.imgStegoName = file.getName();
             } catch (Exception e) {
                 AlertInfo.showAlertErrorMessage("Informasi Kesalahan",
                         "Penyimpanan Gambar Gagal",
@@ -526,9 +526,42 @@ public class EmbeddingController implements Initializable {
             }
         }
         if (res) {
+            //simpan data ke database
+            boolean dbState = false;
+            int val = -1;
+            try {
+                int n = 0;
+                n = MainController.appControll.sqLiteDB.getJumlahBaris(AppControll.TABLE_STEGANO_NAME);
+                n += 1;
+                String sql = "INSERT INTO " + AppControll.TABLE_STEGANO_NAME + " VALUES("
+                        + n + ", '"
+                        + this.imgOriName + "', '"
+                        + this.imgStegoName + "', "
+                        + this.textLength + ", "
+                        + 0.0 + ", "
+                        + 0.0
+                        + ");";
+                val = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sql);
+                MainController.appControll.sqLiteDB.closeConnection();
+                if (val > 0) {
+                    dbState = true;
+                }
+            } catch (Exception e) {
+                AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                        "Database",
+                        "Terjadi kesalahan: " + e.getMessage(),
+                        ButtonType.OK
+                );
+            }
+            String teksStatus = "";
+            if (dbState) {
+                teksStatus = "\nPenyimpanan data ke database berhasil dilakukan.";
+            } else {
+                teksStatus = "\nGagal menyimpan data ke database. Data ini tidak akan valid di sesi ekstraksi.";
+            }
             AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
                     "Penyimpanan Stego Image",
-                    "Proses menyimpan stego image ke direktori berhasil dilakukan",
+                    "Proses menyimpan stego image ke direktori berhasil dilakukan" + teksStatus,
                     ButtonType.OK
             );
         }
@@ -559,6 +592,33 @@ public class EmbeddingController implements Initializable {
         else {
             Main.mainStage.setTitle("Aplikasi Steganografi");
             Main.mainStage.setScene(new Scene(p));
+            Main.mainStage.centerOnScreen();
+        }
+    }
+
+    @FXML void handleBtnNextExtraction (ActionEvent actionEvent) {
+        Parent p = null;
+        boolean loadSukses = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/extractiondoc.fxml"));
+            if (p == null) {
+                loadSukses = false;
+            }
+        } catch (IOException ex) {
+            loadSukses = false;
+        }
+
+        if (!loadSukses) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Open Scene",
+                    "Gagal membuka scene Extraction",
+                    ButtonType.OK
+            );
+        } else {
+            Main.mainStage.setTitle("Aplikasi Steganografi: Extraction");
+            Main.mainStage.setScene(new Scene(p));
+            Main.mainStage.centerOnScreen();
         }
     }
 
@@ -661,15 +721,18 @@ public class EmbeddingController implements Initializable {
             btnBrowseCoverImg.setDisable(false);
         }
         return this.enkripProsesSukses;
-
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        //imagePrev = new Image(getClass().getResourceAsStream("rnd_br_prev32.png"));
-        //btnMainMenu.setGraphic(new ImageView(imagePrev));
         try {
+            btnMainMenu.setGraphic(
+                    //new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("resources/rnd_br_prev32.png")))
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "rnd_br_prev32.png"))
+            );
+            btnNext.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "rnd_br_next32.png"))
+            );
             imgViewCover.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
             imgViewStego.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
         } catch (MalformedURLException e) {

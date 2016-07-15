@@ -24,11 +24,14 @@ import java.util.ResourceBundle;
  * Created by hendro.sinaga on 08-Jun-16.
  */
 public class MainController implements Initializable {
+    public static final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+    public static final ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+
     public static File resouresDir;
+    public static boolean dbStatus = false;
+    public static AppControll appControll = null;
     @FXML
     private void handleExit(ActionEvent event) {
-        ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-        ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
         //ButtonType<>
         Alert alert = new Alert(Alert.AlertType.INFORMATION,
                 "Apakah Anda yakin akan menutup aplikasi?",
@@ -142,6 +145,31 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML void handleShowTestResult (ActionEvent actionEvent) {
+        Parent p = null;
+        boolean sceneLoaded = true;
+        try {
+            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/testresultdoc.fxml"));
+        } catch (IOException e) {
+            sceneLoaded = false;
+        }
+
+        if (!sceneLoaded || p == null) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Load Scene",
+                    "Gagal membuka TestResult scene",
+                    ButtonType.OK
+            );
+        }
+        else {
+            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Result");
+            Main.mainStage.setScene(new Scene(p, 995, 730));
+            Main.mainStage.centerOnScreen();
+        }
+
+    }
+
     @FXML
     private void handleShowAESEncrypt(ActionEvent event) {
         Parent p = null;
@@ -217,9 +245,32 @@ public class MainController implements Initializable {
         }
     }
 
+    void initApp () {
+        if (MainController.appControll == null) {
+            MainController.appControll = AppControll.getInstance();
+        }
+        if (!MainController.appControll.getInitializeStatus()) {
+            try {
+                if (MainController.appControll.init() == 1) {
+                    MainController.appControll.sqLiteDB.createConnection();
+                    MainController.appControll.sqLiteDB.closeConnection();
+                }
+            } catch (Exception e) {
+                AlertInfo.showAlertErrorMessage(
+                        "Informasi Aplikasi",
+                        "Init App",
+                        "Gagal inisialisasi App (Error) : " + e.getMessage(),
+                        ButtonType.OK
+                );
+            }
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         String info = "";
+        MainController.appControll = AppControll.getInstance();
+        initApp();
         //File dir = new File("resources");
         resouresDir = new File("resources/");
         if (resouresDir.exists()) {

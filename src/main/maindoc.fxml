@@ -29,7 +29,8 @@
             <Menu mnemonicParsing="false" text="Testing">
               <items>
                   <MenuItem fx:id="menuitemImperceptibility" mnemonicParsing="false" onAction="#handleShowImperceptibilityScene" text="Imperceptibility" />
-                  <MenuItem fx:id="menuitemRobustness" mnemonicParsing="false" text="Robustness" onAction="#handleShowRobustnessScene" />
+                  <MenuItem fx:id="menuitemRobustness" mnemonicParsing="false" onAction="#handleShowRobustnessScene" text="Robustness" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleShowTestResult" text="Result" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="AES256">

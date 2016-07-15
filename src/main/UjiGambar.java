@@ -211,7 +211,7 @@ public class UjiGambar {
                 }
             }*/
             //imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImage, null));
-            this.bufferedImageNoise = PengolahanCitra.addSaltAndPepperNoise(this.bufferedImage, 10);
+            this.bufferedImageNoise = PengolahanCitra.addSaltAndPepperNoise(this.bufferedImage, 5.5);
             imgviewWrite.setImage(SwingFXUtils.toFXImage(this.bufferedImageNoise, null));
             AlertInfo.showAlertInfoMessage(
                     "Informasi Aplikasi",

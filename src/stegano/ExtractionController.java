@@ -54,7 +54,7 @@ public class ExtractionController implements Initializable {
     @FXML
     Label lblInfoStego;
     @FXML
-    PasswordField txtInputPass;
+    TextField txtInputPass;
     @FXML
     TextArea textAreaChiper, textAreaOri;
     @FXML
@@ -195,20 +195,23 @@ public class ExtractionController implements Initializable {
     @FXML
     private void handleInputPassword(KeyEvent handler) {
         if (txtInputPass.getText().length() > 4) {
-            btnExtract.setDisable(false);
+            if (btnExtract.isDisable()) {
+                btnExtract.setDisable(false);
+            }
+            if (this.txtInputPass.getText().length() > 32) {
+                AlertInfo.showAlertWarningMessage(
+                        "Informasi Aplikasi: Extraction",
+                        "Peringatan",
+                        "Panjang Kunci maksimal adalah 32 Karakter.",
+                        ButtonType.OK
+                );
+                this.txtInputPass.setText(this.txtInputPass.getText().substring(0, 32));
+                this.txtInputPass.positionCaret(32);
+            }
         } else {
             if (!this.isBmp24) {
                 btnExtract.setDisable(true);
             }
-        }
-        if (this.txtInputPass.getText().length() > 32) {
-            AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
-                    "Peringatan",
-                    "Panjang Kunci maksimal adalah 32 Karakter.",
-                    ButtonType.OK
-            );
-            this.txtInputPass.setText(this.txtInputPass.getText().substring(0, 32));
-            this.txtInputPass.positionCaret(32);
         }
     }
 

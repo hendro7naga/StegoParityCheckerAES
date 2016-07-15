@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.TextField?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="618.0" prefWidth="867.0" xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stegano.ExtractionController">
    <content>
       <VBox prefHeight="616.0" prefWidth="865.0">
@@ -25,7 +26,7 @@
                   <Separator layoutX="9.0" layoutY="474.0" prefHeight="0.0" prefWidth="275.0" />
                   <Separator layoutX="296.0" layoutY="10.0" orientation="VERTICAL" prefHeight="552.0" prefWidth="0.0" />
                   <ImageView fx:id="imgViewStegoImg" fitHeight="214.0" fitWidth="270.0" layoutX="12.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true" />
-                  <PasswordField fx:id="txtInputPass" layoutX="13.0" layoutY="396.0" onKeyReleased="#handleInputPassword" onKeyPressed="#handleLengthInputPass" prefHeight="25.0" prefWidth="273.0" />
+                  <TextField fx:id="txtInputPass" layoutX="13.0" layoutY="396.0" onKeyReleased="#handleInputPassword" onKeyPressed="#handleLengthInputPass" prefHeight="25.0" prefWidth="273.0" />
                   <Button fx:id="btnExtract" disable="true" layoutX="183.0" layoutY="429.0" mnemonicParsing="false" onAction="#handleBtnExtraction" text="Extract Message" />
                   <TextArea fx:id="textAreaChiper" editable="false" layoutX="315.0" layoutY="33.0" prefHeight="271.0" prefWidth="504.0" wrapText="true" />
                   <Button fx:id="btnDecrypt" layoutX="761.0" layoutY="311.0" mnemonicParsing="false" onAction="#handleBtnDecrypt" text="Decrypt" />

@@ -12,17 +12,17 @@ import java.util.Random;
  * Created by hendro.sinaga on 09-Jul-16.
  */
 public class PengolahanCitra {
-    public static BufferedImage addSaltAndPepperNoise(BufferedImage imageOri, int noiseProbabilitas) {
+    public static BufferedImage addSaltAndPepperNoise(BufferedImage imageOri, Double noiseProbabilitas) {
         BufferedImage temp = imageOri;
         Random rnd = new Random();
         int width = imageOri.getWidth();
         int height = imageOri.getHeight();
-        int prob = (int) (width * height * noiseProbabilitas * 0.01);
+        int prob = (int) ((width * height) * noiseProbabilitas * 0.01);
         try {
             for (int i = 0; i < prob; i += 1) {
                 int x1 = rnd.nextInt(width - 1);
                 int y1 = rnd.nextInt(height - 1);
-                int random = rnd.nextInt(10) + 1;
+                int random = rnd.nextInt(15);
                 if (random <= 5) {
                     temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
                 }

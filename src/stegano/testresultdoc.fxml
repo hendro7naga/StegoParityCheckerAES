@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fx:controller="stegano.TestResult" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="664.0" prefWidth="771.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <content>
+      <VBox prefHeight="662.0" prefWidth="769.0">
+         <children>
+            <AnchorPane prefHeight="663.0" prefWidth="769.0">
+               <children>
+                  <Button fx:id="btnBacaData" onAction="#handleBacaData" layoutX="14.0" layoutY="21.0" mnemonicParsing="false" text="Baca Data" />
+                  <TableView fx:id="tableViewData" layoutX="14.0" layoutY="64.0" prefHeight="200.0" prefWidth="743.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="C1" />
+                      <TableColumn prefWidth="75.0" text="C2" />
+                    </columns>
+                  </TableView>
+                  <TextArea fx:id="textAreaData" editable="false" layoutX="14.0" layoutY="281.0" prefHeight="302.0" prefWidth="745.0" wrapText="true" />
+                  <HBox layoutX="-2.0" layoutY="627.0" prefHeight="29.0" prefWidth="771.0">
+                     <children>
+                        <ToolBar prefHeight="35.0" prefWidth="771.0">
+                          <items>
+                            <Button fx:id="btnMainMenu" onAction="#handleMainMenu" mnemonicParsing="false" prefHeight="14.0" prefWidth="77.0" text="Main Menu" />
+                          </items>
+                        </ToolBar>
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>
