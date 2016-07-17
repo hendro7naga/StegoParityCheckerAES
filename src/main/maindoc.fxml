@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.effect.GaussianBlur?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -15,7 +14,7 @@
    <children>
       <MenuBar prefHeight="30.0" prefWidth="787.0">
         <menus>
-          <Menu mnemonicParsing="false" onAction="#handleExit" text="File">
+          <Menu mnemonicParsing="false" onAction="#handleExit" text="Main Menu">
             <items>
               <MenuItem mnemonicParsing="false" text="Close" />
             </items>
@@ -31,23 +30,6 @@
                   <MenuItem fx:id="menuitemImperceptibility" mnemonicParsing="false" onAction="#handleShowImperceptibilityScene" text="Imperceptibility" />
                   <MenuItem fx:id="menuitemRobustness" mnemonicParsing="false" onAction="#handleShowRobustnessScene" text="Robustness" />
                   <MenuItem mnemonicParsing="false" onAction="#handleShowTestResult" text="Result" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="AES256">
-              <items>
-                  <MenuItem fx:id="menuitemEncrypt" mnemonicParsing="false" onAction="#handleShowAESEncrypt" text="Encrypt" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem mnemonicParsing="false" text="Decrypt" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="KriptoAES256">
-              <items>
-                <MenuItem fx:id="menuitemEncryptDecrypt" mnemonicParsing="false" onAction="#handleShowKriptoEncryptDecrypt" text="Encrypt / Decrypt" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Test Image">
-              <items>
-                <MenuItem id="menuitemViewImage" fx:id="menuitemViewImage" mnemonicParsing="false" onAction="#handleShowViewImage" text="View" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="About">

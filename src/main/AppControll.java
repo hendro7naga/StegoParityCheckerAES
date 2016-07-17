@@ -69,7 +69,8 @@ public class AppControll {
                 sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_NOISE_NAME
                         + " (nid INTEGER PRIMARY KEY NOT NULL, "
                         + "sid INTEGER NOT NULL, "
-                        + "noiseProb DOUBLE NOT NULL"
+                        + "noiseProb DOUBLE NOT NULL, "
+                        + "percentage DOUBLE NOT NULL"
                         + ");";
                 statement.executeUpdate(sql);
             }

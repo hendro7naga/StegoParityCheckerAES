@@ -50,7 +50,7 @@
                               <Label layoutX="15.0" layoutY="632.0" text="Percentage result (%) :" />
                               <TextField fx:id="txtfieldCompareResult" editable="false" layoutX="143.0" layoutY="626.0" prefHeight="31.0" prefWidth="119.0" />
                               <Label layoutX="15.0" layoutY="677.0" text="Save data to Database? " />
-                              <Button fx:id="btnSaveRobustness" layoutX="148.0" layoutY="673.0" mnemonicParsing="false" text="Save" />
+                              <Button fx:id="btnSaveRobustness" onAction="#handleSaveDataRobustness" layoutX="148.0" layoutY="673.0" mnemonicParsing="false" text="Save" />
                            </children>
                         </AnchorPane>
                      </children>

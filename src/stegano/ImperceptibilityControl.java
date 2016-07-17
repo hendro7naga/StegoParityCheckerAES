@@ -230,30 +230,30 @@ public class ImperceptibilityControl {
                 this.hasData = false;
                 prosesToMainMenu = true;
             }
-        }
+        } else {
+            if (prosesToMainMenu) {
+                Parent p = null;
+                boolean sceneLoaded = true;
 
-        if (prosesToMainMenu) {
-            Parent p = null;
-            boolean sceneLoaded = true;
+                try {
+                    p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
+                } catch (IOException ex) {
+                    sceneLoaded = false;
+                }
 
-            try {
-                p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-            } catch (IOException ex) {
-                sceneLoaded = false;
-            }
-
-            if (!sceneLoaded || p == null) {
-                AlertInfo.showAlertWarningMessage(
-                        "Informasi Aplikasi",
-                        "Load main scene",
-                        "Gagal membuka main scene",
-                        ButtonType.OK
-                );
-            } else {
-                this.dataTable.clear();
-                Main.mainStage.setTitle("Aplikasi Steganografi");
-                Main.mainStage.setScene(new Scene(p, 756, 485));
-                Main.mainStage.centerOnScreen();
+                if (!sceneLoaded || p == null) {
+                    AlertInfo.showAlertWarningMessage(
+                            "Informasi Aplikasi",
+                            "Load main scene",
+                            "Gagal membuka main scene",
+                            ButtonType.OK
+                    );
+                } else {
+                    this.dataTable.clear();
+                    Main.mainStage.setTitle("Aplikasi Steganografi");
+                    Main.mainStage.setScene(new Scene(p, 756, 485));
+                    Main.mainStage.centerOnScreen();
+                }
             }
         }
 

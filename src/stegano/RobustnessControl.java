@@ -18,6 +18,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import kelas.*;
 import kripto.HAES256;
+import main.AppControll;
 import main.Main;
 import main.MainController;
 
@@ -29,7 +30,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -37,13 +41,14 @@ import java.util.ResourceBundle;
  * Created by hendro.sinaga on 10-Jul-16.
  */
 public class RobustnessControl implements Initializable {
+    private HashMap<String, Integer> dataTable;
     List<ArrayList<Integer>> dataEncrypt = null;
     List<ArrayList<Integer>> dataDecrypt = null;
     BufferedImage bufferedImageStego, bufferedImageStegoNoise;
     BigInteger primeNumber;
     Double noiseProb, percentage;
-    String stegoImagePathFile = "", chiperTextInBiner = "";
-    boolean kunciSama = false;
+    String stegoImagePathFile = "", chiperTextInBiner = "", stegoImageName = "";
+    boolean kunciSama = false, stegoImageNameSama = false, hasData = false;
     int[] rgbDataOfImage;
     int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
     int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1, np;
@@ -64,8 +69,10 @@ public class RobustnessControl implements Initializable {
     @FXML
     TextArea txtareaTest, txtareaOriMsg;
 
+
     @FXML
     private void handleBrowseStegoImg (ActionEvent actionEvent) {
+        this.dataTable = new HashMap<String, Integer>();
         this.percentage = 0D;
         this.primeNumber = new BigInteger("0", 10);
         this.kunciSama = false;
@@ -79,6 +86,7 @@ public class RobustnessControl implements Initializable {
         this.btnInitExtractMsg.setDisable(true);
         this.anchorPaneExtraction.setDisable(true);
         /*this.txtfieldNoiseProbSaltPepper.clear();*/
+        String sql = "";
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Stego Image");
@@ -99,13 +107,39 @@ public class RobustnessControl implements Initializable {
                         + "Height: " + this.bufferedImageStego.getHeight() + "\n"
                         + "Size: " + (file.length() / 1024) + " KB\n"
                 );
-                this.btnAddNoise.setDisable(false);
+                this.stegoImageName = file.getName();
+                sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_NAME + " WHERE "
+                        + "stegoImageName = '" + this.stegoImageName + "';";
+                ResultSet rs = MainController.appControll.sqLiteDB.SelectQuery(sql);
+                while (rs.next()) {
+                    if (this.stegoImageName.equalsIgnoreCase(rs.getString("stegoImageName"))) {
+                        this.stegoImageNameSama = true;
+                        this.dataTable.put(rs.getString("stegoImageName"), rs.getInt("id"));
+                        break;
+                    }
+                }
+                if (!this.stegoImageNameSama || this.dataTable.size() < 1) {
+                    throw new Exception("Nama file original image dan stego image tidak tersedia di database");
+                }
+                else {
+                    this.btnAddNoise.setDisable(false);
+                }
+                rs.close();
+                MainController.appControll.sqLiteDB.closeConnection();
             }
             catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",
                         "Kesalahan: Lokasi Berkas",
                         "tidak dapat mengakses image pada direktori",
+                        ButtonType.OK
+                );
+            }
+            catch (Exception e) {
+                AlertInfo.showAlertWarningMessage(
+                        "Informasi Aplikasi",
+                        "Database",
+                        "Terjadi kesalahan ketika mengakses database: \n" + e.getMessage() ,
                         ButtonType.OK
                 );
             }
@@ -396,6 +430,43 @@ public class RobustnessControl implements Initializable {
 
         this.percentage = (double)(counter / charArrOri.length) * 100;
         this.txtfieldCompareResult.setText(this.percentage.toString());
+    }
+
+    @FXML void handleSaveDataRobustness (ActionEvent actionEvent) {
+        String sqlInsert = "INSERT INTO " + AppControll.TABLE_STEGANO_NOISE_NAME
+                + " VALUES("
+                + null + ", "
+                + this.dataTable.get(this.stegoImageName) + ", "
+                + this.noiseProb + ", "
+                + this.percentage
+                + ");";
+        ResultSet rs = null;
+        boolean dataSudahAda = false;
+
+        int res = 0;
+        try {
+            res = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sqlInsert);
+            MainController.appControll.sqLiteDB.closeConnection();
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Database - Robustness Table",
+                    "Terjadi kesalahan: " + e.getMessage(),
+                    ButtonType.OK
+            );
+        }
+        finally {
+            if (res > 0) {
+                AlertInfo.showAlertInfoMessage(
+                        "Informasi Aplikasi",
+                        "Database - Robustness Table",
+                        "Data berhasil disimpan!!!",
+                        ButtonType.OK
+                );
+                this.btnSaveRobustness.setDisable(true);
+            }
+        }
+
     }
 
     private boolean doExtractMessage() {

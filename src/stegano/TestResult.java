@@ -1,18 +1,19 @@
 package stegano;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import kelas.AlertInfo;
 import main.AppControll;
 import main.Main;
 import main.MainController;
+import model.DataImperceptibility;
+import model.DataRobustness;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -22,16 +23,24 @@ import java.sql.SQLException;
  * Created by hendro.sinaga on 15-Jul-16.
  */
 public class TestResult {
+    private ObservableList<DataImperceptibility> dataImperceptibilities = FXCollections.observableArrayList();
+    private ObservableList<DataRobustness> dataRobustness = FXCollections.observableArrayList();
     @FXML
-    Button btnBacaData, btnMainMenu;
+    Button btnBacaDataImperceptibility, btnBacaDataRobustness, btnMainMenu;
     @FXML
-    TableView tableViewData;
+    TableView<DataImperceptibility> tableViewDataImperceptibility;
     @FXML
-    TextArea textAreaData;
+    TableView<DataRobustness> tableViewDataRobustness;
+    @FXML
+    TableColumn<DataImperceptibility, Integer> noImperceptibilityTableCol;
+    @FXML
+    TableColumn<DataImperceptibility, String> oriImageNameImperceptibilityTableCol, stegoImageNameImperceptibilityTableCol;
+    @FXML
+    TableColumn<DataImperceptibility, Integer> txtLengthImperceptibilityTableCol;
+    @FXML
+    TableColumn<DataImperceptibility, Double> mseImperceptibilityTableCol, psnrImperceptibilityTableCol;
 
-
-    @FXML void handleBacaData (ActionEvent actionEvent) {
-
+    @FXML void handleBacaDataImperceptibility (ActionEvent actionEvent) {
         ResultSet rs = null;
         try {
             if (!MainController.appControll.getInitializeStatus()) {
@@ -42,16 +51,70 @@ public class TestResult {
             }
             String sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_NAME;
             rs = MainController.appControll.sqLiteDB.SelectQuery(sql);
+            this.dataImperceptibilities.clear();
+            Integer counter = 1;
             while (rs.next()) {
-                this.textAreaData.appendText(
+                this.dataImperceptibilities.add(new DataImperceptibility(
+                        counter,
+                        rs.getString("oriImageName"),
+                        rs.getString("stegoImageName"),
+                        rs.getInt("msgLength"),
+                        rs.getDouble("mseVal"),
+                        rs.getDouble("psnrVal")
+                ));
+                /*this.textAreaDataImperceptibility.appendText(
                         rs.getInt("id") + "  "
                         + rs.getString("oriImageName") + "\t"
                         + rs.getString("stegoImageName") + "\t"
                         + rs.getInt("msgLength") + "\t"
                         + rs.getDouble("mseVal") + "\t"
                         + rs.getDouble("psnrVal") + "\n"
-                );
+                );*/
+                counter += 1;
             }
+            this.tableViewDataImperceptibility.setItems(this.dataImperceptibilities);
+            this.tableViewDataImperceptibility.autosize();
+            rs.close();
+            MainController.appControll.sqLiteDB.closeConnection();
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Database",
+                    "Terjadi kesalahan: " + e.getMessage(),
+                    ButtonType.OK
+            );
+        }
+    }
+
+    @FXML void handleBacaDataRobustness (ActionEvent actionEvent) {
+        ResultSet rs = null;
+        try {
+            String sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_NOISE_NAME;
+            rs = MainController.appControll.sqLiteDB.SelectQuery(sql);
+            this.dataRobustness.clear();
+            Integer counter = 1;
+            while (rs.next()) {
+                ResultSet rss = MainController.appControll.sqLiteDB.SelectQuery(
+                        "SELECT stegoImageName FROM " + AppControll.TABLE_STEGANO_NAME + " WHERE "
+                        + "id = " + rs.getInt("sid") + ";"
+                );
+                this.dataRobustness.add(new DataRobustness(
+                        counter,
+                        rss.getString("stegoImageName"),
+                        rs.getDouble("noiseProb"),
+                        rs.getDouble("percentage")
+                ));
+                /*this.textAreaDataRobustness.appendText(
+                        rs.getInt("nid") + "  "
+                                + rs.getInt("sid") + "\t"
+                                + rss.getString("stegoImageName") + "\t"
+                                + rs.getDouble("noiseProb") + "\t"
+                                + rs.getDouble("percentage") + "\n"
+                );*/
+                counter += 1;
+            }
+            this.tableViewDataRobustness.setItems(this.dataRobustness);
+            this.tableViewDataImperceptibility.autosize();
             rs.close();
             MainController.appControll.sqLiteDB.closeConnection();
         } catch (Exception e) {
