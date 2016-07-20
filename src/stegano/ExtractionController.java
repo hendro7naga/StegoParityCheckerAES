@@ -58,7 +58,7 @@ public class ExtractionController implements Initializable {
     @FXML
     TextArea textAreaChiper, textAreaOri;
     @FXML
-    Button btnBrowseStegoImg, btnExtract, btnDecrypt;
+    Button btnBrowseStegoImg, btnExtract, btnDecrypt, btnSaveText;
     @FXML
     ImageView imgViewStegoImg;
 
@@ -88,6 +88,8 @@ public class ExtractionController implements Initializable {
                 this.stegoImage = SwingFXUtils.fromFXImage(this.coverImage, null);
                 lblInfoStego.setText("Nama File: " + file.getName());
                 loadImage = true;
+                this.txtInputPass.clear();
+                this.txtInputPass.setEditable(true);
             } catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                         "File Path",
@@ -296,19 +298,6 @@ public class ExtractionController implements Initializable {
                 indeks += 8;
             }
 
-            /*this.textAreaOri.appendText(
-                    "\nBilanganGemod: " + this.gemodNumber +
-                    "\nPanjangPesan: " + panjangPesan
-                    +"\nBinerHurufPertama: " + binerKunci.substring(0, 8)
-                    +"\nHurufPertamaInt: " + bil
-                    +"\nHurufPertamaKunci: " + huruf1
-                    +"\nstrKunci: " + strKunci
-                    +"\nKuncidariPasswordField: " + this.txtInputPass.getText()
-                    +"\nPanjangStrKunci: " + strKunci.length()
-                    +"\nPanjangKunciPasswordField: " + this.txtInputPass.getText().length()
-            );*/
-
-            //this.textAreaOri.appendText("\n");
             this.kunciSama = false;
             char[] arrKunciTersimpan = strKunci.toCharArray();
             char[] arrKunciInput = this.txtInputPass.getText().toCharArray();
@@ -361,10 +350,6 @@ public class ExtractionController implements Initializable {
             );
         }
         if (this.chiperTextInBiner.length() >= 16) {
-            /*this.textAreaOri.appendText(
-                    "\nDataPesanInBiner: " + "\n" + this.chiperTextInBiner + "\n"
-                    +"Panjang dataPesanInBiner: " + this.chiperTextInBiner.length() + "\n"
-            );*/
             doExtractMessage();
         }
     }
@@ -487,7 +472,10 @@ public class ExtractionController implements Initializable {
                 }
             }
             this.arrCharTeksOri = hasilDekrip.toCharArray();
-            this.textAreaOri.appendText(hasilDekrip);
+            this.textAreaOri.clear();
+            this.textAreaOri.setText(hasilDekrip);
+            this.btnDecrypt.setDisable(true);
+            this.btnSaveText.setDisable(false);
         }
     }
 
@@ -548,12 +536,16 @@ public class ExtractionController implements Initializable {
                     "Penyimpanan data teks .txt ke direktori berhasil dilakukan.",
                     ButtonType.OK
             );
+            this.btnSaveText.setDisable(true);
         } catch (IOException ioexception) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                     "Penyimpanan Berkas .txt",
                     "Terjadi kesalahan ketika proses penyimpanan berkas .txt ke direktori",
                     ButtonType.OK
             );
+        }
+        finally {
+            System.gc();
         }
     }
 

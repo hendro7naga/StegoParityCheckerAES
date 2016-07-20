@@ -6,6 +6,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -78,6 +79,24 @@ public class PengolahanCitra {
             );
             temp = Double.MIN_VALUE;
         }
+        return temp;
+    }
+
+    public static int[] getGrayscaleDataRGB(BufferedImage bufferedImage) {
+        if (bufferedImage == null)
+            return null;
+        int[] temp = new int[bufferedImage.getWidth() * bufferedImage.getHeight()];
+        int indeks = 0;
+        for (int x = 0; x < bufferedImage.getWidth(); x += 1) {
+            for (int y = 0; y < bufferedImage.getHeight(); y += 1) {
+                int r = (bufferedImage.getRGB(x, y)>>16)&0x000000FF;
+                int g = (bufferedImage.getRGB(x, y)>>8)&0x000000FF;
+                int b = (bufferedImage.getRGB(x, y))&0x000000FF;
+                temp[indeks] = (r + g + b) / 3;
+                indeks += 1;
+            }
+        }
+        //Arrays.sort(temp);
         return temp;
     }
 

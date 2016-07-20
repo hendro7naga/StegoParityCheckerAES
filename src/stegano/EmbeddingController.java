@@ -139,12 +139,20 @@ public class EmbeddingController implements Initializable {
     @FXML
     private void handleBtnEncrypt(ActionEvent event) {
         if (textInputMessage.getText().length() < 3 || txtInputPass.getText().length() < 4) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Informasi Enkripsi",
+                    "Pastikan Anda sudah mengisi data teks pesan dan kunci,\n" +
+                            "sebelum melakukan enkripsi.",
+                    ButtonType.OK
+            );
             btnBrowseCoverImg.setDisable(true);
         } else {
             int n = textInputMessage.getText().length();
             nOfChiperLenOnByte = n + ((16 - (n % 16)) % 16);
             nOfChiperLenOnByte *= 8;
             if (doEncrypt()) {
+                btnEncrypt.setDisable(true);
                 btnBrowseCoverImg.setDisable(false);
             }
         }
@@ -164,14 +172,15 @@ public class EmbeddingController implements Initializable {
         fc.setTitle("Buka Berkas Gambar");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
 
-        File fg = fc.showOpenDialog(null);
+        File fg = fc.showOpenDialog(Main.mainStage);
         if (fg != null) {
             try {
                 imgPath = fg.toURI().toURL().toString();
                 coverImage = new Image(imgPath);
                 buffCoverImg = SwingFXUtils.fromFXImage(coverImage, null);
                 imgViewCover.setImage(coverImage);
-                imgViewCover.setFitWidth(imgViewCover.getFitWidth());
+                imgViewCover.setFitWidth(292);
+                imgViewCover.setFitHeight(320);
                 textInfoCoverImg.setText(
                         "Nama File: " + fg.getName() + "\n"
                         + "Lebar: " + coverImage.getWidth() + "\n"
@@ -288,9 +297,7 @@ public class EmbeddingController implements Initializable {
                         "Bit Depth Stego Image harus 24 dan berformat .bmp",
                         ButtonType.OK);
             }
-
         }
-
     }
 
     @FXML
@@ -494,6 +501,7 @@ public class EmbeddingController implements Initializable {
 
             if (penyisipan && createStegoImage()) {
                 imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
+                imgViewStego.setFitWidth(292);
                 btnSaveStegoImg.setDisable(false);
                 this.hasData = true;
             }
@@ -727,7 +735,6 @@ public class EmbeddingController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             btnMainMenu.setGraphic(
-                    //new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("resources/rnd_br_prev32.png")))
                     new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "rnd_br_prev32.png"))
             );
             btnNext.setGraphic(

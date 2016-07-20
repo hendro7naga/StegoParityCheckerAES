@@ -21,7 +21,7 @@
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="821.0">
                <children>
                   <Text fx:id="txtLabelMessage" fill="#5e5a5a" layoutX="22.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass=".text" text="Message Text :" />
-                  <TextArea fx:id="textInputMessage" editable="false" layoutX="22.0" layoutY="55.0" prefHeight="222.0" prefWidth="464.0" wrapText="true" />
+                  <TextArea fx:id="textInputMessage" layoutX="22.0" layoutY="55.0" prefHeight="222.0" prefWidth="464.0" wrapText="true" />
                   <Button fx:id="btnBrowseText" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="368.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleBrowseFileText" prefHeight="25.0" prefWidth="73.0" text="Browse" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
@@ -30,7 +30,7 @@
                   <Label layoutX="442.0" layoutY="33.0" text="(.txt)" />
                   <Text fx:id="txtInfoMessage" layoutX="22.0" layoutY="290.0" stroke="#c3c1c1" strokeType="OUTSIDE" strokeWidth="0.0" text="Text Length : -" wrappingWidth="362.13671875" />
                   <Button fx:id="btnEncrypt" disable="true" layoutX="244.0" layoutY="337.0" mnemonicParsing="false" onAction="#handleBtnEncrypt" text="Encrypt" />
-                  <Label layoutX="22.0" layoutY="320.0" text="Password : " />
+                  <Label layoutX="22.0" layoutY="320.0" text="Kunci : " />
                   <Text layoutX="22.0" layoutY="401.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass=".text" text="Chipertext :" />
                   <Text fx:id="txtInfoChipertext" layoutX="22.0" layoutY="640.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chipertext Length : - " wrappingWidth="387.732421875" />
                   <TextField fx:id="txtInputPass" layoutX="22.0" layoutY="337.0" onKeyReleased="#handleInputPassword" prefHeight="25.0" prefWidth="203.0" />

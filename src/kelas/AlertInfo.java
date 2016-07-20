@@ -5,6 +5,9 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+import static main.MainController.buttonTypeNo;
+import static main.MainController.buttonTypeYes;
+
 /**
  * Created by hendro.sinaga on 10-Jun-16.
  */
@@ -53,8 +56,8 @@ public class AlertInfo {
         alert = new Alert(
                 Alert.AlertType.CONFIRMATION,
                 alertMessage,
-                ButtonType.YES,
-                ButtonType.NO
+                buttonTypeYes,
+                buttonTypeNo
         );
         alert.setTitle(alertTitle);
         alert.setHeaderText(alertHeader);

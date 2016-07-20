@@ -6,14 +6,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.stage.*;
 import kelas.AlertInfo;
+import kelas.KonversiData;
 import kelas.PengolahanCitra;
 import main.AppControll;
 import main.Main;
@@ -24,12 +30,16 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 
 /**
  * Created by hendro.sinaga on 07-Jul-16.
  */
+interface Fungsional {
+    void fungsi();
+}
 public class ImperceptibilityControl {
     BufferedImage imageOri, imageStego;
     String oriImageName = "", stegoImageName = "";
@@ -38,7 +48,7 @@ public class ImperceptibilityControl {
     private boolean hasData;
 
     @FXML
-    Button btnBrowseOriginalImg, btnBrowseStegoImg, btnCalculateMSEPSNR, btnSave, btnMainMenu;
+    Button btnBrowseOriginalImg, btnBrowseStegoImg, btnCalculateMSEPSNR, btnSave, btnShowHistogram, btnMainMenu;
     @FXML
     Label lblInfoOriginalImage, lblInfoStegoImage;
     @FXML
@@ -51,6 +61,7 @@ public class ImperceptibilityControl {
     private void handleBrowseOriginalImg (ActionEvent actionEvent) {
         this.btnBrowseStegoImg.setDisable(true);
         this.btnCalculateMSEPSNR.setDisable(true);
+        this.btnShowHistogram.setDisable(true);
         FileChooser fc = new FileChooser();
         fc.setTitle("Open Original Image");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
@@ -104,6 +115,7 @@ public class ImperceptibilityControl {
     private void handleBrowseStegoImg (ActionEvent actionEvent) {
         String sql = "";
         boolean namaOriImageSama = false;
+        this.btnShowHistogram.setDisable(true);
         ResultSet rs = null;
         if (this.dataTable != null) {
             this.dataTable.clear();
@@ -145,6 +157,7 @@ public class ImperceptibilityControl {
                     this.btnCalculateMSEPSNR.setDisable(false);
                 }
                 //this.btnCalculateMSEPSNR.setDisable(false);
+                this.btnShowHistogram.setDisable(false);
             }
             catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertWarningMessage(
@@ -215,9 +228,126 @@ public class ImperceptibilityControl {
         }
     }
 
+    @FXML void handleShowHistogram (ActionEvent actionEvent) {
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(Main.mainStage);
+
+        int[] grayscaleOriImage = null, grayscaleOriImageDistinct = null, niOriImage = null;
+        int[] grayscaleStegoImage = null, grayscaleStegoImageDistinct = null, niStegoImage = null;
+        double[] histogramOriImage = null, histogramStegoImage = null;
+
+        //final NumberAxis xAxis = new NumberAxis(1, 31, 1);
+        final NumberAxis xAxis = new NumberAxis(0, 255, 1);
+        final NumberAxis xAxisStego = new NumberAxis(0, 255, 1);
+        final NumberAxis yAxis = new NumberAxis();
+        final NumberAxis yAxisStego = new NumberAxis();
+        final AreaChart<Number,Number> acOri =
+                new AreaChart<>(xAxis,yAxis);
+        final AreaChart<Number,Number> acStego =
+                new AreaChart<>(xAxisStego,yAxisStego);
+        acOri.setTitle("Histogram Original Image");
+        //acOri.setPrefWidth(446.6);
+        acOri.setLayoutX(10.2);
+        acOri.setLayoutY(122.2);
+
+        acStego.setTitle("Histogram Stego Image");
+        //acStego.setPrefWidth(446.8);
+        acStego.setLayoutX(552.8);
+        acStego.setLayoutY(122.2);
+
+        ScrollPane scrollPane = new ScrollPane();
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setPrefSize(850, 650);
+        scrollPane.setPrefSize(anchorPane.getPrefWidth() + 100, anchorPane.getPrefHeight() + 10);
+
+        Button button = new Button("Testing");
+        button.setLayoutX(10.2);
+        button.setLayoutY(4.2);
+
+        try {
+            grayscaleOriImage = PengolahanCitra.getGrayscaleDataRGB(this.imageOri);
+            grayscaleOriImageDistinct = KonversiData.getDistinctArray(grayscaleOriImage);
+            Arrays.sort(grayscaleOriImageDistinct);
+
+            grayscaleStegoImage = PengolahanCitra.getGrayscaleDataRGB(this.imageStego);
+            grayscaleStegoImageDistinct = KonversiData.getDistinctArray(grayscaleStegoImage);
+            Arrays.sort(grayscaleStegoImageDistinct);
+
+            niOriImage = new int[grayscaleOriImageDistinct.length];
+            niStegoImage = new int[grayscaleStegoImageDistinct.length];
+
+            for (int i = 0; i < grayscaleOriImageDistinct.length; i += 1) {
+                niOriImage[i] = 0;
+            }
+            for (int i = 0; i < grayscaleStegoImageDistinct.length; i += 1) {
+                niStegoImage[i] = 0;
+            }
+
+            for (int i = 0; i < grayscaleOriImageDistinct.length; i += 1) {
+                for (int j = 0; j < grayscaleOriImage.length; j += 1) {
+                    if (grayscaleOriImageDistinct[i] == grayscaleOriImage[j]) {
+                        niOriImage[i] = niOriImage[i] + 1;
+                    }
+                }
+            }
+
+            for (int i = 0; i < grayscaleStegoImageDistinct.length; i += 1) {
+                for (int j = 0; j < grayscaleStegoImage.length; j += 1) {
+                    if (grayscaleStegoImageDistinct[i] == grayscaleStegoImage[j]) {
+                        niStegoImage[i] = niStegoImage[i] + 1;
+                    }
+                }
+            }
+
+            histogramOriImage = new double[niOriImage.length];
+            for (int i = 0; i < niOriImage.length; i += 1) {
+                histogramOriImage[i] = (double)niOriImage[i] / (this.imageOri.getWidth() * this.imageOri.getHeight());
+            }
+
+            histogramStegoImage = new double[niStegoImage.length];
+            for (int i = 0; i < niStegoImage.length; i += 1) {
+                histogramStegoImage[i] = (double)niStegoImage[i] / (this.imageStego.getWidth() * this.imageStego.getHeight());
+            }
+
+            XYChart.Series seriesOri = new XYChart.Series();
+            seriesOri.setName("Original Image");
+            for (int i = 0; i < grayscaleOriImageDistinct.length; i += 1) {
+                seriesOri.getData().add(new XYChart.Data(grayscaleOriImageDistinct[i], histogramOriImage[i]));
+            }
+
+            XYChart.Series seriesStego = new XYChart.Series();
+            seriesStego.setName("Stego Image");
+
+            for (int i = 0; i < grayscaleStegoImageDistinct.length; i += 1) {
+                seriesStego.getData().add(new XYChart.Data(grayscaleStegoImageDistinct[i], histogramStegoImage[i]));
+            }
+
+            acOri.getStylesheets().add(getClass().getClassLoader().getResource("css/Chart.css").toString());
+
+            acOri.getData().addAll(seriesOri);
+            acStego.getData().addAll(seriesStego);
+            anchorPane.getChildren().addAll(acOri, acStego);
+            scrollPane.setContent(anchorPane);
+            Scene dialogScene = new Scene(scrollPane, 850, 650);
+            dialog.setTitle("Histrogram : Grayscale");
+            dialog.setScene(dialogScene);
+            dialog.showAndWait();
+        } catch (Exception e) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Init Histogram Scene",
+                    "Terjadi kesalahan: " + e.getMessage(),
+                    ButtonType.OK
+            );
+        }
+
+        System.gc();
+    }
+
     @FXML
     private void handleMainMenuScene(ActionEvent actionEvent) {
-        boolean prosesToMainMenu = false;
+        boolean prosesToMainMenu = true;
         if (this.hasData) {
             Optional<ButtonType> b = AlertInfo.showConfirmMessage(
                     "Informasi Aplikasi",
@@ -226,34 +356,34 @@ public class ImperceptibilityControl {
                             + "Data yang telah diproses tidak tersedia pada hasil testing.\n"
                             + "Anda yakin mengabaikan data yang telah diproses?"
             );
-            if (b.equals(ButtonType.OK)) {
+            if (b.get().equals(MainController.buttonTypeYes)) {
                 this.hasData = false;
                 prosesToMainMenu = true;
+            } else {
+                prosesToMainMenu = false;
             }
-        } else {
-            if (prosesToMainMenu) {
-                Parent p = null;
-                boolean sceneLoaded = true;
+        }
 
-                try {
-                    p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-                } catch (IOException ex) {
-                    sceneLoaded = false;
-                }
+        if (prosesToMainMenu) {
+            Parent p = null;
+            boolean sceneLoaded = true;
+            try {
+                p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
+            } catch (IOException ex) {
+                sceneLoaded = false;
+            }
 
-                if (!sceneLoaded || p == null) {
-                    AlertInfo.showAlertWarningMessage(
-                            "Informasi Aplikasi",
-                            "Load main scene",
-                            "Gagal membuka main scene",
-                            ButtonType.OK
-                    );
-                } else {
-                    this.dataTable.clear();
-                    Main.mainStage.setTitle("Aplikasi Steganografi");
-                    Main.mainStage.setScene(new Scene(p, 756, 485));
-                    Main.mainStage.centerOnScreen();
-                }
+            if (!sceneLoaded || p == null) {
+                AlertInfo.showAlertWarningMessage(
+                        "Informasi Aplikasi",
+                        "Load main scene",
+                        "Gagal membuka main scene",
+                        ButtonType.OK
+                );
+            } else {
+                Main.mainStage.setTitle("Aplikasi Steganografi");
+                Main.mainStage.setScene(new Scene(p, 756, 485));
+                Main.mainStage.centerOnScreen();
             }
         }
 
