@@ -1,0 +1,24 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="StegoParityCheckerAES">
+    <output-path>$PROJECT_DIR$/out/artifacts/StegoParityCheckerAES</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="main.Main" />
+        <option name="description" value="" />
+        <option name="height" value="500" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="Stegano ParityChecker AES" />
+        <option name="vendor" value="" />
+        <option name="version" value="0.654" />
+        <option name="width" value="650" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="StegoParityCheckerAES.jar">
+        <element id="module-output" name="StegoParityCheckerAES" />
+      </element>
+      <element id="library" level="project" name="curvesapi-1.03" />
+      <element id="library" level="project" name="sqlite-jdbc-3.8.11.2" />
+    </root>
+  </artifact>
+</component>

@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.OpenScene;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ import javafx.scene.text.Text;
 import javafx.stage.*;
 import kelas.AlertInfo;
 import kelas.KonversiData;
+import kelas.Matematik;
 import kelas.PengolahanCitra;
 import main.AppControll;
 import main.Main;
@@ -37,10 +39,8 @@ import java.util.Optional;
 /**
  * Created by hendro.sinaga on 07-Jul-16.
  */
-interface Fungsional {
-    void fungsi();
-}
-public class ImperceptibilityControl {
+
+public class ImperceptibilityControl implements OpenScene {
     BufferedImage imageOri, imageStego;
     String oriImageName = "", stegoImageName = "";
     HashMap<String, Integer> dataTable;
@@ -67,22 +67,23 @@ public class ImperceptibilityControl {
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
         Image image = null;
         String sql = "";
-
+        boolean continueProcess = true;
         File file = null;
+
         if (this.hasData) {
             Optional<ButtonType> b = AlertInfo.showConfirmMessage(
                     "Informasi Aplikasi",
                     "Konfirmasi",
                     "Sistem mendeteksi bahwa data sebelumnya belum disimpan.\n"
-                    + "Data yang telah diproses tidak tersedia pada hasil testing.\n"
-                    + "Anda yakin mengabaikan data yang telah diproses?"
+                            + "Data yang telah diproses tidak tersedia pada hasil testing.\n"
+                            + "Anda yakin mengabaikan data yang telah diproses?"
             );
-            if (b.equals(ButtonType.OK)) {
+            if (b.get().equals(MainController.buttonTypeYes)) {
                 this.hasData = false;
-                file = fc.showOpenDialog(null);
+                file = fc.showOpenDialog(Main.mainStage);
             }
         } else {
-            file = fc.showOpenDialog(null);
+            file = fc.showOpenDialog(Main.mainStage);
         }
 
         if (file != null) {
@@ -141,9 +142,10 @@ public class ImperceptibilityControl {
                 this.lblInfoStegoImage.setText(infoStegoImage);
                 this.stegoImageName = file.getName();
 
-                sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_NAME + " WHERE "
+                sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_MASTER + " WHERE "
                         + "stegoImageName = '" + this.stegoImageName + "';";
                 rs = MainController.appControll.sqLiteDB.SelectQuery(sql);
+
                 while (rs.next()) {
                     if (this.oriImageName.equalsIgnoreCase(rs.getString("oriImageName"))) {
                         namaOriImageSama = true;
@@ -188,8 +190,12 @@ public class ImperceptibilityControl {
         }
         if (prosesCalculate) {
             this.mseVal = PengolahanCitra.calculateMSE(this.imageOri, this.imageStego);
+            //this.mseVal = Matematik.roundUpDoubleWithTwoDecimalPlace(this.mseVal);
             if (this.mseVal > Double.MIN_VALUE) {
                 this.psnrVal = PengolahanCitra.calculatePSNR(this.mseVal);
+                this.mseVal = Matematik.roundUpDoubleWithTwoDecimalPlace(this.mseVal);
+                //this.mseVal = Double.parseDouble(this.mseVal + "");
+                this.psnrVal = Matematik.roundUpDoubleWithTwoDecimalPlace(this.psnrVal);
                 this.txtfieldMSE.setText(this.mseVal + "");
                 this.txtfieldPSNR.setText(this.psnrVal + "");
                 this.hasData = true;
@@ -201,31 +207,70 @@ public class ImperceptibilityControl {
     }
 
     @FXML void handleBtnSaveData(ActionEvent actionEvent) {
-        String sql = "UPDATE " + AppControll.TABLE_STEGANO_NAME
-                + " SET mseVal = " + this.mseVal
-                + ", psnrVal = " + this.psnrVal
-                + " WHERE id = " + this.dataTable.get(this.stegoImageName);
         int res = 0;
+        boolean dataSudahAda = false, prosesCekBerhasil = false;
         try {
-            res = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sql);
-            this.hasData = false;
+            ResultSet rs = MainController.appControll.sqLiteDB.SelectQuery(
+                    "SELECT * FROM " + AppControll.TABLE_STEGANO_IMPERCEPTIBILITY + " WHERE "
+                            + "sid = " + this.dataTable.get(this.stegoImageName) + ";"
+            );
+            if (rs.next()) {
+                dataSudahAda = true;
+            }
+            prosesCekBerhasil = true;
         } catch (Exception e) {
+            prosesCekBerhasil = false;
+        }
+
+        if (prosesCekBerhasil) {
+            if (dataSudahAda) {
+                AlertInfo.showAlertInfoMessage(
+                        "Informasi Aplikasi",
+                        "Pengecekan Data",
+                        "Data imperceptibility sudah tersedia pada database\n"
+                        + "Silahkan lakukan proses pengujian imperceptibility yang berbeda.",
+                        ButtonType.OK
+                );
+            } else {
+                try {
+                    int n = 0;
+                    n = MainController.appControll.sqLiteDB.getJumlahBaris(AppControll.TABLE_STEGANO_IMPERCEPTIBILITY);
+                    n += 1;
+                    String sql = "INSERT INTO " + AppControll.TABLE_STEGANO_IMPERCEPTIBILITY + " VALUES("
+                            + n + ", "
+                            + this.dataTable.get(this.stegoImageName) + ", "
+                            + this.mseVal + ", "
+                            + this.psnrVal
+                            + ");";
+                    res = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sql);
+                    this.hasData = false;
+                } catch (Exception e) {
+                    AlertInfo.showAlertErrorMessage(
+                            "Informasi Aplikasi",
+                            "Update Data",
+                            "Gagal memperbaharui data pada database: \n" + e.getMessage(),
+                            ButtonType.OK
+                    );
+                }
+
+                if (res > 0) {
+                    AlertInfo.showAlertInfoMessage(
+                            "Informasi Aplikasi",
+                            "Update Data",
+                            "Data mse dan psnr berhasil disimpan",
+                            ButtonType.OK
+                    );
+                }
+            }
+        } else {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
-                    "Update Data",
-                    "Gagal memperbaharui data pada database: \n" + e.getMessage(),
+                    "Periksa Data",
+                    "Gagal Memeriksa data pada database",
                     ButtonType.OK
             );
         }
 
-        if (res > 0) {
-            AlertInfo.showAlertInfoMessage(
-                    "Informasi Aplikasi",
-                    "Update Data",
-                    "Data berhasil diperbaharui",
-                    ButtonType.OK
-            );
-        }
     }
 
     @FXML void handleShowHistogram (ActionEvent actionEvent) {
@@ -341,7 +386,6 @@ public class ImperceptibilityControl {
                     ButtonType.OK
             );
         }
-
         System.gc();
     }
 
@@ -365,26 +409,17 @@ public class ImperceptibilityControl {
         }
 
         if (prosesToMainMenu) {
-            Parent p = null;
-            boolean sceneLoaded = true;
             try {
-                p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-            } catch (IOException ex) {
-                sceneLoaded = false;
-            }
-
-            if (!sceneLoaded || p == null) {
+                open("main", 756.0, 485.0);
+            } catch (Exception e) {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",
                         "Load main scene",
-                        "Gagal membuka main scene",
+                        "Terjadi kesalahan: " + e.getMessage(),
                         ButtonType.OK
                 );
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi");
-                Main.mainStage.setScene(new Scene(p, 756, 485));
-                Main.mainStage.centerOnScreen();
             }
+
         }
 
     }

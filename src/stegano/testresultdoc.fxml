@@ -25,7 +25,7 @@
                                     <AnchorPane prefHeight="600.0" prefWidth="856.0">
                                        <children>
                                           <Button fx:id="btnBacaDataImperceptibility" layoutX="3.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleBacaDataImperceptibility" text="Syncronize Data" />
-                                          <TableView fx:id="tableViewDataImperceptibility" layoutX="3.0" layoutY="50.0" prefHeight="511.0" prefWidth="848.0">
+                                          <TableView fx:id="tableViewDataImperceptibility" layoutX="3.0" layoutY="50.0" prefHeight="517.0" prefWidth="848.0">
                                              <columns>
                                                 <TableColumn fx:id="noImperceptibilityTableCol" editable="false" prefWidth="56.0" text="No.">
                                                     <cellValueFactory><PropertyValueFactory property="nomor" /></cellValueFactory>
@@ -47,6 +47,8 @@
                                                 </TableColumn>
                                              </columns>
                                           </TableView>
+                                          <Button fx:id="btnExportToExcelImperceptibility" disable="true" layoutX="3.0" layoutY="570.0" mnemonicParsing="false" onAction="#handleExportToExcelImperceptibility" text="Export to Excel" />
+                                          <Button fx:id="btnclearDataImperceptibility" onAction="#handleClearDataImperceptibility" layoutX="690.0" layoutY="570.0" mnemonicParsing="false" text="Clear Data Imperceptibility" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -60,7 +62,7 @@
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="744.0">
                                        <children>
                                           <Button fx:id="btnBacaDataRobustness" layoutX="3.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleBacaDataRobustness" text="Syncronize Data" />
-                                          <TableView fx:id="tableViewDataRobustness" layoutX="3.0" layoutY="50.0" prefHeight="540.0" prefWidth="737.0">
+                                          <TableView fx:id="tableViewDataRobustness" layoutX="3.0" layoutY="50.0" prefHeight="517.0" prefWidth="737.0">
                                             <columns>
                                               <TableColumn fx:id="noColRobustness" editable="false" prefWidth="56.0" text="No.">
                                                   <cellValueFactory><PropertyValueFactory property="nomor" /></cellValueFactory>
@@ -76,6 +78,8 @@
                                               </TableColumn>
                                             </columns>
                                           </TableView>
+                                          <Button fx:id="btnExportToExcelRobustness" disable="true" layoutX="3.0" layoutY="570.0" mnemonicParsing="false" onAction="#handleExportToExcelRobustness" text="Export to Excel" />
+                                          <Button fx:id="btnClearDataRobustness" onAction="#handleClearDataRobustness" layoutX="595.0" layoutY="570.0" mnemonicParsing="false" text="Clear Data Robustness" />
                                        </children>
                                     </AnchorPane>
                                 </content>

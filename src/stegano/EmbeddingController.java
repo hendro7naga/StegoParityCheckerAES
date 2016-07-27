@@ -30,6 +30,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.ArrayList;
@@ -64,16 +66,19 @@ public class EmbeddingController implements Initializable {
     @FXML
     TextArea textInputMessage, textChiper;
     @FXML
-    Text txtInfoMessage,textInfoStegoImg, textInfoCoverImg;
+    Text txtInfoMessage, txtInfoChipertext, textInfoStegoImg, textInfoCoverImg;
     @FXML
     TextField txtInputPass;
     @FXML
     Button btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
-    @FXML
-    ImageView imgViewCover, imgViewStego;
+    @FXML ImageView imgViewCover, imgViewStego;
+    @FXML ProgressBar progressBar;
 
     @FXML
     private void handleBrowseFileText(ActionEvent event) {
+        this.btnBrowseCoverImg.setDisable(true);
+        this.btnEmbedMessage.setDisable(true);
+        this.btnEncrypt.setDisable(true);
         hasData = false;
         boolean sukses = true;
         byte[] byteTeks = null;
@@ -89,6 +94,8 @@ public class EmbeddingController implements Initializable {
                 byteTeks = Files.readAllBytes(Paths.get(fileTeks.getPath()));
                 textInputMessage.setText(new String(byteTeks));
                 this.textLength = textInputMessage.getLength();
+                this.textInputMessage.setEditable(false);
+                this.txtInputPass.setEditable(true);
             } catch (IOException ex) {
                 alert = new Alert(Alert.AlertType.ERROR,
                                 "Berkas tidak dapat diakses dan dibaca.\nDetail Error: " + ex.getMessage(),
@@ -109,8 +116,15 @@ public class EmbeddingController implements Initializable {
     }
 
     private void handleTextInputMessage() {
+        textInputMessage.commitValue();
         int len = textInputMessage.getText().length();
         txtInfoMessage.setText("Text Length : " + len + " Byte");
+        this.textLength = len;
+        if (len > 3) {
+            this.txtInputPass.setEditable(true);
+        } else {
+            this.txtInputPass.setEditable(false);
+        }
     }
 
     @FXML
@@ -149,9 +163,11 @@ public class EmbeddingController implements Initializable {
             btnBrowseCoverImg.setDisable(true);
         } else {
             int n = textInputMessage.getText().length();
-            nOfChiperLenOnByte = n + ((16 - (n % 16)) % 16);
-            nOfChiperLenOnByte *= 8;
+            this.textLength = n;
+            this.nOfChiperLenOnByte = n + ((16 - (n % 16)) % 16);
+            this.nOfChiperLenOnByte *= 8;
             if (doEncrypt()) {
+                this.txtInfoChipertext.setText("Length: " + (this.dataEncrypt.size() * 16) + " byte");
                 btnEncrypt.setDisable(true);
                 btnBrowseCoverImg.setDisable(false);
             }
@@ -250,53 +266,65 @@ public class EmbeddingController implements Initializable {
                 }
             }
 
-            if (this.isBmp24Bit) {
-                int np = this.coverImgWidth * this.coverImgHeight;
-                this.rgbDataOfImage = new int[buffCoverImg.getWidth() * buffCoverImg.getHeight()];
-                String npOnBinary = Integer.toBinaryString(np);
-                this.xnm = npOnBinary.length();
-                //this.nOfChiperLenOnByte = textChiper.getText().length() * 8;
-                this.nOfPixelForEmbedding = this.xnm + this.nOfChiperLenOnByte + NK_ON_BYTE;
-                for (int i = ((np % 2 == 0) ? np - 1 : np); i > 0; i -= 2) {
-                    this.primeNumber = new BigInteger(i + "", 10);
-                    if (primeNumber.isProbablePrime(1)) {
-                        break;
-                    }
-                }
-
-                if (this.primeNumber.intValue() > this.nOfPixelForEmbedding) {
-                    try {
-                        int indeks = 0;
-                        for (int x = 0; x < buffCoverImg.getWidth(); x += 1) {
-                            for (int y = 0; y < buffCoverImg.getHeight(); y += 1) {
-                                this.rgbDataOfImage[indeks] = buffCoverImg.getRGB(x, y);
-                                indeks += 1;
-                            }
+            if (checkStegoData()) {
+                AlertInfo.showAlertWarningMessage(
+                        "Informasi Aplikasi",
+                        "Perhatian",
+                        "Pesan dan Citra yang Anda berikan sudah tersedia di database..\n"
+                                + "Harap berikan data yang berbeda.",
+                        ButtonType.OK
+                );
+            }
+            else {
+                if (this.isBmp24Bit) {
+                    int np = this.coverImgWidth * this.coverImgHeight;
+                    this.rgbDataOfImage = new int[buffCoverImg.getWidth() * buffCoverImg.getHeight()];
+                    String npOnBinary = Integer.toBinaryString(np);
+                    this.xnm = npOnBinary.length();
+                    //this.nOfChiperLenOnByte = textChiper.getText().length() * 8;
+                    this.nOfPixelForEmbedding = this.xnm + this.nOfChiperLenOnByte + NK_ON_BYTE;
+                    for (int i = ((np % 2 == 0) ? np - 1 : np); i > 0; i -= 2) {
+                        this.primeNumber = new BigInteger(i + "", 10);
+                        if (primeNumber.isProbablePrime(1)) {
+                            break;
                         }
-                        this.btnEmbedMessage.setDisable(false);
-                    } catch (Exception except) {
-                        AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
-                                "Membaca Data RGB Gambar",
-                                "Terjadi kesalahan ketika membaca data RGB Stego Image",
+                    }
+
+                    if (this.primeNumber.intValue() > this.nOfPixelForEmbedding) {
+                        try {
+                            int indeks = 0;
+                            for (int x = 0; x < buffCoverImg.getWidth(); x += 1) {
+                                for (int y = 0; y < buffCoverImg.getHeight(); y += 1) {
+                                    this.rgbDataOfImage[indeks] = buffCoverImg.getRGB(x, y);
+                                    indeks += 1;
+                                }
+                            }
+                            this.btnEmbedMessage.setDisable(false);
+                        } catch (Exception except) {
+                            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                                    "Membaca Data RGB Gambar",
+                                    "Terjadi kesalahan ketika membaca data RGB Stego Image",
+                                    ButtonType.OK
+                            );
+                        }
+                    } else {
+                        AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
+                                "Perhatian",
+                                "Image yang Anda input untuk disisipi pesan tidak sanggup menampung pesan Anda.\n"
+                                        + "Harap upload ulang image yang lebih besar.",
                                 ButtonType.OK
                         );
                     }
-                } else {
-                    AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
-                            "Perhatian",
-                            "Image yang Anda input untuk disisipi pesan tidak sanggup menampung pesan Anda.\n"
-                            + "Harap upload ulang image yang lebih besar.",
-                            ButtonType.OK
-                    );
-                }
 
-            } else {
-                AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
-                        "Validasi Awal Stego Image",
-                        "Stego Image tidak mendukung.\n" +
-                        "Bit Depth Stego Image harus 24 dan berformat .bmp",
-                        ButtonType.OK);
+                } else {
+                    AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                            "Validasi Awal Stego Image",
+                            "Stego Image tidak mendukung.\n" +
+                            "Bit Depth Stego Image harus 24 dan berformat .bmp",
+                            ButtonType.OK);
+                }
             }
+
         }
     }
 
@@ -502,6 +530,7 @@ public class EmbeddingController implements Initializable {
             if (penyisipan && createStegoImage()) {
                 imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
                 imgViewStego.setFitWidth(292);
+                this.btnEmbedMessage.setDisable(true);
                 btnSaveStegoImg.setDisable(false);
                 this.hasData = true;
             }
@@ -514,6 +543,9 @@ public class EmbeddingController implements Initializable {
         fileChooser.setTitle("Buka Berkas Gambar");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
         boolean res = false;
+        fileChooser.setInitialFileName(this.imgOriName.substring(0, this.imgOriName.lastIndexOf('.'))
+                                        + "_" + this.textLength + "_stego");
+
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             //String selected_desc = fileChooser.getSelectedExtensionFilter().getDescription();
@@ -539,15 +571,13 @@ public class EmbeddingController implements Initializable {
             int val = -1;
             try {
                 int n = 0;
-                n = MainController.appControll.sqLiteDB.getJumlahBaris(AppControll.TABLE_STEGANO_NAME);
+                n = MainController.appControll.sqLiteDB.getJumlahBaris(AppControll.TABLE_STEGANO_MASTER);
                 n += 1;
-                String sql = "INSERT INTO " + AppControll.TABLE_STEGANO_NAME + " VALUES("
+                String sql = "INSERT INTO " + AppControll.TABLE_STEGANO_MASTER + " VALUES("
                         + n + ", '"
                         + this.imgOriName + "', '"
                         + this.imgStegoName + "', "
-                        + this.textLength + ", "
-                        + 0.0 + ", "
-                        + 0.0
+                        + this.textLength
                         + ");";
                 val = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sql);
                 MainController.appControll.sqLiteDB.closeConnection();
@@ -572,6 +602,8 @@ public class EmbeddingController implements Initializable {
                     "Proses menyimpan stego image ke direktori berhasil dilakukan" + teksStatus,
                     ButtonType.OK
             );
+            this.btnSaveStegoImg.setDisable(true);
+            this.txtInputPass.setEditable(false);
         }
     }
 
@@ -658,13 +690,26 @@ public class EmbeddingController implements Initializable {
         HAES256 haes256 = HAES256.getInstance();
 
         try {
+            progressBar.setVisible(true);
+            progressBar.setProgress(0.00);
+            progressBar.setVisible(true);
+            Thread.sleep(400);
             for (short i = 0; i < kunciArrChar.length; i += 1) {
                 kunciEncrypt[i] = (int)kunciArrChar[i];
+                progressBar.setProgress(progressBar.getProgress() + 0.02);
+            }
+
+            if (progressBar.getProgress() < 0.40) {
+                progressBar.setProgress(progressBar.getProgress() + 0.05);
+                Thread.sleep(200);
             }
 
             while (prosesPotong) {
                 ArrayList<Integer> tmpPesan = new ArrayList<>();
                 String subs = "";
+                if (progressBar.getProgress() < 0.64) {
+                    progressBar.setProgress(progressBar.getProgress() + 0.02);
+                }
                 if (indeksStart + 16 >= this.textInputMessage.getText().length()) {
                     subs = this.textInputMessage.getText(indeksStart, panjangTeks);
                     prosesPotong = false;
@@ -681,9 +726,13 @@ public class EmbeddingController implements Initializable {
             }
             this.dataEncrypt = new ArrayList<>();
 
+
             for (int i = 0; i < this.dataPesan.size(); i += 1) {
                 ArrayList<Integer> subData = new ArrayList<>();
                 try {
+                    if (progressBar.getProgress() < 0.96) {
+                        progressBar.setProgress(progressBar.getProgress() + 0.02);
+                    }
                     if (haes256.encryptDataInteger(
                             KonversiData.arraylist1DToArr1D(this.dataPesan.get(i)),
                             kunciEncrypt
@@ -708,6 +757,9 @@ public class EmbeddingController implements Initializable {
                     break;
                 }*/
             }
+            progressBar.setProgress(1.00);
+            Thread.sleep(600);
+            progressBar.setVisible(false);
 
         } catch (Exception except) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Embedding",
@@ -729,6 +781,41 @@ public class EmbeddingController implements Initializable {
             btnBrowseCoverImg.setDisable(false);
         }
         return this.enkripProsesSukses;
+    }
+
+    private boolean checkStegoData() {
+        boolean sameData = false;
+        /*
+        "SELECT * FROM " + AppControll.TABLE_STEGANO_MASTER
+                    + " WHERE oriImageName = '" + this.imgOriName + "' AND msgLength = " + this
+         */
+        String q = "SELECT oriImageName, msgLength FROM " + AppControll.TABLE_STEGANO_MASTER;
+        MainController.initApp();
+        int initAppControl;
+        ResultSet resultSet;
+
+        try {
+            initAppControl = MainController.appControll.init();
+            if (initAppControl == 1) {
+                resultSet = MainController.appControll.sqLiteDB.SelectQuery(q);
+                while (resultSet.next()) {
+                    if (this.imgOriName.equalsIgnoreCase(resultSet.getString("oriImageName")) &&
+                            this.textLength == resultSet.getInt("msgLength")) {
+                        sameData = true;
+                        break;
+                    }
+                }
+                resultSet.close();
+                MainController.appControll.sqLiteDB.closeConnection();
+            }
+        } catch (Exception e) {
+            sameData = false;
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Inisialisasi Aplikasi",
+                    "Terjadi kesalahan: " + e.getMessage(),
+                    ButtonType.OK);
+        }
+        return sameData;
     }
 
     @Override

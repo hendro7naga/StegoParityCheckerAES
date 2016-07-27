@@ -8,8 +8,9 @@ import java.sql.Statement;
  */
 public class AppControll {
     public static final String USER_DIR = "user.home";
-    public static final String TABLE_STEGANO_NAME = "stegano";
-    public static final String TABLE_STEGANO_NOISE_NAME = "steganonoise";
+    public static final String TABLE_STEGANO_MASTER = "stegano";
+    public static final String TABLE_STEGANO_IMPERCEPTIBILITY = "steganoImperceptibility";
+    public static final String TABLE_STEGANO_ROBUSTNESS = "steganoRobustness";
     public static final String DB_NAME = "main.db";
     private static String pathSeparator;
     private boolean isAlreadyInitialize = false;
@@ -57,20 +58,30 @@ public class AppControll {
     private void checkTable() throws Exception {
         try {
             Statement statement = this.sqLiteDB.createConnection().createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_NAME
+            String sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_MASTER
                     + " (id INTEGER PRIMARY KEY NOT NULL, "
                     + "oriImageName VARCHAR NOT NULL, "
                     + "stegoImageName VARCHAR NOT NULL, "
-                    + "msgLength INTEGER NOT NULL, "
-                    + "mseVal DOUBLE NOT NULL, "
-                    + "psnrVal DOUBLE NOT NULL"
+                    + "msgLength INTEGER NOT NULL"
                     + ");";
             if (statement.executeUpdate(sql) > -1) {
-                sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_NOISE_NAME
-                        + " (nid INTEGER PRIMARY KEY NOT NULL, "
+                sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_IMPERCEPTIBILITY
+                        + " (id INTEGER PRIMARY KEY NOT NULL, "
+                        + "sid INTEGER NOT NULL, "
+                        + "mseVal DOUBLE NOT NULL, "
+                        + "psnrVal DOUBLE NOT NULL, "
+                        + "FOREIGN KEY(sid) REFERENCES "
+                        + AppControll.TABLE_STEGANO_MASTER + "(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                        + ");";
+            }
+            if (statement.executeUpdate(sql) > -1) {
+                sql = "CREATE TABLE IF NOT EXISTS " + AppControll.TABLE_STEGANO_ROBUSTNESS
+                        + " (nid INTEGER PRIMARY KEY, "
                         + "sid INTEGER NOT NULL, "
                         + "noiseProb DOUBLE NOT NULL, "
-                        + "percentage DOUBLE NOT NULL"
+                        + "percentage DOUBLE NOT NULL, "
+                        + "FOREIGN KEY(sid) REFERENCES "
+                        + AppControll.TABLE_STEGANO_MASTER + "(id) ON DELETE CASCADE ON UPDATE CASCADE"
                         + ");";
                 statement.executeUpdate(sql);
             }

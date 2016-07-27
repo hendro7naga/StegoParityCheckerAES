@@ -14,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import kelas.*;
 import kripto.HAES256;
@@ -31,11 +30,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Created by hendro.sinaga on 10-Jul-16.
@@ -48,12 +43,12 @@ public class RobustnessControl implements Initializable {
     BigInteger primeNumber;
     Double noiseProb, percentage;
     String stegoImagePathFile = "", chiperTextInBiner = "", stegoImageName = "";
-    boolean kunciSama = false, stegoImageNameSama = false, hasData = false;
+    boolean kunciSama = false, stegoImageNameSama = false, hasData = false, skipOpenFile = false;
     int[] rgbDataOfImage;
     int nOfChiperLenOnByte = 0, nOfPixelForEmbedding = -1;
     int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1, np;
     final int NK_ON_BYTE = 256;
-    char[] arrCharTeksOri;
+    char[] arrCharTeksOri = null;
     @FXML
     AnchorPane anchorPaneExtraction;
     @FXML
@@ -76,6 +71,7 @@ public class RobustnessControl implements Initializable {
         this.percentage = 0D;
         this.primeNumber = new BigInteger("0", 10);
         this.kunciSama = false;
+        this.skipOpenFile = false;
         this.chiperTextInBiner = "";
         this.rgbDataOfImage = null;
         this.dataEncrypt = null;
@@ -84,6 +80,10 @@ public class RobustnessControl implements Initializable {
         this.bufferedImageStegoNoise = null;
         this.btnAddNoise.setDisable(true);
         this.btnInitExtractMsg.setDisable(true);
+        this.txtfieldKunci.clear();
+        this.txtareaTest.clear();
+        this.txtareaOriMsg.clear();
+        this.txtfieldCompareResult.clear();
         this.anchorPaneExtraction.setDisable(true);
         /*this.txtfieldNoiseProbSaltPepper.clear();*/
         String sql = "";
@@ -94,6 +94,7 @@ public class RobustnessControl implements Initializable {
 
         File file = fileChooser.showOpenDialog(Main.mainStage);
         Image image = null;
+        boolean dataTersedia = false;
 
         if (file != null) {
             try {
@@ -108,7 +109,7 @@ public class RobustnessControl implements Initializable {
                         + "Size: " + (file.length() / 1024) + " KB\n"
                 );
                 this.stegoImageName = file.getName();
-                sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_NAME + " WHERE "
+                sql = "SELECT * FROM " + AppControll.TABLE_STEGANO_MASTER + " WHERE "
                         + "stegoImageName = '" + this.stegoImageName + "';";
                 ResultSet rs = MainController.appControll.sqLiteDB.SelectQuery(sql);
                 while (rs.next()) {
@@ -119,7 +120,7 @@ public class RobustnessControl implements Initializable {
                     }
                 }
                 if (!this.stegoImageNameSama || this.dataTable.size() < 1) {
-                    throw new Exception("Nama file original image dan stego image tidak tersedia di database");
+                    throw new Exception("Nama file stego image tidak tersedia di database");
                 }
                 else {
                     this.btnAddNoise.setDisable(false);
@@ -139,7 +140,7 @@ public class RobustnessControl implements Initializable {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",
                         "Database",
-                        "Terjadi kesalahan ketika mengakses database: \n" + e.getMessage() ,
+                        "Terjadi kesalahan: \n" + e.getMessage() ,
                         ButtonType.OK
                 );
             }
@@ -183,7 +184,8 @@ public class RobustnessControl implements Initializable {
                     );
                 } else {
                     this.imgViewStegoNoise.setImage(SwingFXUtils.toFXImage(this.bufferedImageStegoNoise, null));
-                    this.btnAddNoise.setDisable(true);
+                    //this.btnAddNoise.setDisable(true);
+                    this.btnCompare.setDisable(true);
                     this.btnInitExtractMsg.setDisable(false);
                 }
             }
@@ -225,12 +227,32 @@ public class RobustnessControl implements Initializable {
             }
         }
         if (initStatus) {
-            this.txtfieldKunci.clear();
-            this.txtareaTest.clear();
-            this.btnExtractDecrypt.setDisable(true);
-            this.txtareaOriMsg.clear();
-            this.anchorPaneExtraction.setDisable(false);
-            this.txtfieldKunci.setEditable(true);
+            boolean skipYes = false;
+            if (this.skipOpenFile) {
+                Optional<ButtonType> optional = AlertInfo.showConfirmMessage(
+                        "Informasi Aplikasi",
+                        "Inisialisasi Data Pengujian Robustness",
+                        "Sistem mendeteksi bahwa stego image yang akan digunakan sama dengan sebelumnya"
+                                + "\nJika pernyataan ini benar, klik Yes untuk skip proses input kunci dan berkas teks asli."
+                                + "\nJika tidak, klik No"
+                );
+                if (optional.get().equals(MainController.buttonTypeYes)) {
+                    skipYes = true;
+                }
+            }
+            if (skipYes) {
+                this.btnExtractDecrypt.setDisable(false);
+                this.txtareaTest.clear();
+            }
+            else {
+                this.skipOpenFile = false;
+                this.txtfieldKunci.clear();
+                this.txtareaTest.clear();
+                this.btnExtractDecrypt.setDisable(true);
+                this.txtareaOriMsg.clear();
+                this.anchorPaneExtraction.setDisable(false);
+                this.txtfieldKunci.setEditable(true);
+            }
         }
     }
 
@@ -371,7 +393,12 @@ public class RobustnessControl implements Initializable {
             if (this.chiperTextInBiner.length() >= 16) {
                 if (doExtractMessage()) {
                     if (doDecryptMessage()) {
-                        this.btnBrowseTxt.setDisable(false);
+                        if (!this.skipOpenFile) {
+                            this.btnBrowseTxt.setDisable(false);
+                        } else {
+                            this.btnCompare.setDisable(false);
+                        }
+                        this.txtfieldCompareResult.clear();
                     }
                 }
             }
@@ -410,6 +437,9 @@ public class RobustnessControl implements Initializable {
            }
             if (loadFileStatus) {
                 this.txtareaOriMsg.setText(new String(byteTeks));
+                this.btnBrowseTxt.setDisable(true);
+                this.txtfieldCompareResult.clear();
+                this.btnCompare.setDisable(false);
             }
         }
     }
@@ -424,16 +454,27 @@ public class RobustnessControl implements Initializable {
                 if (charArrOri[i] == charArrExtraction[i]) {
                     counter += 1;
                 }
+                /*if (Character.valueOf(charArrOri[i]).compareTo(Character.valueOf(charArrExtraction[i])) == 0) {
+                    counter += 1;
+                }*/
+                /*if ((int)charArrOri[i] == (int)charArrExtraction[i])
+                    counter += 1;*/
             }
         }
         catch (Exception ex) {}
+        finally {
+            this.percentage = Matematik.roundUpDoubleWithTwoDecimalPlace(((double)counter / charArrOri.length) * 100);
+            this.btnSaveRobustness.setDisable(false);
+            this.hasData = true;
+            this.txtfieldCompareResult.setText(this.percentage.toString());
+            this.txtfieldNoiseProbSaltPepper.setEditable(true);
+            this.btnAddNoise.setDisable(false);
+        }
 
-        this.percentage = (double)(counter / charArrOri.length) * 100;
-        this.txtfieldCompareResult.setText(this.percentage.toString());
     }
 
     @FXML void handleSaveDataRobustness (ActionEvent actionEvent) {
-        String sqlInsert = "INSERT INTO " + AppControll.TABLE_STEGANO_NOISE_NAME
+        String sqlInsert = "INSERT INTO " + AppControll.TABLE_STEGANO_ROBUSTNESS
                 + " VALUES("
                 + null + ", "
                 + this.dataTable.get(this.stegoImageName) + ", "
@@ -464,6 +505,7 @@ public class RobustnessControl implements Initializable {
                         ButtonType.OK
                 );
                 this.btnSaveRobustness.setDisable(true);
+                this.skipOpenFile = true;
             }
         }
 
@@ -526,6 +568,9 @@ public class RobustnessControl implements Initializable {
         int[] kunciDecrypt = new int[arrCharKunci.length];
         for (short i = 0; i < arrCharKunci.length; i += 1) {
             kunciDecrypt[i] = (int)arrCharKunci[i];
+        }
+        if (this.dataDecrypt != null) {
+            this.dataDecrypt.clear();
         }
         this.dataDecrypt = new ArrayList<>();
         HAES256 haes256 = HAES256.getInstance();

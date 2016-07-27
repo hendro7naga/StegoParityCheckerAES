@@ -1,6 +1,9 @@
 package kelas;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +13,12 @@ import java.util.List;
 public class Matematik {
     private static boolean subGemod(int g, int pangkat, int mods) {
         boolean gemodStatus = false;
-        int loopState = pangkat - 1;
-        int proses = 0;
+        //int loopState = pangkat - 1;
+        //int proses = 0;
         BigInteger gBig = new BigInteger(g + "", 10);
         BigInteger primeNumBig = new BigInteger(pangkat + "", 10);
         BigInteger modBig = new BigInteger(mods + "", 10);
-        BigInteger tmpResult;
+        //BigInteger tmpResult;
 
         gBig = gBig.modPow(primeNumBig, modBig);
         if (gBig.intValue() == 1) {
@@ -103,4 +106,14 @@ public class Matematik {
         }
         return hasilBilangan;
     }
+
+    public static double roundUpDoubleWithTwoDecimalPlace (double d) {
+        DecimalFormat decimalFormat = new DecimalFormat("000.000");
+        decimalFormat.setRoundingMode(RoundingMode.CEILING);
+        return Double.parseDouble(decimalFormat.format(d));
+        //return Double.valueOf(decimalFormat.format(d));
+        //return bigDecimal.doubleValue();
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package main;
 
+import interfaces.OpenScene;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +24,7 @@ import java.util.ResourceBundle;
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
-public class MainController implements Initializable {
+public class MainController implements Initializable, OpenScene {
     public static final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
     public static final ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
 
@@ -32,105 +33,65 @@ public class MainController implements Initializable {
     public static AppControll appControll = null;
     @FXML
     private void handleExit(ActionEvent event) {
-        //ButtonType<>
-        Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                "Apakah Anda yakin akan menutup aplikasi?",
-                buttonTypeYes,
-                buttonTypeNo);
-        alert.setTitle("Informasi Aplikasi");
-        alert.setHeaderText("Tutup Aplikasi?");
-        Optional<ButtonType> result = alert.showAndWait();
+        Optional<ButtonType> result = AlertInfo.showConfirmMessage(
+                "Informasi Aplikasi",
+                "Tutup Aplikasi?",
+                "Apakah Anda yakin ingin menutup aplikasi?"
+        );
         if (result.get().equals(buttonTypeYes)) {
             Main.mainStage.close();
         } else {
-            alert.close();
+            //alert.close();
         }
     }
 
     @FXML
     private void handleShowEmbeddingMessage(ActionEvent event) {
-        Parent p = null;
-        boolean loadSukses = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/embeddingdoc.fxml"));
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-        finally {
-            if (!loadSukses || p == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Gagal membuka scene embedding fxml",
-                        ButtonType.OK);
-                alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("File tidak ditemukan");
-                alert.show();
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi: Embedding Message");
-                Main.mainStage.setScene(new Scene(p, 1145, 640));
-                Main.mainStage.centerOnScreen();
-            }
+            open("embedding", 1152.6, 660.5);
+        } catch (Exception ex) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Membuka Scene",
+                    "Terjadi kesalahan: " + ex.getMessage(),
+                    ButtonType.OK
+            );
         }
     }
 
     @FXML
     private void handleShowExtractionMessage(ActionEvent actionEvent) {
-        Parent p = null;
-        boolean loadSukses = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/extractiondoc.fxml"));
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-        finally {
-            if (!loadSukses || p == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Gagal membuka scene extraction fxml",
-                        ButtonType.OK);
-                alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("File tidak ditemukan");
-                alert.show();
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi: Extraction Message");
-                Main.mainStage.setScene(new Scene(p, 870, 625));
-                Main.mainStage.centerOnScreen();
-            }
+            open("extraction", 896.5, 665.5);
+        } catch (Exception ex) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Membuka Scene",
+                    "Terjadi kesalahan: " + ex.getMessage(),
+                    ButtonType.OK
+            );
         }
     }
 
     @FXML
     private void handleShowImperceptibilityScene(ActionEvent actionEvent) {
-        Parent p = null;
-        boolean sceneLoaded = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/imperceptibilitydoc.fxml"));
-        } catch (IOException ex) {
-            sceneLoaded = false;
-        }
-        if (!sceneLoaded || p == null) {
+            open("imperceptibility", 785.5, 645.6);
+        } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
-                    "Load imperceptibility scene",
-                    "Gagal membuka imperceptibility scene",
+                    "Membuka Scene",
+                    "Terjadi kesalahan: " + ex.getMessage(),
                     ButtonType.OK
             );
-        }
-        else {
-            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Imperceptibility");
-            Main.mainStage.setScene(new Scene(p, 775, 605));
-            Main.mainStage.centerOnScreen();
         }
     }
 
     @FXML
     private void handleShowRobustnessScene(ActionEvent actionEvent) {
-        Parent p = null;
-        boolean sceneLoaded = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/robustnessdoc.fxml"));
-        } catch (IOException ex) {
-            sceneLoaded = false;
-        }
-        if (!sceneLoaded || p == null) {
+            open("robustness", 1068.5, 645.5);
+        } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
                     "Load Robustness scene",
@@ -138,36 +99,20 @@ public class MainController implements Initializable {
                     ButtonType.OK
             );
         }
-        else {
-            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Robustness");
-            Main.mainStage.setScene(new Scene(p, 1064, 620));
-            Main.mainStage.centerOnScreen();
-        }
     }
 
     @FXML void handleShowTestResult (ActionEvent actionEvent) {
-        Parent p = null;
         boolean sceneLoaded = true;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("stegano/testresultdoc.fxml"));
-        } catch (IOException e) {
-            sceneLoaded = false;
-        }
-
-        if (!sceneLoaded || p == null) {
+            open("result", 998.5, 756.5);
+        } catch (Exception e) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
                     "Load Scene",
-                    "Gagal membuka TestResult scene",
+                    "Terjadi kesalahan: " + e.getMessage(),
                     ButtonType.OK
             );
         }
-        else {
-            Main.mainStage.setTitle("Aplikasi Steganografi - Testing: Result");
-            Main.mainStage.setScene(new Scene(p, 995, 730));
-            Main.mainStage.centerOnScreen();
-        }
-
     }
 
     @FXML
@@ -221,7 +166,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void handleShowViewImage(ActionEvent event) {
+    public void handleShowViewImage(ActionEvent actionEvent) {
         Parent p = null;
         boolean loadSukses = true;
         try {
@@ -245,7 +190,20 @@ public class MainController implements Initializable {
         }
     }
 
-    void initApp () {
+    @FXML void handleShowAbout (ActionEvent actionEvent) {
+        try {
+            open("about", 763.0, 627.0);
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Open Scene",
+                    "Terjadi kesalahan (Error) : " + e.getMessage(),
+                    ButtonType.OK
+            );
+        }
+    }
+
+    public static void initApp () {
         if (MainController.appControll == null) {
             MainController.appControll = AppControll.getInstance();
         }
@@ -254,6 +212,7 @@ public class MainController implements Initializable {
                 if (MainController.appControll.init() == 1) {
                     MainController.appControll.sqLiteDB.createConnection();
                     MainController.appControll.sqLiteDB.closeConnection();
+                    //MainController.appControll.sqLiteDB.deleteTableData(AppControll.TABLE_STEGANO_NOISE_NAME);
                 }
             } catch (Exception e) {
                 AlertInfo.showAlertErrorMessage(
@@ -270,7 +229,7 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         String info = "";
         MainController.appControll = AppControll.getInstance();
-        initApp();
+        MainController.initApp();
         //File dir = new File("resources");
         resouresDir = new File("resources/");
         if (resouresDir.exists()) {
@@ -280,7 +239,7 @@ public class MainController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.INFORMATION,
                     info,
                     ButtonType.OK);
-            alert.setTitle("INfo lokasi : ");
+            alert.setTitle("Info lokasi : ");
             alert.show();
         }
 

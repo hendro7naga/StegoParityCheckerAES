@@ -104,7 +104,7 @@ public class SQLiteDB {
         }
         this.statement = this.connection.createStatement();
         this.statement.executeUpdate("delete from " + tableName);
-        this.statement.executeUpdate("vacuum");
+        this.statement.executeUpdate("VACUUM " + tableName);
         this.statement.closeOnCompletion();
     }
 
