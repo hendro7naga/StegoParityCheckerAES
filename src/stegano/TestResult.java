@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.OpenScene;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,7 +33,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  * Created by hendro.sinaga on 15-Jul-16.
  */
-public class TestResult {
+public class TestResult implements OpenScene {
     private ObservableList<DataImperceptibility> dataImperceptibilities = FXCollections.observableArrayList();
     private ObservableList<DataRobustness> dataRobustness = FXCollections.observableArrayList();
     @FXML
@@ -336,29 +337,16 @@ public class TestResult {
     }
 
     @FXML void handleMainMenu (ActionEvent actionEvent) {
-        Parent parent = null;
-        boolean sukses = false;
         try {
-            parent = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-            if (parent != null) {
-                sukses = true;
-            }
-        } catch (IOException ex) {
-            sukses = false;
-        }
-
-        if (!sukses) {
+            System.gc();
+            open("main", 787, 517);
+        } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
                     "Open Scene",
-                    "Gagal membuka scene Main Menu",
+                    "Terjadi kesalahan (Error) : " + e.getMessage(),
                     ButtonType.OK
             );
-        } else {
-            Main.mainStage.setTitle("Aplikasi Steganografi");
-            Main.mainStage.setScene(new Scene(parent));
-            Main.mainStage.centerOnScreen();
         }
-
     }
 }

@@ -13,11 +13,12 @@ import javafx.stage.Stage;
 
 public class Main extends Application{
     public static Stage mainStage;
+    public static boolean firstRun = true;
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("maindoc.fxml"));
         primaryStage.setTitle("Aplikasi Steganografi");
-        primaryStage.setScene(new Scene(root, 765.5, 485));
+        primaryStage.setScene(new Scene(root, 765, 485));
         primaryStage.centerOnScreen();
         Main.mainStage = primaryStage;
         primaryStage.show();

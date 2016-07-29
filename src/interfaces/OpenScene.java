@@ -50,8 +50,12 @@ public interface OpenScene {
             throw new Exception("Gagal membuka scene " + doc);
         }
         else {
+            System.gc();
             Main.mainStage.setTitle(title);
-            Main.mainStage.setScene(new Scene(parent, width, height));
+            //Main.mainStage.setScene(new Scene(parent, width, height));
+            Main.mainStage.setWidth(width);
+            Main.mainStage.setHeight(height);
+            Main.mainStage.getScene().setRoot(parent);
             Main.mainStage.centerOnScreen();
         }
     }

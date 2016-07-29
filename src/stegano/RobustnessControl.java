@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.OpenScene;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
@@ -35,7 +36,7 @@ import java.util.*;
 /**
  * Created by hendro.sinaga on 10-Jul-16.
  */
-public class RobustnessControl implements Initializable {
+public class RobustnessControl implements Initializable, OpenScene {
     private HashMap<String, Integer> dataTable;
     List<ArrayList<Integer>> dataEncrypt = null;
     List<ArrayList<Integer>> dataDecrypt = null;
@@ -615,29 +616,16 @@ public class RobustnessControl implements Initializable {
 
     @FXML
     private void handleBtnMainMenu(ActionEvent actionEvent) {
-        Parent parent = null;
-        boolean loadMainScene = true;
-
         try {
-            parent = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-            if (parent == null)
-                loadMainScene = false;
-        } catch (IOException ex) {
-            loadMainScene = false;
-        }
-
-        if (!loadMainScene) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    "Gagal membuka scene MainDoc fxml",
-                    ButtonType.OK);
-            alert.setTitle("Informasi Aplikasi");
-            alert.setHeaderText("File tidak ditemukan");
-            alert.show();
-        }
-        else {
-            Main.mainStage.setTitle("Aplikasi Steganografi");
-            Main.mainStage.setScene(new Scene(parent, 790, 520));
-            Main.mainStage.centerOnScreen();
+            System.gc();
+            open("main", 787, 517);
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Open Scene",
+                    "Terjadi kesalahan (Error) : " + e.getMessage(),
+                    ButtonType.OK
+            );
         }
     }
 

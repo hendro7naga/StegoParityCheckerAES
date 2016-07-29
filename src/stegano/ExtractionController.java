@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.OpenScene;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -38,7 +39,7 @@ import java.util.ResourceBundle;
 /**
  * Created by hendro.sinaga on 25-Jun-16.
  */
-public class ExtractionController implements Initializable {
+public class ExtractionController implements Initializable, OpenScene {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgProperty = "", bitDepthImg = "";
@@ -494,20 +495,16 @@ public class ExtractionController implements Initializable {
     }
 
     @FXML private void handleMainMenu(ActionEvent actionEvent) {
-        Parent p = null;
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-        } catch (IOException handleMainMenuException) {
-            AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Extraction",
-                    "Load Main Menu",
-                    "Gagal memanggil document main menu",
+            System.gc();
+            open("main", 787, 517);
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Open Scene",
+                    "Terjadi kesalahan (Error) : " + e.getMessage(),
                     ButtonType.OK
             );
-        }
-        if (p != null) {
-            Main.mainStage.setTitle("Aplikasi Steganografi");
-            Main.mainStage.setScene(new Scene(p));
-            Main.mainStage.centerOnScreen();
         }
     }
 
@@ -516,11 +513,7 @@ public class ExtractionController implements Initializable {
 
             FileWriter fileWriter = new FileWriter(file);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            //fileWriter.write(teks);
-            //fileWriter.close();
-            /*PrintWriter printWriter = new PrintWriter(new FileWriter(file));
-            printWriter.print(this.textAreaOri.getText());
-            */
+
             for (int i = 0; i < this.arrCharTeksOri.length; i += 1) {
                 if ((int)this.arrCharTeksOri[i] == 10) {
                     bufferedWriter.newLine();

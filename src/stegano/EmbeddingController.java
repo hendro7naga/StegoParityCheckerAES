@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.OpenScene;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -31,7 +32,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import javax.imageio.stream.ImageInputStream;
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
-public class EmbeddingController implements Initializable {
+public class EmbeddingController implements Initializable, OpenScene {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgOriName = "", imgStegoName = "", imgProperty = "", bitDepthImg = "";
@@ -72,7 +72,6 @@ public class EmbeddingController implements Initializable {
     @FXML
     Button btnBrowseText, btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
     @FXML ImageView imgViewCover, imgViewStego;
-    @FXML ProgressBar progressBar;
 
     @FXML
     private void handleBrowseFileText(ActionEvent event) {
@@ -609,30 +608,16 @@ public class EmbeddingController implements Initializable {
 
     @FXML
     private void handleBtnMainMenu(ActionEvent event) {
-        Parent p = null;
-        boolean loadSukses = true;
-
         try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"));
-            if (p == null) {
-                loadSukses = false;
-            }
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-
-        if (!loadSukses) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    "Gagal membuka scene maindoc fxml",
-                    ButtonType.OK);
-            alert.setTitle("Informasi Aplikasi");
-            alert.setHeaderText("File tidak ditemukan");
-            alert.show();
-        }
-        else {
-            Main.mainStage.setTitle("Aplikasi Steganografi");
-            Main.mainStage.setScene(new Scene(p));
-            Main.mainStage.centerOnScreen();
+            System.gc();
+            open("main", 787, 517);
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Open Scene",
+                    "Terjadi kesalahan (Error) : " + e.getMessage(),
+                    ButtonType.OK
+            );
         }
     }
 
@@ -690,26 +675,13 @@ public class EmbeddingController implements Initializable {
         HAES256 haes256 = HAES256.getInstance();
 
         try {
-            progressBar.setVisible(true);
-            progressBar.setProgress(0.00);
-            progressBar.setVisible(true);
-
             for (short i = 0; i < kunciArrChar.length; i += 1) {
                 kunciEncrypt[i] = (int)kunciArrChar[i];
-                progressBar.setProgress(progressBar.getProgress() + 0.02);
-            }
-
-            if (progressBar.getProgress() < 0.40) {
-                progressBar.setProgress(progressBar.getProgress() + 0.05);
-                //Thread.sleep(200);
             }
 
             while (prosesPotong) {
                 ArrayList<Integer> tmpPesan = new ArrayList<>();
                 String subs = "";
-                if (progressBar.getProgress() < 0.64) {
-                    progressBar.setProgress(progressBar.getProgress() + 0.02);
-                }
                 if (indeksStart + 16 >= this.textInputMessage.getText().length()) {
                     subs = this.textInputMessage.getText(indeksStart, panjangTeks);
                     prosesPotong = false;
@@ -730,9 +702,6 @@ public class EmbeddingController implements Initializable {
             for (int i = 0; i < this.dataPesan.size(); i += 1) {
                 ArrayList<Integer> subData = new ArrayList<>();
                 try {
-                    if (progressBar.getProgress() < 0.96) {
-                        progressBar.setProgress(progressBar.getProgress() + 0.02);
-                    }
                     if (haes256.encryptDataInteger(
                             KonversiData.arraylist1DToArr1D(this.dataPesan.get(i)),
                             kunciEncrypt
@@ -754,9 +723,6 @@ public class EmbeddingController implements Initializable {
                 }
 
             }
-            progressBar.setProgress(1.00);
-            Thread.sleep(600);
-            progressBar.setVisible(false);
 
         } catch (Exception except) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Embedding",

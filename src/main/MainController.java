@@ -192,7 +192,7 @@ public class MainController implements Initializable, OpenScene {
 
     @FXML void handleShowAbout (ActionEvent actionEvent) {
         try {
-            open("about", 763.0, 627.0);
+            open("about", 763, 627);
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
@@ -228,19 +228,22 @@ public class MainController implements Initializable, OpenScene {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         String info = "";
-        MainController.appControll = AppControll.getInstance();
-        MainController.initApp();
-        //File dir = new File("resources");
-        resouresDir = new File("resources/");
-        if (resouresDir.exists()) {
-            info = "resources dikenal";
-        } else {
-            info = "resources tidak dikenal";
-            Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                    info,
-                    ButtonType.OK);
-            alert.setTitle("Info lokasi : ");
-            alert.show();
+        if (Main.firstRun) {
+            MainController.appControll = AppControll.getInstance();
+            MainController.initApp();
+            //File dir = new File("resources");
+            resouresDir = new File("resources/");
+            if (resouresDir.exists()) {
+                info = "resources dikenal";
+            } else {
+                info = "resources tidak dikenal";
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        info,
+                        ButtonType.OK);
+                alert.setTitle("Info lokasi : ");
+                alert.show();
+            }
+            Main.firstRun = false;
         }
 
     }
