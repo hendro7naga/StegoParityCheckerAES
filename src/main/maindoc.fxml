@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="517.0" prefWidth="787.0" style="-fx-background-color: rgba(100,120,240,.898);" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="517.0" prefWidth="787.0" style="-fx-background-color: rgba(106,120,248,.898);" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
    <children>
       <MenuBar prefHeight="30.0" prefWidth="787.0">
         <menus>
@@ -45,20 +45,20 @@
             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
          </padding>
       </MenuBar>
-      <Text fill="#d7d1d1" layoutX="197.0" layoutY="100.0" lineSpacing="4.0" opacity="0.93" stroke="#9a9696" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="319.13671875">
+      <Text fill="#eeeded" layoutX="197.0" layoutY="100.0" lineSpacing="4.0" opacity="0.93" stroke="#c3c3c3" text="Tugas Akhir" textAlignment="CENTER" wrappingWidth="319.13671875">
          <font>
             <Font name="System Bold" size="42.0" />
          </font>
          <effect>
-            <InnerShadow color="#900505" />
+            <InnerShadow color="#ddcfcf" />
          </effect>
       </Text>
-      <Text layoutX="65.0" layoutY="194.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
+      <Text layoutX="37.0" layoutY="192.0" stroke="#0a0a0a" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 18pt;" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font>
       </Text>
-      <Text layoutX="193.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 16pt;" text="Berbasis LSB dengan Enkripsi AES">
+      <Text layoutX="199.0" layoutY="226.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 18pt;" text="Berbasis LSB dengan Enkripsi AES">
          <font>
             <Font size="15.0" />
          </font>
@@ -69,11 +69,14 @@
             <Font size="15.0" />
          </font>
       </Text>
-      <Text layoutX="315.0" layoutY="371.0" lineSpacing="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Yusuf Saleh Lubis" textAlignment="CENTER">
+      <Text layoutX="315.0" layoutY="361.0" lineSpacing="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Yusuf Saleh Lubis" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font>
       </Text>
-      <Text layoutX="296.0" layoutY="499.0" strokeType="OUTSIDE" strokeWidth="0.0" text="STMIK Mikroskil Medan - 2016" />
+      <Text layoutX="256.0" layoutY="468.0" strokeType="OUTSIDE" strokeWidth="0.0" text="STMIK Mikroskil Medan - 2016" textAlignment="CENTER" wrappingWidth="231.146484375">
+         <font>
+            <Font size="13.0" />
+         </font></Text>
    </children>
 </AnchorPane>

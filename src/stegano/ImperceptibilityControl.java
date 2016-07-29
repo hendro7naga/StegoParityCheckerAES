@@ -5,6 +5,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
@@ -31,16 +32,18 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Created by hendro.sinaga on 07-Jul-16.
  */
 
-public class ImperceptibilityControl implements OpenScene {
+public class ImperceptibilityControl implements Initializable, OpenScene {
     BufferedImage imageOri, imageStego;
     String oriImageName = "", stegoImageName = "";
     HashMap<String, Integer> dataTable;
@@ -153,7 +156,8 @@ public class ImperceptibilityControl implements OpenScene {
                     this.dataTable.put(rs.getString("stegoImageName"), rs.getInt("id"));
                 }
                 if (!namaOriImageSama || this.dataTable.size() < 1) {
-                    throw new Exception("Nama file original image dan stego image tidak tersedia di database");
+                    throw new Exception("Nama file original image dan stego image tidak valid\n"
+                            + "dengan data yang tersedia di database");
                 }
                 else {
                     this.btnCalculateMSEPSNR.setDisable(false);
@@ -172,8 +176,8 @@ public class ImperceptibilityControl implements OpenScene {
             catch (Exception e) {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",
-                        "Database",
-                        "Terjadi kesalahan ketika mengakses database: \n" + e.getMessage() ,
+                        "Pencocokan Data",
+                        "Terjadi kesalahan : \n" + e.getMessage() ,
                         ButtonType.OK
                 );
             }
@@ -424,4 +428,23 @@ public class ImperceptibilityControl implements OpenScene {
 
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            btnBrowseOriginalImg.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
+            btnBrowseStegoImg.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
+            btnMainMenu.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
+            );
+        } catch (MalformedURLException e) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Kesalahan Akeses File",
+                    "File tidak terdeteksi",
+                    ButtonType.OK);
+        }
+    }
 }

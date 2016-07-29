@@ -643,6 +643,22 @@ public class RobustnessControl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            btnBrowse.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
+            btnBrowseTxt.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "fltxt-icon16.png"))
+            );
+            btnMainMenu.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
+            );
+        } catch (MalformedURLException e) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Kesalahan Akeses File",
+                    "File tidak terdeteksi",
+                    ButtonType.OK);
+        }
         txtfieldNoiseProbSaltPepper.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {

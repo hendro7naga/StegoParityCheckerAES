@@ -66,11 +66,11 @@ public class EmbeddingController implements Initializable {
     @FXML
     TextArea textInputMessage, textChiper;
     @FXML
-    Text txtInfoMessage, txtInfoChipertext, textInfoStegoImg, textInfoCoverImg;
+    Text txtInfoMessage, txtInfoChipertext, textInfoCoverImg;
     @FXML
     TextField txtInputPass;
     @FXML
-    Button btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
+    Button btnBrowseText, btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
     @FXML ImageView imgViewCover, imgViewStego;
     @FXML ProgressBar progressBar;
 
@@ -167,7 +167,7 @@ public class EmbeddingController implements Initializable {
             this.nOfChiperLenOnByte = n + ((16 - (n % 16)) % 16);
             this.nOfChiperLenOnByte *= 8;
             if (doEncrypt()) {
-                this.txtInfoChipertext.setText("Length: " + (this.dataEncrypt.size() * 16) + " byte");
+                this.txtInfoChipertext.setText("Chipertext Length: " + (this.dataEncrypt.size() * 16) + " byte");
                 btnEncrypt.setDisable(true);
                 btnBrowseCoverImg.setDisable(false);
             }
@@ -196,7 +196,7 @@ public class EmbeddingController implements Initializable {
                 buffCoverImg = SwingFXUtils.fromFXImage(coverImage, null);
                 imgViewCover.setImage(coverImage);
                 imgViewCover.setFitWidth(292);
-                imgViewCover.setFitHeight(320);
+                imgViewCover.setFitHeight(220);
                 textInfoCoverImg.setText(
                         "Nama File: " + fg.getName() + "\n"
                         + "Lebar: " + coverImage.getWidth() + "\n"
@@ -693,7 +693,7 @@ public class EmbeddingController implements Initializable {
             progressBar.setVisible(true);
             progressBar.setProgress(0.00);
             progressBar.setVisible(true);
-            Thread.sleep(400);
+
             for (short i = 0; i < kunciArrChar.length; i += 1) {
                 kunciEncrypt[i] = (int)kunciArrChar[i];
                 progressBar.setProgress(progressBar.getProgress() + 0.02);
@@ -701,7 +701,7 @@ public class EmbeddingController implements Initializable {
 
             if (progressBar.getProgress() < 0.40) {
                 progressBar.setProgress(progressBar.getProgress() + 0.05);
-                Thread.sleep(200);
+                //Thread.sleep(200);
             }
 
             while (prosesPotong) {
@@ -752,10 +752,7 @@ public class EmbeddingController implements Initializable {
                             ButtonType.OK);
                     this.enkripProsesSukses = false;
                 }
-                /*if (!this.enkripProsesSukses) {
-                    btnBrowseCoverImg.setDisable(true);
-                    break;
-                }*/
+
             }
             progressBar.setProgress(1.00);
             Thread.sleep(600);
@@ -785,10 +782,7 @@ public class EmbeddingController implements Initializable {
 
     private boolean checkStegoData() {
         boolean sameData = false;
-        /*
-        "SELECT * FROM " + AppControll.TABLE_STEGANO_MASTER
-                    + " WHERE oriImageName = '" + this.imgOriName + "' AND msgLength = " + this
-         */
+
         String q = "SELECT oriImageName, msgLength FROM " + AppControll.TABLE_STEGANO_MASTER;
         MainController.initApp();
         int initAppControl;
@@ -800,7 +794,7 @@ public class EmbeddingController implements Initializable {
                 resultSet = MainController.appControll.sqLiteDB.SelectQuery(q);
                 while (resultSet.next()) {
                     if (this.imgOriName.equalsIgnoreCase(resultSet.getString("oriImageName")) &&
-                            this.textLength == resultSet.getInt("msgLength")) {
+                        this.textLength == resultSet.getInt("msgLength")) {
                         sameData = true;
                         break;
                     }
@@ -821,11 +815,20 @@ public class EmbeddingController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            btnBrowseText.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
+            );
+            btnBrowseCoverImg.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
+            btnSaveStegoImg.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
             btnMainMenu.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "rnd_br_prev32.png"))
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
             );
             btnNext.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "rnd_br_next32.png"))
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowright16.png"))
             );
             imgViewCover.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
             imgViewStego.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
@@ -836,14 +839,10 @@ public class EmbeddingController implements Initializable {
                     ButtonType.OK);
         }
 
-
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
-        textInputMessage.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue.length() > 0) {
-                    handleTextInputMessage();
-                }
+        textInputMessage.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 0) {
+                handleTextInputMessage();
             }
         });
         textInputMessage.focusedProperty().addListener(new ChangeListener<Boolean>() {

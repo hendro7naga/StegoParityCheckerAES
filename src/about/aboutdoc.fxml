@@ -2,15 +2,77 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane fx:controller="about.AboutControl" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="627.0" prefWidth="763.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="627.0" prefWidth="763.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="about.AboutControl">
   <content>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="625.0" prefWidth="761.0">
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="625.0" prefWidth="761.0" style="-fx-background-color: rgba(106,120,248,.898);">
          <children>
-            <Button fx:id="btnMainMenu" onAction="#handleMainMenu" layoutX="14.0" layoutY="586.0" mnemonicParsing="false" text="Main Menu" />
-            <Text fx:id="textAbout" layoutX="364.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="About" textAlignment="CENTER" />
+            <Button fx:id="btnMainMenu" layoutX="14.0" layoutY="586.0" mnemonicParsing="false" onAction="#handleMainMenu" text="Main Menu" />
+            <Text fx:id="textAbout" fill="WHITE" layoutX="61.0" layoutY="70.0" stroke="#e8e4e4" strokeLineCap="ROUND" strokeType="INSIDE" text="Steganografi Menggunakan Parity Checker dan Generator Modulo" textAlignment="CENTER">
+               <font>
+                  <Font size="22.0" />
+               </font></Text>
+            <Text fill="WHITE" layoutX="218.0" layoutY="109.0" stroke="#e8e4e4" strokeLineCap="ROUND" strokeType="INSIDE" text="Berbasis LSB dengan Enkripsi AES">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Text>
+            <Text layoutX="376.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="by :">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fill="#f5f0f0" layoutX="90.0" layoutY="275.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hendro Pramana Sinaga">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
+            <Text fill="#f5f0f0" layoutX="486.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Yusuf Saleh Lubis">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
+            <Text fill="#f2eeee" layoutX="155.0" layoutY="307.0" strokeType="OUTSIDE" strokeWidth="0.0" text="11.111.2824">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fill="#f2eeee" layoutX="520.0" layoutY="307.0" strokeType="OUTSIDE" strokeWidth="0.0" text="11.111.0891">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Separator layoutX="88.0" layoutY="283.0" prefHeight="3.0" prefWidth="216.0" style="-fx-background-color: #444444; -fx-border-color: #333333;" />
+            <Separator layoutX="454.0" layoutY="282.0" prefHeight="3.0" prefWidth="216.0" style="-fx-background-color: #444444; -fx-border-color: #333333;" />
+            <Text layoutX="207.0" layoutY="372.0" strokeType="OUTSIDE" strokeWidth="0.0" text="This Application source code available online on :">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fill="#030000" layoutX="205.0" layoutY="394.0" strokeType="OUTSIDE" strokeWidth="0.0" text="https://github.com/hendro7naga/StegoParityCheckerAES" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+            <Text fill="WHITE" layoutX="293.0" layoutY="512.0" strokeType="OUTSIDE" strokeWidth="0.0" text="STMIK MIKROSKIL">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Text>
+            <Text fill="WHITE" layoutX="355.0" layoutY="534.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MEDAN">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Text>
+            <Text fill="WHITE" layoutX="366.0" layoutY="554.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2016">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
          </children></AnchorPane>
   </content>
 </ScrollPane>

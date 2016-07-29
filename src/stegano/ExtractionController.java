@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;
 import kelas.*;
 import kripto.HAES256;
 import main.Main;
+import main.MainController;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -58,7 +59,7 @@ public class ExtractionController implements Initializable {
     @FXML
     TextArea textAreaChiper, textAreaOri;
     @FXML
-    Button btnBrowseStegoImg, btnExtract, btnDecrypt, btnSaveText;
+    Button btnBrowseStegoImg, btnExtract, btnDecrypt, btnSaveText, btnMainMenu;
     @FXML
     ImageView imgViewStegoImg;
 
@@ -552,5 +553,23 @@ public class ExtractionController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
+        try {
+            btnSaveText.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
+            );
+            btnBrowseStegoImg.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+            );
+
+            imgViewStegoImg.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+            btnMainMenu.setGraphic(
+                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
+            );
+        } catch (MalformedURLException e) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Kesalahan Akeses File",
+                    "File tidak terdeteksi",
+                    ButtonType.OK);
+        }
     }
 }
