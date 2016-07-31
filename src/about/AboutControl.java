@@ -16,7 +16,7 @@ public class AboutControl implements OpenScene {
 
     @FXML void handleMainMenu (ActionEvent actionEvent) {
         try {
-            open("main", 756.0, 485.0);
+            open("main", 756.0, 517.0);
         } catch (Exception e) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",

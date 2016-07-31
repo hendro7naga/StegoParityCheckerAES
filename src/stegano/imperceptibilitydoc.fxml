@@ -24,7 +24,7 @@
                   <Label layoutX="561.0" layoutY="147.0" text="PSNR :" />
                   <Label layoutX="560.0" layoutY="68.0" text="Result :" />
                   <Label fx:id="lblInfoOriginalImage" layoutX="11.0" layoutY="261.0" prefHeight="135.0" prefWidth="256.0" text="(Image Info ... )" wrapText="true" />
-                  <Button fx:id="btnCalculateMSEPSNR" disable="true" layoutX="561.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCalculateMSEPSNR" text="Calculate MSE &amp; PSNR" />
+                  <Button fx:id="btnCalculateMSEPSNR" disable="true" layoutX="561.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCalculateMSEPSNR" text="Process" />
                   <Button fx:id="btnMainMenu" layoutX="14.0" layoutY="564.0" mnemonicParsing="false" onAction="#handleMainMenuScene" text="Main Menu" />
                   <Separator layoutX="277.0" layoutY="10.0" orientation="VERTICAL" prefHeight="369.0" prefWidth="0.0" />
                   <Label layoutX="476.0" layoutY="18.0" text="(.bmp)" />

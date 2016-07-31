@@ -36,7 +36,7 @@ import java.util.*;
 /**
  * Created by hendro.sinaga on 10-Jul-16.
  */
-public class RobustnessControl implements Initializable, OpenScene {
+public class RobustnessControl implements Initializable {
     private HashMap<String, Integer> dataTable;
     List<ArrayList<Integer>> dataEncrypt = null;
     List<ArrayList<Integer>> dataDecrypt = null;
@@ -618,7 +618,12 @@ public class RobustnessControl implements Initializable, OpenScene {
     private void handleBtnMainMenu(ActionEvent actionEvent) {
         try {
             System.gc();
-            open("main", 787, 517);
+            Main.mainStage.setTitle("Aplikasi Steganografi");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",

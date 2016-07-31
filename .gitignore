@@ -1,4 +1,4 @@
-/resource/*.png
+/resources/*.png
 /out/artifacts/*
 /jdbc-driver/*.jar
 /lib/*.jar

@@ -2,7 +2,6 @@ package interfaces;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import main.Main;
 
 /**
@@ -52,7 +51,6 @@ public interface OpenScene {
         else {
             System.gc();
             Main.mainStage.setTitle(title);
-            //Main.mainStage.setScene(new Scene(parent, width, height));
             Main.mainStage.setWidth(width);
             Main.mainStage.setHeight(height);
             Main.mainStage.getScene().setRoot(parent);

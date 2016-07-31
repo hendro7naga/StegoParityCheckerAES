@@ -2,6 +2,7 @@ package main;
 
 import interfaces.OpenScene;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +30,6 @@ public class MainController implements Initializable, OpenScene {
     public static final ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
 
     public static File resouresDir;
-    public static boolean dbStatus = false;
     public static AppControll appControll = null;
     @FXML
     private void handleExit(ActionEvent event) {
@@ -40,8 +40,6 @@ public class MainController implements Initializable, OpenScene {
         );
         if (result.get().equals(buttonTypeYes)) {
             Main.mainStage.close();
-        } else {
-            //alert.close();
         }
     }
 
@@ -102,7 +100,6 @@ public class MainController implements Initializable, OpenScene {
     }
 
     @FXML void handleShowTestResult (ActionEvent actionEvent) {
-        boolean sceneLoaded = true;
         try {
             open("result", 998.5, 756.5);
         } catch (Exception e) {
@@ -112,81 +109,6 @@ public class MainController implements Initializable, OpenScene {
                     "Terjadi kesalahan: " + e.getMessage(),
                     ButtonType.OK
             );
-        }
-    }
-
-    @FXML
-    private void handleShowAESEncrypt(ActionEvent event) {
-        Parent p = null;
-        boolean loadSukses = true;
-        try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("aes/encryptdoc.fxml"));
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-        finally {
-            if (!loadSukses || p == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Gagal membuka scene encryption fxml",
-                        ButtonType.OK);
-                alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("File tidak ditemukan");
-                alert.show();
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi: AES256 Encryption");
-                Main.mainStage.setScene(new Scene(p, 738, 595));
-                Main.mainStage.centerOnScreen();
-            }
-        }
-    }
-
-    @FXML
-    private void handleShowKriptoEncryptDecrypt(ActionEvent event) {
-        Parent p = null;
-        boolean loadSukses = true;
-        try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("aes/kriptodoc.fxml"));
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-        finally {
-            if (!loadSukses || p == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Gagal membuka scene kriptodoc fxml",
-                        ButtonType.OK);
-                alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("File tidak ditemukan");
-                alert.show();
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi: KriptoAES256 Encrypt-Decrypt");
-                Main.mainStage.setScene(new Scene(p, 1150, 669));
-                Main.mainStage.centerOnScreen();
-            }
-        }
-    }
-
-    @FXML
-    public void handleShowViewImage(ActionEvent actionEvent) {
-        Parent p = null;
-        boolean loadSukses = true;
-        try {
-            p = FXMLLoader.load(getClass().getClassLoader().getResource("main/ujigambardoc.fxml"));
-        } catch (IOException ex) {
-            loadSukses = false;
-        }
-        finally {
-            if (!loadSukses || p == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Gagal membuka scene ujigambardoc fxml",
-                        ButtonType.OK);
-                alert.setTitle("Informasi Aplikasi");
-                alert.setHeaderText("File tidak ditemukan");
-                alert.show();
-            } else {
-                Main.mainStage.setTitle("Aplikasi Steganografi: UjiGambar");
-                Main.mainStage.setScene(new Scene(p, 795, 615));
-                Main.mainStage.centerOnScreen();
-            }
         }
     }
 
@@ -212,7 +134,6 @@ public class MainController implements Initializable, OpenScene {
                 if (MainController.appControll.init() == 1) {
                     MainController.appControll.sqLiteDB.createConnection();
                     MainController.appControll.sqLiteDB.closeConnection();
-                    //MainController.appControll.sqLiteDB.deleteTableData(AppControll.TABLE_STEGANO_NOISE_NAME);
                 }
             } catch (Exception e) {
                 AlertInfo.showAlertErrorMessage(
@@ -227,23 +148,30 @@ public class MainController implements Initializable, OpenScene {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        String info = "";
-        if (Main.firstRun) {
-            MainController.appControll = AppControll.getInstance();
-            MainController.initApp();
-            //File dir = new File("resources");
-            resouresDir = new File("resources/");
-            if (resouresDir.exists()) {
-                info = "resources dikenal";
-            } else {
-                info = "resources tidak dikenal";
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        info,
-                        ButtonType.OK);
-                alert.setTitle("Info lokasi : ");
-                alert.show();
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (Main.firstRun) {
+                    MainController.appControll = AppControll.getInstance();
+                    MainController.initApp();
+                    resouresDir = new File("resources/");
+                    if (!resouresDir.exists()) {
+                        throw new Exception("Resources tidak dikenal");
+                    }
+                    Main.firstRun = false;
+                }
+                return null;
             }
-            Main.firstRun = false;
+        };
+        try {
+            new Thread(task).start();
+        } catch (Exception e) {
+            AlertInfo.showAlertWarningMessage(
+                    "Informasi Aplikasi",
+                    "Akses Resource",
+                    "Terjadi kesalahan: " + e.getMessage(),
+                    ButtonType.OK
+            );
         }
 
     }

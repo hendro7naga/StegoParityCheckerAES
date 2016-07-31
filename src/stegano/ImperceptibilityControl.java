@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
  * Created by hendro.sinaga on 07-Jul-16.
  */
 
-public class ImperceptibilityControl implements Initializable, OpenScene {
+public class ImperceptibilityControl implements Initializable {
     BufferedImage imageOri, imageStego;
     String oriImageName = "", stegoImageName = "";
     HashMap<String, Integer> dataTable;
@@ -414,7 +414,13 @@ public class ImperceptibilityControl implements Initializable, OpenScene {
 
         if (prosesToMainMenu) {
             try {
-                open("main", 756.0, 485.0);
+                System.gc();
+                Main.mainStage.setTitle("Aplikasi Steganografi");
+                Main.mainStage.getScene().setRoot(
+                        FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
+                );
+                Main.mainStage.sizeToScene();
+                Main.mainStage.centerOnScreen();
             } catch (Exception e) {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",

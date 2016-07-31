@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
 /**
  * Created by hendro.sinaga on 25-Jun-16.
  */
-public class ExtractionController implements Initializable, OpenScene {
+public class ExtractionController implements Initializable {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgProperty = "", bitDepthImg = "";
@@ -497,7 +497,12 @@ public class ExtractionController implements Initializable, OpenScene {
     @FXML private void handleMainMenu(ActionEvent actionEvent) {
         try {
             System.gc();
-            open("main", 787, 517);
+            Main.mainStage.setTitle("Aplikasi Steganografi");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",

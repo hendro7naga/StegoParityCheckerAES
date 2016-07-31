@@ -5,6 +5,7 @@ import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,7 +48,7 @@ import javax.imageio.stream.ImageInputStream;
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
-public class EmbeddingController implements Initializable, OpenScene {
+public class EmbeddingController implements Initializable {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgOriName = "", imgStegoName = "", imgProperty = "", bitDepthImg = "";
@@ -610,7 +611,12 @@ public class EmbeddingController implements Initializable, OpenScene {
     private void handleBtnMainMenu(ActionEvent event) {
         try {
             System.gc();
-            open("main", 787, 517);
+            Main.mainStage.setTitle("Aplikasi Steganografi");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
@@ -780,28 +786,35 @@ public class EmbeddingController implements Initializable, OpenScene {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                btnBrowseText.setGraphic(
+                        new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
+                );
+                btnBrowseCoverImg.setGraphic(
+                        new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+                );
+                btnSaveStegoImg.setGraphic(
+                        new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+                );
+                btnMainMenu.setGraphic(
+                        new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
+                );
+                btnNext.setGraphic(
+                        new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowright16.png"))
+                );
+                imgViewCover.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+                imgViewStego.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+                return null;
+            }
+        };
         try {
-            btnBrowseText.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
-            );
-            btnBrowseCoverImg.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
-            );
-            btnSaveStegoImg.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
-            );
-            btnMainMenu.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
-            );
-            btnNext.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowright16.png"))
-            );
-            imgViewCover.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
-            imgViewStego.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
-        } catch (MalformedURLException e) {
+            new Thread(task).start();
+        } catch (Exception e) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
-                    "Kesalahan Akeses File",
-                    "File tidak terdeteksi",
+                    "Inisialisasi Gambar",
+                    "Terjadi kesalahan: " + e.getMessage(),
                     ButtonType.OK);
         }
 

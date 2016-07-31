@@ -33,7 +33,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  * Created by hendro.sinaga on 15-Jul-16.
  */
-public class TestResult implements OpenScene {
+public class TestResult {
     private ObservableList<DataImperceptibility> dataImperceptibilities = FXCollections.observableArrayList();
     private ObservableList<DataRobustness> dataRobustness = FXCollections.observableArrayList();
     @FXML
@@ -339,7 +339,12 @@ public class TestResult implements OpenScene {
     @FXML void handleMainMenu (ActionEvent actionEvent) {
         try {
             System.gc();
-            open("main", 787, 517);
+            Main.mainStage.setTitle("Aplikasi Steganografi");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
