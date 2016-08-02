@@ -1,13 +1,10 @@
 package stegano;
 
-import interfaces.OpenScene;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -19,17 +16,15 @@ import main.Main;
 import main.MainController;
 import model.DataImperceptibility;
 import model.DataRobustness;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.util.Optional;
-
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.sql.ResultSet;
+import java.util.Optional;
 /**
  * Created by hendro.sinaga on 15-Jul-16.
  */

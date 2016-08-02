@@ -1,31 +1,22 @@
 package main;
 
-import interfaces.OpenScene;
-import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import kelas.AlertInfo;
-
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
-public class MainController implements Initializable, OpenScene {
+public class MainController implements Initializable {
     public static final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
     public static final ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
 
@@ -46,7 +37,13 @@ public class MainController implements Initializable, OpenScene {
     @FXML
     private void handleShowEmbeddingMessage(ActionEvent event) {
         try {
-            open("embedding", 1152.6, 660.5);
+            //open("embedding", 1152.6, 660.5);
+            Main.mainStage.setTitle("Embedding Messages");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/embeddingdoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
@@ -60,7 +57,12 @@ public class MainController implements Initializable, OpenScene {
     @FXML
     private void handleShowExtractionMessage(ActionEvent actionEvent) {
         try {
-            open("extraction", 896.5, 665.5);
+            Main.mainStage.setTitle("Extraction Messages");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/extractiondoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
@@ -74,7 +76,14 @@ public class MainController implements Initializable, OpenScene {
     @FXML
     private void handleShowImperceptibilityScene(ActionEvent actionEvent) {
         try {
-            open("imperceptibility", 785.5, 645.6);
+            //open("imperceptibility", 785.5, 645.6);
+            System.gc();
+            Main.mainStage.setTitle("Testing: Imperceptibility");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/imperceptibility.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
@@ -88,7 +97,13 @@ public class MainController implements Initializable, OpenScene {
     @FXML
     private void handleShowRobustnessScene(ActionEvent actionEvent) {
         try {
-            open("robustness", 1068.5, 645.5);
+            System.gc();
+            Main.mainStage.setTitle("Testing: Robustness");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/robustnessdoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
@@ -101,7 +116,13 @@ public class MainController implements Initializable, OpenScene {
 
     @FXML void handleShowTestResult (ActionEvent actionEvent) {
         try {
-            open("result", 998.5, 756.5);
+            System.gc();
+            Main.mainStage.setTitle("Result");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/testresultdoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi",
@@ -114,7 +135,14 @@ public class MainController implements Initializable, OpenScene {
 
     @FXML void handleShowAbout (ActionEvent actionEvent) {
         try {
-            open("about", 763, 627);
+            //open("about", 763, 627);
+            System.gc();
+            Main.mainStage.setTitle("About");
+            Main.mainStage.getScene().setRoot(
+                    FXMLLoader.load(getClass().getClassLoader().getResource("about/aboutdoc.fxml"))
+            );
+            Main.mainStage.sizeToScene();
+            Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",

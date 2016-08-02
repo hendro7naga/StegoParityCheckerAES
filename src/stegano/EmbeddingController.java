@@ -1,6 +1,5 @@
 package stegano;
 
-import interfaces.OpenScene;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -19,11 +18,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import kelas.*;
+import kripto.HAES256;
 import main.AppControll;
 import main.Main;
 import main.MainController;
 import org.w3c.dom.Node;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,17 +38,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
-import java.util.Iterator;
-import java.util.ResourceBundle;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import kripto.HAES256;
-import kelas.*;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
+import java.util.ResourceBundle;
 
 /**
  * Created by hendro.sinaga on 08-Jun-16.

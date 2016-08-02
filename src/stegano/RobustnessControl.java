@@ -1,6 +1,6 @@
 package stegano;
 
-import interfaces.OpenScene;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
@@ -8,8 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,7 +40,7 @@ public class RobustnessControl implements Initializable {
     List<ArrayList<Integer>> dataDecrypt = null;
     BufferedImage bufferedImageStego, bufferedImageStegoNoise;
     BigInteger primeNumber;
-    Double noiseProb, percentage;
+    Double noiseProb = 0.00, percentage;
     String stegoImagePathFile = "", chiperTextInBiner = "", stegoImageName = "";
     boolean kunciSama = false, stegoImageNameSama = false, hasData = false, skipOpenFile = false;
     int[] rgbDataOfImage;
@@ -79,6 +77,7 @@ public class RobustnessControl implements Initializable {
         this.dataDecrypt = null;
         this.bufferedImageStego = null;
         this.bufferedImageStegoNoise = null;
+        this.imgViewStegoNoise.setImage(null);
         this.btnAddNoise.setDisable(true);
         this.btnInitExtractMsg.setDisable(true);
         this.txtfieldKunci.clear();
@@ -154,41 +153,46 @@ public class RobustnessControl implements Initializable {
         boolean noiseValid = false;
         try {
             this.noiseProb = Double.parseDouble(this.txtfieldNoiseProbSaltPepper.getText());
-            noiseValid = true;
+            if (this.noiseProb >= 0.00 && this.noiseProb <= 1.00) {
+                noiseValid = true;
+                this.imgViewStegoNoise.setImage(null);
+            }
+            else {
+                throw new Exception("tidak valid");
+            }
         } catch (Exception e) {
             AlertInfo.showAlertWarningMessage(
                     "Informasi Aplikasi: Testing - Robustness",
                     "Noise Probability Value",
-                    "Invalid noise probability.\nNilai Noise 0 - 100",
+                    "Invalid noise probability.\nRentang nilai probabilitas Noise 0 - 1"
+                    + "\nDetail: " + e.getMessage(),
                     ButtonType.OK
             );
+            this.imgViewStegoNoise.setImage(null);
         }
         if (noiseValid) {
-            if (!(noiseProb >= 0 && noiseProb <= 100)) {
-                AlertInfo.showAlertWarningMessage(
+            this.bufferedImageStegoNoise = PengolahanCitra.addSaltAndPepperNoise(this.bufferedImageStego, this.noiseProb);
+            //this.bufferedImageStegoNoise = this.bufferedImageStego;
+            if (bufferedImageStegoNoise == null) {
+                AlertInfo.showAlertErrorMessage(
                         "Informasi Aplikasi",
-                        "Salt And Pepper Input",
-                        "Nilai probabilitas tidak valid. Nilai probabilitas harus diantara 0 - 100 (%)",
+                        "Error: Salt And Pepper Noise",
+                        "Terjadi kesalahan pada proses penambahan noise\n"
+                                + "Salt and Pepper.",
                         ButtonType.OK
                 );
-            }
-            else {
-                this.bufferedImageStegoNoise = PengolahanCitra.addSaltAndPepperNoise(this.bufferedImageStego, this.noiseProb);
-                //this.bufferedImageStegoNoise = this.bufferedImageStego;
-                if (bufferedImageStegoNoise == null) {
-                    AlertInfo.showAlertErrorMessage(
-                            "Informasi Aplikasi",
-                            "Error: Salt And Pepper Noise",
-                            "Terjadi kesalahan pada proses penambahan noise\n"
-                                    + "Salt and Pepper.",
-                            ButtonType.OK
-                    );
-                } else {
-                    this.imgViewStegoNoise.setImage(SwingFXUtils.toFXImage(this.bufferedImageStegoNoise, null));
-                    //this.btnAddNoise.setDisable(true);
-                    this.btnCompare.setDisable(true);
-                    this.btnInitExtractMsg.setDisable(false);
-                }
+            } else {
+                Platform.runLater(() -> {
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception e) {}
+                    imgViewStegoNoise.setImage(SwingFXUtils.toFXImage(bufferedImageStegoNoise, null));
+                });
+
+                this.imgViewStegoNoise.setVisible(true);
+                //this.btnAddNoise.setDisable(true);
+                this.btnCompare.setDisable(true);
+                this.btnInitExtractMsg.setDisable(false);
             }
         }
     }

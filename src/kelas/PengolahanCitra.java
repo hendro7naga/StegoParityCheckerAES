@@ -88,24 +88,9 @@ public class PengolahanCitra {
                 }
             }
 
-
-            //bataslama
-            /*for (int i = 0; i < prob; i += 1) {
-                int x1 = rnd.nextInt(width - 1);
-                int y1 = rnd.nextInt(height - 1);
-                int random = rnd.nextInt(11);
-                if (random == 0) {
-                    temp.setRGB(x1, y1, ((255 << 24) | (0 << 16) | (0 << 8) | 0));
-                }
-                else if (random == 10) {
-                    temp.setRGB(x1, y1, ((255 << 24) | (255 << 16) | (255 << 8) | 255));
-                }
-            }*/
         } catch (Exception e) {
-            //temp = null;
             bufferedImageStego = null;
         }
-        //return  temp;
         return bufferedImageStego;
     }
 

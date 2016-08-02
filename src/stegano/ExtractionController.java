@@ -1,15 +1,13 @@
 package stegano;
 
-import interfaces.OpenScene;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,7 +17,6 @@ import kelas.*;
 import kripto.HAES256;
 import main.Main;
 import main.MainController;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import javax.imageio.ImageIO;
@@ -76,11 +73,10 @@ public class ExtractionController implements Initializable {
         this.btnDecrypt.setDisable(true);
         this.chiperTextInBiner = "";
         boolean loadImage = false;
-        BufferedImage bufferedImage;
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Browse Stego Image");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
-        File file = fileChooser.showOpenDialog(null);
+        File file = fileChooser.showOpenDialog(Main.mainStage);
 
         if (file != null) {
             try {
@@ -163,11 +159,6 @@ public class ExtractionController implements Initializable {
                             break;
                         }
                     }
-                    /*this.textAreaOri.setText(
-                            "np: " + np + "\n"
-                            + "XnM: " + this.xnm + "\n"
-                            + "BilanganPrima: " + this.primeNumber + "\n"
-                    );*/
 
                     if (this.primeNumber.intValue() > this.nOfPixelForEmbedding) {
                         try {
@@ -278,7 +269,6 @@ public class ExtractionController implements Initializable {
 
             //binerKunci.substring(beginIndex, endIndex)
             int bil = Integer.parseInt(binerKunci.substring(0, 8), 2);
-            String huruf1 = Character.toString((char)bil);
 
             String strKunci = "";
             boolean potonglagi = true;
@@ -342,7 +332,6 @@ public class ExtractionController implements Initializable {
                 );
             }
 
-
         } catch (Exception exception) {
             AlertInfo.showAlertErrorMessage("Error",
                     "Proses Extraksi",
@@ -358,18 +347,15 @@ public class ExtractionController implements Initializable {
 
     private void doExtractMessage() {
         boolean potonglagi = true, prosesKonversiBinerPesanEkstraksi = false;
-        int indeks = 0, prosesPotong = 0;
+        int indeks = 0;
         this.dataEncrypt = new ArrayList<>();
         try {
-            //List<String> strBiner = new ArrayList<>();
-            //ArrayList<Integer> tmp = new ArrayList<>();
+
             while (potonglagi) {
-                //prosesPotong += 1;
                 ArrayList<Integer> tmp = new ArrayList<>();
                 for (int i = 0; i < 16; i += 1) {
-                    //String str = "";
+
                     if (indeks + 8 >= this.chiperTextInBiner.length()) {
-                        //str = this.chiperTextInBiner.substring(indeks, this.chiperTextInBiner.length());
                         tmp.add(Integer.parseInt(
                                 this.chiperTextInBiner.substring(indeks, this.chiperTextInBiner.length()),
                                 2)
@@ -377,36 +363,13 @@ public class ExtractionController implements Initializable {
                         potonglagi = false;
                         i = 16;
                     } else {
-                        //str = this.chiperTextInBiner.substring(indeks, indeks + 8);
-                        tmp.add(Integer.parseInt(
-                                this.chiperTextInBiner.substring(indeks, indeks + 8),
-                                2)
+                        tmp.add(
+                                Integer.parseInt(this.chiperTextInBiner.substring(indeks, indeks + 8),2)
                         );
                     }
-                    //tmp.add(Integer.parseInt(str, 2));
                     indeks += 8;
                 }
                 this.dataEncrypt.add(tmp);
-                /*if (indeks + 8 >= this.chiperTextInBiner.length()) {
-                    //str = this.chiperTextInBiner.substring(indeks, this.chiperTextInBiner.length());
-                    tmp.add(Integer.parseInt(
-                            this.chiperTextInBiner.substring(indeks, this.chiperTextInBiner.length()),
-                            2)
-                    );
-                    potonglagi = false;
-                } else {
-                    //str = this.chiperTextInBiner.substring(indeks, indeks + 8);
-                    tmp.add(Integer.parseInt(
-                            this.chiperTextInBiner.substring(indeks, indeks + 8),
-                            2)
-                    );
-                }
-                if (prosesPotong == 16 || (potonglagi == false)) {
-                    prosesPotong = 0;
-                    this.dataEncrypt.add(tmp);
-                    tmp = new ArrayList<>();
-                }*/
-
             }
             prosesKonversiBinerPesanEkstraksi = true;
         } catch (Exception exception) {
@@ -552,21 +515,28 @@ public class ExtractionController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
         try {
-            btnSaveText.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
-            );
-            btnBrowseStegoImg.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
-            );
+            Task<Void> task = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    btnSaveText.setGraphic(
+                            new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "filtxt-icon16.png"))
+                    );
+                    btnBrowseStegoImg.setGraphic(
+                            new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "bmp-icon16.png"))
+                    );
 
-            imgViewStegoImg.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
-            btnMainMenu.setGraphic(
-                    new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
-            );
-        } catch (MalformedURLException e) {
+                    imgViewStegoImg.setImage(new Image(MainController.resouresDir.toURI().toURL().toString() + "image-invalid.png"));
+                    btnMainMenu.setGraphic(
+                            new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
+                    );
+                    return null;
+                }
+            };
+            new Thread(task).start();
+        } catch (Exception e) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                     "Kesalahan Akeses File",
-                    "File tidak terdeteksi",
+                    "Error Detail: " + e.getMessage(),
                     ButtonType.OK);
         }
     }
