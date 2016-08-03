@@ -22,7 +22,7 @@ public class PengolahanCitra {
         BigInteger primeNumber = new BigInteger("0", 10);
         int width = stegoImage.getWidth();
         int height = stegoImage.getHeight();
-        int prob = (int) ((width * height) * noiseProbabilitas * 0.01);
+        int prob = (int) ((width * height) * noiseProbabilitas);
         int np = width * height;
         int indeks = 0, gemodNumber = 0, pixelIterator = 1;
         int[] rgbDataStego = new int[np];
