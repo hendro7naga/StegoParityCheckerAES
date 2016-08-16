@@ -190,9 +190,9 @@ public class TestResult {
                 workbook.write(fileOutputStream);
                 fileOutputStream.close();
                 workbook.close();
-                AlertInfo.showAlertErrorMessage(
+                AlertInfo.showAlertInfoMessage(
                         "Informasi Aplikasi",
-                        "Export Excel",
+                        "Export Data ke Excel",
                         "Proses export dan penyimpanan file excel berhasil...",
                         ButtonType.OK
                 );
@@ -256,9 +256,9 @@ public class TestResult {
                 workbook.write(fileOutputStream);
                 fileOutputStream.close();
                 workbook.close();
-                AlertInfo.showAlertErrorMessage(
+                AlertInfo.showAlertInfoMessage(
                         "Informasi Aplikasi",
-                        "Export Excel",
+                        "Export Data ke Excel",
                         "Proses export dan penyimpanan berkas excel berhasil...",
                         ButtonType.OK
                 );
@@ -281,11 +281,14 @@ public class TestResult {
         Optional<ButtonType> optional = AlertInfo.showConfirmMessage(
                 "Informasi Aplikasi",
                 "Penghapusan Data Tabel di Database",
-                "Apakah Anda yakin akan menghapus seluruh data Imperceptibility yang tersimpan di database?"
+                "Proses penghapusan data Imperceptibility merupakan penghapusan keseluruhan data "
+                + "(Stegano, Imperceptibility, Robustness).\n"
+                +"Apakah Anda yakin akan menghapus seluruh data yang tersimpan di database?"
         );
         if (optional.get().equals(MainController.buttonTypeYes)) {
             try {
-                MainController.appControll.sqLiteDB.deleteTableData(AppControll.TABLE_STEGANO_IMPERCEPTIBILITY);
+                //MainController.appControll.sqLiteDB.deleteTableData(AppControll.TABLE_STEGANO_IMPERCEPTIBILITY);
+                MainController.appControll.sqLiteDB.deleteTableData(AppControll.TABLE_STEGANO_MASTER);
                 AlertInfo.showAlertInfoMessage(
                         "Informasi Aplikasi",
                         "Hasil Proses",

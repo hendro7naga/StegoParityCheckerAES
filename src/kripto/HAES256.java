@@ -1,7 +1,4 @@
 package kripto;
-
-import java.util.Arrays;
-
 /**
  * Created by hendro.sinaga on 12-Jun-16.
  */
@@ -180,42 +177,9 @@ public class HAES256 {
         return this.statusProses;
     }
 
-    public boolean decrypt(String chiper, String kunci) {
-        this.statusProses = true;
-        this.indexOfWord = 0;
-        if (!this.keyHasCreated) {
-            boolean result = keyExpansion(kunci);
-            if (!result) {
-                this.statusProses = false;
-                throw new ExceptionInInitializerError("Error: Kesalahan pada Key Expansion Decrypt");
-            }
-        }
-
-        if (this.statusProses) {
-            this.indexOfWord = 59;
-            boolean resKonversiPesan = toArray2D(this.arrChiper, chiper);
-            if (resKonversiPesan) {
-                addRoundKeys(this.arrChiper, this.arrKunci, false);
-
-                for (short ronde = 1; ronde < N_OF_ROUND; ronde += 1) {
-                    invShiftRow(this.arrChiper);
-                    subBytePesan(this.arrChiper, INVERSE_SBOX);
-                    addRoundKeys(this.arrChiper, this.arrKunci, false);
-                    invMixColumns(this.arrChiper);
-                }
-                invShiftRow(this.arrChiper);
-                subBytePesan(this.arrChiper, INVERSE_SBOX);
-                addRoundKeys(this.arrChiper, this.arrKunci, false);
-            } else {
-                this.statusProses = false;
-            }
-        }
-        return this.statusProses;
-    }
-
     public boolean decryptDataInteger(int[] chiper, int[] kunci) {
         this.statusProses = true;
-        AESH.indexOfWord = 0;
+        this.indexOfWord = 0;
         if (!this.keyHasCreated) {
             //boolean result = keyExpansion(kunci);
             if (!keyExpansion(kunci)) {
@@ -392,21 +356,6 @@ public class HAES256 {
         }
     }
 
-    /*private static void mixColumns(int[][] s) {
-        // 's' is the main State matrix, 'ss' is a temp matrix of the same dimensions as 's'.
-        int[][] ss = new int[4][4];
-       //Array.Clear(ss, 0, ss.Length);
-
-        for (int c = 0; c < 4; c++) {
-            ss[0][c] = (GMul(0x02, s[0][c]) ^ GMul(0x03, s[1][c]) ^ s[2][c] ^ s[3][c]);
-            ss[1][c] = (s[0][c] ^ GMul(0x02, s[1][c]) ^ GMul(0x03, s[2][c]) ^ s[3][c]);
-            ss[2][c] = (s[0][c] ^ s[1][c] ^ GMul(0x02, s[2][c]) ^ GMul(0x03, s[3][c]));
-            ss[3][c] = (GMul(0x03, s[0][c]) ^ s[1][c] ^ s[2][c] ^ GMul(0x02, s[3][c]));
-        }
-        //Array.ConstrainedCopy(ss, 0, s, 0, ss.Length);
-        System.arraycopy(ss, 0, s, 0, ss.length);
-    }*/
-
     private void mixColumns(int[][] arr)
     {
         int[] temp = new int[4];
@@ -471,7 +420,7 @@ public class HAES256 {
         return res;
     }
 
-    private Integer GMul(int a, int b) { // Galois Field (256) Multiplication of two Bytes
+    private Integer GMul(int a, int b) {
         Integer p = 0;
         Integer counter;
         Integer hi_bit_set;
@@ -533,7 +482,7 @@ public class HAES256 {
         return tmp;
     }
 
-    private boolean toArray2D(int[][] target, String source) //fungsi untuk mengubah array 1 dimensi ke 2 dimensi
+    private boolean toArray2D(int[][] target, String source)
     {
         char[] arrSource = source.toCharArray();
         int indeks = 0;
@@ -550,7 +499,6 @@ public class HAES256 {
                     else
                     {
                         target[j][i] = 0;
-                        //target[j, i] = 0x00;
                     }
                 } catch (ArrayIndexOutOfBoundsException aie) {
                     status = false;

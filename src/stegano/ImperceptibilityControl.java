@@ -57,15 +57,11 @@ public class ImperceptibilityControl implements Initializable {
 
     @FXML
     private void handleBrowseOriginalImg (ActionEvent actionEvent) {
-        this.btnBrowseStegoImg.setDisable(true);
-        this.btnCalculateMSEPSNR.setDisable(true);
-        this.btnShowHistogram.setDisable(true);
         FileChooser fc = new FileChooser();
         fc.setTitle("Open Original Image");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
         Image image = null;
-        String sql = "";
-        boolean continueProcess = true;
+
         File file = null;
 
         if (this.hasData) {
@@ -96,7 +92,11 @@ public class ImperceptibilityControl implements Initializable {
                         "Size: " + (int)(file.length() / 1024) + " KB";
                 this.lblInfoOriginalImage.setText(infoOriginal);
                 this.btnBrowseStegoImg.setDisable(false);
-
+                this.btnCalculateMSEPSNR.setDisable(true);
+                this.btnShowHistogram.setDisable(true);
+                this.txtfieldMSE.clear();
+                this.txtfieldPSNR.clear();
+                this.btnSave.setDisable(true);
                 this.oriImageName = file.getName();
             }
             catch (MalformedURLException malformedURLException) {
@@ -201,8 +201,6 @@ public class ImperceptibilityControl implements Initializable {
                 btnSave.setDisable(false);
             }
         }
-
-
     }
 
     @FXML void handleBtnSaveData(ActionEvent actionEvent) {
@@ -223,6 +221,8 @@ public class ImperceptibilityControl implements Initializable {
 
         if (prosesCekBerhasil) {
             if (dataSudahAda) {
+                this.hasData = false;
+                this.btnSave.setDisable(true);
                 AlertInfo.showAlertInfoMessage(
                         "Informasi Aplikasi",
                         "Pengecekan Data",
@@ -243,6 +243,7 @@ public class ImperceptibilityControl implements Initializable {
                             + ");";
                     res = MainController.appControll.sqLiteDB.InsertUpdateDeleteQuery(sql);
                     this.hasData = false;
+                    this.btnSave.setDisable(true);
                 } catch (Exception e) {
                     AlertInfo.showAlertErrorMessage(
                             "Informasi Aplikasi",

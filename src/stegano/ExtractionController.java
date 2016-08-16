@@ -88,6 +88,9 @@ public class ExtractionController implements Initializable {
                 loadImage = true;
                 this.txtInputPass.clear();
                 this.txtInputPass.setEditable(true);
+                this.textAreaChiper.clear();
+                this.textAreaOri.clear();
+                this.btnSaveText.setDisable(true);
             } catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                         "File Path",
@@ -169,6 +172,7 @@ public class ExtractionController implements Initializable {
                                     indeks += 1;
                                 }
                             }
+                            txtInputPass.setDisable(false);
                         } catch (Exception except) {
                             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                                     "Membaca Data RGB Gambar",
@@ -190,7 +194,7 @@ public class ExtractionController implements Initializable {
     @FXML
     private void handleInputPassword(KeyEvent handler) {
         if (txtInputPass.getText().length() > 4) {
-            if (btnExtract.isDisable()) {
+            if (btnExtract.isDisable() && this.isBmp24) {
                 btnExtract.setDisable(false);
             }
             if (this.txtInputPass.getText().length() > 32) {
@@ -514,6 +518,7 @@ public class ExtractionController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
+        txtInputPass.setDisable(true);
         try {
             Task<Void> task = new Task<Void>() {
                 @Override

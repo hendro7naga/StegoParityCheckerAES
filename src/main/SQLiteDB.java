@@ -131,12 +131,6 @@ public class SQLiteDB {
         if (this.connection.isClosed()) {
             this.statement = this.createConnection().createStatement();
         }
-        /*ResultSet rs = this.statement.executeQuery("select * from " + tableName);
-
-        while (rs.next()) {
-            temp += 1;
-        }
-        rs.close();*/
         temp = this.statement.executeQuery("SELECT COUNT(*) AS jumlahBaris FROM " + tableName).getInt("jumlahBaris");
         this.statement.close();
         this.connection.close();

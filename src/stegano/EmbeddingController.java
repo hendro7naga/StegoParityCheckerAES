@@ -2,8 +2,6 @@ package stegano;
 
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -60,14 +58,18 @@ public class EmbeddingController implements Initializable {
     final int NK = 32;
     final int NK_ON_BYTE = 256;
     boolean isBmp24Bit = false, hasData = false;
-    boolean enkripProsesSukses = false;
+    boolean enkripProsesSukses = false, processTimer;
+    Thread threadTimer;
+    Task taskTimer;
+
     Alert alert;
+    @FXML ProgressBar progressBar;
     @FXML
     TextArea textInputMessage, textChiper;
     @FXML
     Text txtInfoMessage, txtInfoChipertext, textInfoCoverImg;
     @FXML
-    TextField txtInputPass;
+    TextField txtInputPass, txtfieldDetik, txtfieldMs;
     @FXML
     Button btnBrowseText, btnEncrypt, btnBrowseCoverImg, btnEmbedMessage, btnMainMenu, btnSaveStegoImg, btnNext;
     @FXML ImageView imgViewCover, imgViewStego;
@@ -85,7 +87,7 @@ public class EmbeddingController implements Initializable {
         fc.setTitle("Buka Berkas Teks");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Berkas Teks", "*.txt"));
 
-        File fileTeks = fc.showOpenDialog(null);
+        File fileTeks = fc.showOpenDialog(Main.mainStage);
 
         if (fileTeks != null) {
             try {
@@ -146,6 +148,25 @@ public class EmbeddingController implements Initializable {
                 btnEncrypt.setDisable(true);
             }
         }
+    }
+
+    private void updateProgressBar(double newVal) throws Exception {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (!progressBar.isVisible()) {
+                    progressBar.setProgress(0.00);
+                    progressBar.setVisible(true);
+                }
+                progressBar.setProgress(newVal);
+                if (progressBar.getProgress() >= 99.29) {
+                    progressBar.setVisible(false);
+                }
+                progressBar.notify();
+                return null;
+            }
+        };
+        new Thread(task).start();
     }
 
     @FXML
@@ -268,7 +289,7 @@ public class EmbeddingController implements Initializable {
                 AlertInfo.showAlertWarningMessage(
                         "Informasi Aplikasi",
                         "Perhatian",
-                        "Pesan dan Citra yang Anda berikan sudah tersedia di database..\n"
+                        "Pesan atau Citra yang Anda berikan sudah tersedia di database..\n"
                                 + "Harap berikan data yang berbeda.",
                         ButtonType.OK
                 );
@@ -315,7 +336,7 @@ public class EmbeddingController implements Initializable {
                     }
 
                 } else {
-                    AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
+                    AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
                             "Validasi Awal Stego Image",
                             "Stego Image tidak mendukung.\n" +
                             "Bit Depth Stego Image harus 24 dan berformat .bmp",
@@ -337,6 +358,7 @@ public class EmbeddingController implements Initializable {
                                         this.xnm
                                     );
         try {
+            progressBar.setProgress(0.09d);
             for (ArrayList<Integer> data: this.dataEncrypt) {
                 for (int i = 0; i < data.size(); i += 1) {
                     msgInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString(data.get(i)),8);
@@ -346,7 +368,8 @@ public class EmbeddingController implements Initializable {
                 kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
             }
             kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
-
+            updateProgressBar(0.12d);
+            Thread.sleep(250);
             konversiMsg = true;
             konversiKunci = true;
         } catch (Exception except) {
@@ -361,9 +384,13 @@ public class EmbeddingController implements Initializable {
             this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
 
             try {
+                //lakukan counter
+                startCountTime();
                 int pixelIterator = 1;
                 BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
                 byte siklusRGB = 1;
+
+                updateProgressBar(0.22d);
 
                 //for untuk sisip informasi panjang pesan
                 for (int i = 0; i < msgLengthInfoInBinary.length(); i += 1) {
@@ -415,6 +442,8 @@ public class EmbeddingController implements Initializable {
                     }
                     pixelIterator += 1;
                 } //end for untuk sisip informasi panjang pesan
+                updateProgressBar(0.32d);
+                Thread.sleep(250);
 
                 //for untuk sisi kunci
                 for (int i = 0; i < kunciInBinary.length(); i += 1) {
@@ -465,8 +494,9 @@ public class EmbeddingController implements Initializable {
                     }
                     pixelIterator += 1;
                 } //END FOR SISI KUNCI
-
-                //For untuk sisip pesan chiper
+                updateProgressBar(0.56d);
+                Thread.sleep(150);
+                //for untuk sisip pesan chiper
                 for (int i = 0; i < msgInBinary.length(); i += 1) {
                     int bitPesan = Integer.parseInt(msgInBinary.charAt(i) + "", 10);
                     BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
@@ -514,7 +544,9 @@ public class EmbeddingController implements Initializable {
                     }
                     pixelIterator += 1;
                 }
+                updateProgressBar(0.95d);
                 penyisipan = true;
+                stopCountTime();
             } catch (Exception exceptionEmbedding) {
                 penyisipan = false;
                 AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
@@ -531,6 +563,17 @@ public class EmbeddingController implements Initializable {
                 this.btnEmbedMessage.setDisable(true);
                 btnSaveStegoImg.setDisable(false);
                 this.hasData = true;
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(150);
+                            progressBar.setProgress(1.00);
+                            Thread.sleep(250);
+                            progressBar.setVisible(false);
+                        } catch (Exception e) {}
+                    }
+                });
             }
         }
     }
@@ -625,6 +668,45 @@ public class EmbeddingController implements Initializable {
         }
     }
 
+    private void startCountTime() throws Exception {
+        processTimer = true;
+        taskTimer = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                int counter = 0;
+                short detik = 0;
+                while (processTimer) {
+                    if (counter > 59) {
+
+                        txtfieldDetik.setText(
+                                (detik < 10) ? ("0" + detik) : ("" + detik)
+                        );
+                        counter = 0;
+                    }
+                    counter += 1;
+                    if (counter < 10) {
+                        txtfieldMs.setText("0" + counter);
+                    } else {
+                        txtfieldMs.setText(counter + "");
+                    }
+                }
+                notify();
+                return null;
+            }
+        };
+
+        threadTimer = new Thread(taskTimer);
+        threadTimer.start();
+    }
+
+    private void stopCountTime() throws Exception {
+        if (threadTimer.isAlive()) {
+            threadTimer.interrupt();
+            threadTimer = null;
+            processTimer = false;
+        }
+    }
+
     @FXML void handleBtnNextExtraction (ActionEvent actionEvent) {
         Parent p = null;
         boolean loadSukses = true;
@@ -679,6 +761,7 @@ public class EmbeddingController implements Initializable {
         HAES256 haes256 = HAES256.getInstance();
 
         try {
+            updateProgressBar(progressBar.getProgress() + 0.02);
             for (short i = 0; i < kunciArrChar.length; i += 1) {
                 kunciEncrypt[i] = (int)kunciArrChar[i];
             }
@@ -701,7 +784,7 @@ public class EmbeddingController implements Initializable {
                 indeksStart += 16;
             }
             this.dataEncrypt = new ArrayList<>();
-
+            updateProgressBar(progressBar.getProgress() + 0.02);
 
             for (int i = 0; i < this.dataPesan.size(); i += 1) {
                 ArrayList<Integer> subData = new ArrayList<>();
@@ -714,6 +797,9 @@ public class EmbeddingController implements Initializable {
                             subData.add(val);
                         }
                         this.dataEncrypt.add(subData);
+                        if (progressBar.getProgress() < 91) {
+                            updateProgressBar(progressBar.getProgress() + 0.04);
+                        }
                     } else {
                         throw new Exception("Kesalahan proses enkripsi");
                     }
@@ -727,7 +813,7 @@ public class EmbeddingController implements Initializable {
                 }
 
             }
-
+            updateProgressBar(94.22);
         } catch (Exception except) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi: Embedding",
                     "Proses Enkripsi",
@@ -744,16 +830,30 @@ public class EmbeddingController implements Initializable {
                     hasilEnkrip += Character.toString((char)val.get(i).intValue());
                 }
             }
-            textChiper.setText(hasilEnkrip);
-            btnBrowseCoverImg.setDisable(false);
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 10; i += 1) {
+                            progressBar.setProgress(progressBar.getProgress() + 0.02);
+                        }
+                        progressBar.setProgress(progressBar.getProgress() + 0.02);
+                    }
+                });
+                updateProgressBar(99.89);
+                textChiper.setText(hasilEnkrip);
+                btnBrowseCoverImg.setDisable(false);
+            } catch (Exception e) {}
+
         }
+        //progressBar.setVisible(false);
         return this.enkripProsesSukses;
     }
 
     private boolean checkStegoData() {
         boolean sameData = false;
 
-        String q = "SELECT oriImageName, msgLength FROM " + AppControll.TABLE_STEGANO_MASTER;
+        String q = "SELECT oriImageName, stegoImageName, msgLength FROM " + AppControll.TABLE_STEGANO_MASTER;
         MainController.initApp();
         int initAppControl;
         ResultSet resultSet;
@@ -763,7 +863,11 @@ public class EmbeddingController implements Initializable {
             if (initAppControl == 1) {
                 resultSet = MainController.appControll.sqLiteDB.SelectQuery(q);
                 while (resultSet.next()) {
-                    if (this.imgOriName.equalsIgnoreCase(resultSet.getString("oriImageName")) &&
+                    if (this.imgOriName.equalsIgnoreCase(resultSet.getString("stegoImageName"))) {
+                        sameData = true;
+                        break;
+                    }
+                    else if (this.imgOriName.equalsIgnoreCase(resultSet.getString("oriImageName")) &&
                         this.textLength == resultSet.getInt("msgLength")) {
                         sameData = true;
                         break;
@@ -822,12 +926,9 @@ public class EmbeddingController implements Initializable {
                 handleTextInputMessage();
             }
         });
-        textInputMessage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if(!newValue) {
-                    handleTextInputMessage();
-                }
+        textInputMessage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) {
+                handleTextInputMessage();
             }
         });
     }

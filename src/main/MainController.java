@@ -42,7 +42,8 @@ public class MainController implements Initializable {
             Main.mainStage.getScene().setRoot(
                     FXMLLoader.load(getClass().getClassLoader().getResource("stegano/embeddingdoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(1052.6);
+            Main.mainStage.setHeight(722.5);
             Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
@@ -61,7 +62,8 @@ public class MainController implements Initializable {
             Main.mainStage.getScene().setRoot(
                     FXMLLoader.load(getClass().getClassLoader().getResource("stegano/extractiondoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(895.0);
+            Main.mainStage.setHeight(668.0);
             Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
@@ -76,13 +78,13 @@ public class MainController implements Initializable {
     @FXML
     private void handleShowImperceptibilityScene(ActionEvent actionEvent) {
         try {
-            //open("imperceptibility", 785.5, 645.6);
             System.gc();
             Main.mainStage.setTitle("Testing: Imperceptibility");
             Main.mainStage.getScene().setRoot(
-                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/imperceptibility.fxml"))
+                    FXMLLoader.load(getClass().getClassLoader().getResource("stegano/imperceptibilitydoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(885.0);
+            Main.mainStage.setHeight(635.0);
             Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
@@ -102,7 +104,8 @@ public class MainController implements Initializable {
             Main.mainStage.getScene().setRoot(
                     FXMLLoader.load(getClass().getClassLoader().getResource("stegano/robustnessdoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(1142.0);
+            Main.mainStage.setHeight(750.0);
             Main.mainStage.centerOnScreen();
         } catch (Exception ex) {
             AlertInfo.showAlertWarningMessage(
@@ -121,7 +124,8 @@ public class MainController implements Initializable {
             Main.mainStage.getScene().setRoot(
                     FXMLLoader.load(getClass().getClassLoader().getResource("stegano/testresultdoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(912.0);
+            Main.mainStage.setHeight(746.0);
             Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertWarningMessage(
@@ -135,13 +139,13 @@ public class MainController implements Initializable {
 
     @FXML void handleShowAbout (ActionEvent actionEvent) {
         try {
-            //open("about", 763, 627);
             System.gc();
             Main.mainStage.setTitle("About");
             Main.mainStage.getScene().setRoot(
                     FXMLLoader.load(getClass().getClassLoader().getResource("about/aboutdoc.fxml"))
             );
-            Main.mainStage.sizeToScene();
+            Main.mainStage.setWidth(780.0);
+            Main.mainStage.setHeight(615.0);
             Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(

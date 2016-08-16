@@ -34,7 +34,7 @@ public class AppControll {
         }
     }
 
-    private void checkDirektori() throws Exception { //sudah oke
+    private void checkDirektori() throws Exception {
         boolean initDir = true;
         String dir = System.getProperty(AppControll.USER_DIR) + pathSeparator + "steganoparity";
         String db = dir + pathSeparator + AppControll.DB_NAME;

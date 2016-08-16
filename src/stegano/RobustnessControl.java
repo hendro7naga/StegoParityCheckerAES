@@ -120,13 +120,19 @@ public class RobustnessControl implements Initializable {
                     }
                 }
                 if (!this.stegoImageNameSama || this.dataTable.size() < 1) {
+                    this.txtfieldNoiseProbSaltPepper.setDisable(true);
                     throw new Exception("Nama file stego image tidak tersedia di database");
                 }
                 else {
+                    this.txtfieldNoiseProbSaltPepper.clear();
                     this.btnAddNoise.setDisable(false);
                 }
                 rs.close();
                 MainController.appControll.sqLiteDB.closeConnection();
+                if (this.txtfieldNoiseProbSaltPepper.isDisable()) {
+                    this.txtfieldNoiseProbSaltPepper.clear();
+                    this.txtfieldNoiseProbSaltPepper.setDisable(false);
+                }
             }
             catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertWarningMessage(
