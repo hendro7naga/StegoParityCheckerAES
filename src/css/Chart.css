@@ -1,4 +1,6 @@
-.default-color0.chart-area-symbol { -fx-background-color: #e9967a, #ffa07a; }
+.chart-title {-fx-text-alignment: center;}
+
+.default-color0.chart-area-symbol { -fx-background-color: #e9967a, #e69080; }
 .default-color1.chart-area-symbol { -fx-background-color: #2fa4f0, #97a4ff; }
 
 .default-color0.chart-series-area-line { -fx-stroke: #e9967a; }

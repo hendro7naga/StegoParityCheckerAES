@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.TimerExecution;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -36,7 +37,7 @@ import java.util.ResourceBundle;
 /**
  * Created by hendro.sinaga on 25-Jun-16.
  */
-public class ExtractionController implements Initializable {
+public class ExtractionController implements Initializable, TimerExecution {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgProperty = "", bitDepthImg = "";
@@ -49,11 +50,15 @@ public class ExtractionController implements Initializable {
     int coverImgWidth = 0, coverImgHeight = 0, coverImgType = -1, xnm = -1, gemodNumber = -1, np;
     final int NK_ON_BYTE = 256;
     char[] arrCharTeksOri;
-    boolean isBmp24 = false, kunciSama = false;
+    boolean isBmp24 = false, kunciSama = false, processTimer;
+    Thread threadTimer;
+    Task taskTimer;
+
+    @FXML ProgressBar progressBar;
     @FXML
     Label lblInfoStego;
     @FXML
-    TextField txtInputPass;
+    TextField txtInputPass, txtfieldDetik, txtfieldMs;
     @FXML
     TextArea textAreaChiper, textAreaOri;
     @FXML
@@ -231,111 +236,13 @@ public class ExtractionController implements Initializable {
     private void handleBtnExtraction(ActionEvent actionEvent) {
         this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
         try {
-            int pixelIterator = 1;
-            BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
-            //byte siklusRGB = 1;
-            String binerInfoPanjangPesan = "";
-            for (int i = 0; i < this.xnm; i += 1) {
-                BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                                                     this.primeNumber);
-                int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
-                int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
-                int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
-                int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
-
-                //jika parity genap
-                if (ParityChecker.generateParity(r,g,b) == 0) {
-                    binerInfoPanjangPesan += "0";
-                } else {
-                    binerInfoPanjangPesan += "1";
+            new Thread(new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    doExtraction();
+                    return null;
                 }
-                pixelIterator += 1;
-            }
-
-            int panjangPesan = Integer.parseInt(binerInfoPanjangPesan, 2);
-
-            String binerKunci = "";
-            for (int i = 0; i < this.NK_ON_BYTE; i += 1) {
-                BigInteger randoms = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                                                      this.primeNumber);
-                int r = (this.rgbDataOfImage[randoms.intValue()]>>16)&0x000000FF;
-                int g = (this.rgbDataOfImage[randoms.intValue()]>>8)&0x000000FF;
-                int b = (this.rgbDataOfImage[randoms.intValue()])&0x000000FF;
-
-                //jika parity genap
-                if (ParityChecker.generateParity(r,g,b) == 0) {
-                    binerKunci += "0";
-                } else {
-                    binerKunci += "1";
-                }
-                pixelIterator += 1;
-            }
-
-            //binerKunci.substring(beginIndex, endIndex)
-            int bil = Integer.parseInt(binerKunci.substring(0, 8), 2);
-
-            String strKunci = "";
-            boolean potonglagi = true;
-            int indeks = 0;
-            //this.textAreaOri.appendText("\nDeretan nilaiInteger kunci: \n");
-            while (potonglagi) {
-                int tmpBil;
-                if (indeks + 8 >= binerKunci.length()) {
-                    tmpBil = Integer.parseInt(binerKunci.substring(indeks, binerKunci.length()), 2);
-                    potonglagi = false;
-                }
-                else {
-                    tmpBil = Integer.parseInt(binerKunci.substring(indeks, indeks + 8), 2);
-                }
-                if (tmpBil != 0) {
-                    strKunci += Character.toString((char)tmpBil);
-                    //this.textAreaOri.appendText(tmpBil + " ");
-                }
-                indeks += 8;
-            }
-
-            this.kunciSama = false;
-            char[] arrKunciTersimpan = strKunci.toCharArray();
-            char[] arrKunciInput = this.txtInputPass.getText().toCharArray();
-            if (arrKunciTersimpan.length == arrKunciInput.length) {
-                boolean tmpPersamaan = true;
-                //this.textAreaOri.appendText("\nPanjangKunci input dan tersimpan sama\n");
-                for (int i = 0; i < arrKunciInput.length; i += 1) {
-                    if (arrKunciInput[i] != arrKunciTersimpan[i]) {
-                        tmpPersamaan = false;
-                        break;
-                    }
-                }
-                this.kunciSama = tmpPersamaan;
-            }
-            if (this.kunciSama) {
-                //this.textAreaOri.appendText("\nKunci input dan tersimpan sama\n");
-                this.chiperTextInBiner = "";
-                for (int i = 0; i < panjangPesan; i += 1) {
-                    BigInteger randoms = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                            this.primeNumber);
-                    int r = (this.rgbDataOfImage[randoms.intValue()]>>16)&0x000000FF;
-                    int g = (this.rgbDataOfImage[randoms.intValue()]>>8)&0x000000FF;
-                    int b = (this.rgbDataOfImage[randoms.intValue()])&0x000000FF;
-
-                    //jika parity genap
-                    if (ParityChecker.generateParity(r,g,b) == 0) {
-                        this.chiperTextInBiner += "0";
-                    } else {
-                        this.chiperTextInBiner += "1";
-                    }
-                    pixelIterator += 1;
-                }
-
-            }
-            else {
-                AlertInfo.showAlertInfoMessage("Informasi Aplikasi",
-                        "Kunci Invalid",
-                        "Maaf!!!\nKunci yang Anda berikan tidak sesuai.",
-                        ButtonType.OK
-                );
-            }
-
+            }).start();
         } catch (Exception exception) {
             AlertInfo.showAlertErrorMessage("Error",
                     "Proses Extraksi",
@@ -344,12 +251,133 @@ public class ExtractionController implements Initializable {
                     ButtonType.OK
             );
         }
+    }
+
+    private void doExtraction() throws Exception {
+        int pixelIterator = 1;
+        BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
+        //byte siklusRGB = 1;
+        String binerInfoPanjangPesan = "";
+        updateProgressBar(0.09d);
+        startCountTime();
+        for (int i = 0; i < this.xnm; i += 1) {
+            BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                    this.primeNumber);
+            int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+            int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+            int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+            int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+            //jika parity genap
+            if (ParityChecker.generateParity(r,g,b) == 0) {
+                binerInfoPanjangPesan += "0";
+            } else {
+                binerInfoPanjangPesan += "1";
+            }
+            pixelIterator += 1;
+        }
+        updateProgressBar(0.22d);
+        Thread.sleep(22);
+        int panjangPesan = Integer.parseInt(binerInfoPanjangPesan, 2);
+        String binerKunci = "";
+        for (int i = 0; i < this.NK_ON_BYTE; i += 1) {
+            BigInteger randoms = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                    this.primeNumber);
+            int r = (this.rgbDataOfImage[randoms.intValue()]>>16)&0x000000FF;
+            int g = (this.rgbDataOfImage[randoms.intValue()]>>8)&0x000000FF;
+            int b = (this.rgbDataOfImage[randoms.intValue()])&0x000000FF;
+
+            //jika parity genap
+            if (ParityChecker.generateParity(r,g,b) == 0) {
+                binerKunci += "0";
+            } else {
+                binerKunci += "1";
+            }
+            pixelIterator += 1;
+        }
+        updateProgressBar(0.36d);
+        Thread.sleep(12);
+        //binerKunci.substring(beginIndex, endIndex)
+        int bil = Integer.parseInt(binerKunci.substring(0, 8), 2);
+
+        String strKunci = "";
+        boolean potonglagi = true;
+        int indeks = 0;
+        //this.textAreaOri.appendText("\nDeretan nilaiInteger kunci: \n");
+        while (potonglagi) {
+            int tmpBil;
+            if (indeks + 8 >= binerKunci.length()) {
+                potonglagi = false;
+                tmpBil = Integer.parseInt(binerKunci.substring(indeks, binerKunci.length()), 2);
+            }
+            else {
+                tmpBil = Integer.parseInt(binerKunci.substring(indeks, indeks + 8), 2);
+            }
+            if (tmpBil != 0) {
+                strKunci += Character.toString((char)tmpBil);
+            }
+            indeks += 8;
+        }
+        updateProgressBar(0.42d);
+        Thread.sleep(10);
+        this.kunciSama = false;
+        char[] arrKunciTersimpan = strKunci.toCharArray();
+        char[] arrKunciInput = this.txtInputPass.getText().toCharArray();
+        if (arrKunciTersimpan.length == arrKunciInput.length) {
+            boolean tmpPersamaan = true;
+            //this.textAreaOri.appendText("\nPanjangKunci input dan tersimpan sama\n");
+            for (int i = 0; i < arrKunciInput.length; i += 1) {
+                if (arrKunciInput[i] != arrKunciTersimpan[i]) {
+                    tmpPersamaan = false;
+                    break;
+                }
+            }
+            this.kunciSama = tmpPersamaan;
+            updateProgressBar(0.50d);
+            Thread.sleep(10);
+        }
+        if (this.kunciSama) {
+            //this.textAreaOri.appendText("\nKunci input dan tersimpan sama\n");
+            this.chiperTextInBiner = "";
+            for (int i = 0; i < panjangPesan; i += 1) {
+                BigInteger randoms = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                        this.primeNumber);
+                int r = (this.rgbDataOfImage[randoms.intValue()]>>16)&0x000000FF;
+                int g = (this.rgbDataOfImage[randoms.intValue()]>>8)&0x000000FF;
+                int b = (this.rgbDataOfImage[randoms.intValue()])&0x000000FF;
+
+                //jika parity genap
+                if (ParityChecker.generateParity(r,g,b) == 0) {
+                    this.chiperTextInBiner += "0";
+                } else {
+                    this.chiperTextInBiner += "1";
+                }
+                pixelIterator += 1;
+                if (progressBar.getProgress() < 0.95d) {
+                    updateProgressBar(progressBar.getProgress() + 0.02d);
+                    Thread.sleep(5);
+                }
+            }
+
+        }
+        else {
+            AlertInfo.showAlertWarningMessage("Informasi Aplikasi",
+                    "Kunci Invalid",
+                    "Kunci yang Anda berikan tidak sesuai.",
+                    ButtonType.OK
+            );
+        }
+        updateProgressBar(1.00d);
+        Thread.sleep(5);
+        stopCountTime();
+        Thread.sleep(5);
+        progressBar.setVisible(false);
         if (this.chiperTextInBiner.length() >= 16) {
-            doExtractMessage();
+            convertDataDecrypt();
         }
     }
 
-    private void doExtractMessage() {
+    private void convertDataDecrypt() {
         boolean potonglagi = true, prosesKonversiBinerPesanEkstraksi = false;
         int indeks = 0;
         this.dataEncrypt = new ArrayList<>();
@@ -358,14 +386,13 @@ public class ExtractionController implements Initializable {
             while (potonglagi) {
                 ArrayList<Integer> tmp = new ArrayList<>();
                 for (int i = 0; i < 16; i += 1) {
-
                     if (indeks + 8 >= this.chiperTextInBiner.length()) {
                         tmp.add(Integer.parseInt(
                                 this.chiperTextInBiner.substring(indeks, this.chiperTextInBiner.length()),
                                 2)
                         );
-                        potonglagi = false;
                         i = 16;
+                        potonglagi = false;
                     } else {
                         tmp.add(
                                 Integer.parseInt(this.chiperTextInBiner.substring(indeks, indeks + 8),2)
@@ -421,7 +448,10 @@ public class ExtractionController implements Initializable {
                     }
                     this.dataDecrypt.add(subData);
                 } else {
-                    throw new Exception("Kesalahan proses dekripsi");
+                    throw new Exception(
+                            "Kesalahan proses dekripsi"
+                            + ""
+                    );
                 }
                 dekripStatus = true;
             } catch (Exception decriptException) {
@@ -469,7 +499,8 @@ public class ExtractionController implements Initializable {
                     FXMLLoader.load(getClass().getClassLoader().getResource("main/maindoc.fxml"))
             );
             Main.mainStage.sizeToScene();
-            Main.mainStage.centerOnScreen();
+            if (!Main.mainStage.isMaximized())
+                Main.mainStage.centerOnScreen();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage(
                     "Informasi Aplikasi",
@@ -478,6 +509,26 @@ public class ExtractionController implements Initializable {
                     ButtonType.OK
             );
         }
+    }
+
+    private void updateProgressBar(double newVal) throws Exception {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (!progressBar.isVisible()) {
+                    progressBar.setProgress(0.00);
+                    progressBar.setVisible(true);
+                }
+                progressBar.setProgress(newVal);
+                if (progressBar.getProgress() >= 99.29) {
+                    Thread.sleep(10);
+                    progressBar.setVisible(false);
+                }
+                progressBar.notify();
+                return null;
+            }
+        };
+        new Thread(task).start();
     }
 
     private void saveFile(String teks, File file) {
@@ -520,7 +571,7 @@ public class ExtractionController implements Initializable {
         Platform.isSupported(ConditionalFeature.INPUT_METHOD);
         txtInputPass.setDisable(true);
         try {
-            Task<Void> task = new Task<Void>() {
+            Task<Void> taske = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
                     btnSaveText.setGraphic(
@@ -537,12 +588,66 @@ public class ExtractionController implements Initializable {
                     return null;
                 }
             };
-            new Thread(task).start();
+            new Thread(taske).start();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                     "Kesalahan Akeses File",
                     "Error Detail: " + e.getMessage(),
                     ButtonType.OK);
+        }
+    }
+
+    @Override
+    public void startCountTime() throws Exception {
+        processTimer = true;
+        taskTimer = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                int counter = 0;
+                short detik = 0;
+                while (processTimer) {
+                    counter += 1;
+                    if (counter > 59) {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                txtfieldDetik.setText(
+                                        (detik < 10) ? ("0" + detik) : ("" + detik)
+                                );
+                            }
+                        });
+                        wait(10);
+                        counter = 0;
+                    } else {
+                        int finalCounter = counter;
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (finalCounter < 10) {
+                                    txtfieldMs.setText("0" + finalCounter);
+                                } else {
+                                    txtfieldMs.setText(finalCounter + "");
+                                }
+                            }
+                        });
+                    }
+                    Thread.sleep(50);
+                }
+                notify();
+                return null;
+            }
+        };
+
+        threadTimer = new Thread(taskTimer);
+        threadTimer.start();
+    }
+
+    @Override
+    public void stopCountTime() throws Exception {
+        if (threadTimer.isAlive()) {
+            threadTimer.interrupt();
+            threadTimer = null;
+            processTimer = false;
         }
     }
 }

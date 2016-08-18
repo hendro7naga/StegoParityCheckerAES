@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
@@ -9,6 +10,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="618.0" prefWidth="867.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stegano.ExtractionController">
    <content>
@@ -17,25 +19,62 @@
             <AnchorPane prefHeight="616.0" prefWidth="749.0">
                <children>
                   <Label layoutX="12.0" layoutY="17.0" text="Stego Image" />
-                  <Label layoutX="240.0" layoutY="15.0" text="(.bmp)" />
+                  <Label layoutX="250.0" layoutY="14.0" text="(.bmp)" />
                   <Label layoutX="13.0" layoutY="376.0" text="Kunci:" />
-                  <Button fx:id="btnBrowseStegoImg" alignment="BASELINE_RIGHT" layoutX="150.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleBtnBrowse" prefHeight="25.0" prefWidth="86.0" text="Browse" textAlignment="RIGHT" />
+                  <Button fx:id="btnBrowseStegoImg" alignment="BASELINE_RIGHT" layoutX="147.0" layoutY="2.0" mnemonicParsing="false" onAction="#handleBtnBrowse" prefHeight="30.0" prefWidth="102.0" text="Browse" textAlignment="RIGHT">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
                   <Separator layoutX="14.0" layoutY="253.0" prefHeight="2.0" prefWidth="271.0" />
-                  <Separator layoutX="315.0" layoutY="322.0" prefHeight="0.0" prefWidth="439.0" />
-                  <Separator layoutX="9.0" layoutY="474.0" prefHeight="0.0" prefWidth="275.0" />
+                  <Separator layoutX="316.0" layoutY="319.0" prefHeight="5.0" prefWidth="426.0" />
+                  <Separator layoutX="9.0" layoutY="467.0" prefHeight="0.0" prefWidth="275.0" />
                   <Separator layoutX="296.0" layoutY="10.0" orientation="VERTICAL" prefHeight="552.0" prefWidth="0.0" />
                   <ImageView fx:id="imgViewStegoImg" fitHeight="214.0" fitWidth="270.0" layoutX="12.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true" />
                   <TextField fx:id="txtInputPass" layoutX="13.0" layoutY="396.0" onKeyPressed="#handleLengthInputPass" onKeyReleased="#handleInputPassword" prefHeight="25.0" prefWidth="273.0" />
-                  <Button fx:id="btnExtract" disable="true" layoutX="183.0" layoutY="429.0" mnemonicParsing="false" onAction="#handleBtnExtraction" text="Extract Message" />
+                  <Button fx:id="btnExtract" disable="true" layoutX="166.0" layoutY="427.0" mnemonicParsing="false" onAction="#handleBtnExtraction" text="Extract Message">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
                   <TextArea fx:id="textAreaChiper" editable="false" layoutX="315.0" layoutY="33.0" prefHeight="271.0" prefWidth="504.0" wrapText="true" />
-                  <Button fx:id="btnDecrypt" disable="true" layoutX="761.0" layoutY="311.0" mnemonicParsing="false" onAction="#handleBtnDecrypt" text="Decrypt" />
-                  <Button fx:id="btnMainMenu" layoutX="14.0" layoutY="575.0" mnemonicParsing="false" onAction="#handleMainMenu" text="Main Menu" />
+                  <Button fx:id="btnDecrypt" disable="true" layoutX="750.0" layoutY="307.0" mnemonicParsing="false" onAction="#handleBtnDecrypt" text="Decrypt">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
+                  <Button fx:id="btnMainMenu" layoutX="14.0" layoutY="575.0" mnemonicParsing="false" onAction="#handleMainMenu" text="Main Menu">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
                   <Label layoutX="318.0" layoutY="15.0" text="ChiperText :" />
                   <Label fx:id="lblInfoStego" layoutX="12.0" layoutY="256.0" prefHeight="116.0" prefWidth="290.0" text="(Initial Image)" wrapText="true" />
                   <Label layoutX="317.0" layoutY="323.0" text="Text : " />
                   <TextArea fx:id="textAreaOri" editable="false" layoutX="315.0" layoutY="340.0" prefHeight="234.0" prefWidth="506.0" wrapText="true" />
-                  <Button fx:id="btnSaveText" alignment="BASELINE_RIGHT" disable="true" layoutX="723.0" layoutY="575.0" mnemonicParsing="false" onAction="#handleBtnSaveText" prefHeight="25.0" prefWidth="67.0" text="Save" textAlignment="RIGHT" />
-                  <Label layoutX="796.0" layoutY="581.0" text="(.txt)" />
+                  <Button fx:id="btnSaveText" alignment="BASELINE_RIGHT" disable="true" layoutX="706.0" layoutY="575.0" mnemonicParsing="false" onAction="#handleBtnSaveText" prefHeight="30.0" prefWidth="84.0" text="Save" textAlignment="RIGHT">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
+                  <Label layoutX="790.0" layoutY="585.0" text="(.txt)" />
+                  <Label layoutX="38.0" layoutY="480.0" text="Time Execution" textFill="#363333">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="182.0" layoutY="477.0" text=":">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtfieldDetik" alignment="CENTER" editable="false" layoutX="138.0" layoutY="475.0" prefHeight="30.0" prefWidth="38.0" promptText="00">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="txtfieldMs" alignment="CENTER" editable="false" layoutX="190.0" layoutY="475.0" prefHeight="30.0" prefWidth="38.0" promptText="00">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Separator layoutX="10.0" layoutY="513.0" prefHeight="0.0" prefWidth="275.0" />
+                  <ProgressBar fx:id="progressBar" layoutX="238.0" layoutY="579.0" prefHeight="23.0" prefWidth="352.0" progress="0.0" visible="false" />
                </children>
             </AnchorPane>
          </children>

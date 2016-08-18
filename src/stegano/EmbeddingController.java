@@ -1,5 +1,6 @@
 package stegano;
 
+import interfaces.TimerExecution;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -44,7 +45,7 @@ import java.util.ResourceBundle;
 /**
  * Created by hendro.sinaga on 08-Jun-16.
  */
-public class EmbeddingController implements Initializable {
+public class EmbeddingController implements Initializable, TimerExecution {
     BufferedImage stegoImage = null;
     Image coverImage;
     String imgPath = "", imgOriName = "", imgStegoName = "", imgProperty = "", bitDepthImg = "";
@@ -349,232 +350,21 @@ public class EmbeddingController implements Initializable {
 
     @FXML
     private void handleBtnEmbedMessage(ActionEvent event) {
-        boolean konversiMsg = false, konversiKunci = false, penyisipan = false;
-        char[] arrKunci = txtInputPass.getText().toCharArray();
-        String msgInBinary = "";
-        String kunciInBinary = "";
-        String msgLengthInfoInBinary = KonversiData.paddingInLeftBinaryString(
-                                        Integer.toBinaryString(this.nOfChiperLenOnByte),
-                                        this.xnm
-                                    );
         try {
-            progressBar.setProgress(0.09d);
-            for (ArrayList<Integer> data: this.dataEncrypt) {
-                for (int i = 0; i < data.size(); i += 1) {
-                    msgInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString(data.get(i)),8);
+            new Thread(new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    doEmbedding();
+                    return null;
                 }
-            }
-            for (int i = 0; i < arrKunci.length; i += 1) {
-                kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
-            }
-            kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
-            updateProgressBar(0.12d);
-            Thread.sleep(250);
-            konversiMsg = true;
-            konversiKunci = true;
-        } catch (Exception except) {
-            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
-                    "Konversi Msg to binary",
-                    "Terjadi kesalahan ketika proses konversi chipertext ke dalam notasi binary",
+            }).start();
+        } catch (Exception e) {
+            AlertInfo.showAlertErrorMessage(
+                    "Informasi Aplikasi",
+                    "Embedding Proses",
+                    "Terjadi kesalahan. Detail Error: \n" + e.getMessage(),
                     ButtonType.OK
             );
-        }
-
-        if (konversiMsg && konversiKunci) {
-            this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
-
-            try {
-                //lakukan counter
-                startCountTime();
-                int pixelIterator = 1;
-                BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
-                byte siklusRGB = 1;
-
-                updateProgressBar(0.22d);
-
-                //for untuk sisip informasi panjang pesan
-                for (int i = 0; i < msgLengthInfoInBinary.length(); i += 1) {
-                    int bitPesan = Integer.parseInt(msgLengthInfoInBinary.charAt(i) + "", 10);
-                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                                                         this.primeNumber);
-                    //int argb = this.rgbDataOfImage[random.intValue()];
-                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
-                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
-                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
-                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
-
-                    if (siklusRGB > 3) {
-                        siklusRGB = 1;
-                    }
-
-                    //jika hasil parity even
-                    if (ParityChecker.generateParity(r,g,b) == 0) {
-                        if (bitPesan == 1) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { // no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    else { //hasil parity odd
-                        if (bitPesan == 0) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { //no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    pixelIterator += 1;
-                } //end for untuk sisip informasi panjang pesan
-                updateProgressBar(0.32d);
-                Thread.sleep(250);
-
-                //for untuk sisi kunci
-                for (int i = 0; i < kunciInBinary.length(); i += 1) {
-                    int bitPesan = Integer.parseInt(kunciInBinary.charAt(i) + "", 10);
-                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                                                         this.primeNumber);
-                    //int argb = this.rgbDataOfImage[random.intValue()];
-                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
-                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
-                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
-                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
-
-                    if (siklusRGB > 3) {
-                        siklusRGB = 1;
-                    }
-                    //jika hasil parity even
-                    if (ParityChecker.generateParity(r,g,b) == 0) {
-                        if (bitPesan == 1) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { // no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    else { //hasil parity odd
-                        if (bitPesan == 0) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { //no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    pixelIterator += 1;
-                } //END FOR SISI KUNCI
-                updateProgressBar(0.56d);
-                Thread.sleep(150);
-                //for untuk sisip pesan chiper
-                for (int i = 0; i < msgInBinary.length(); i += 1) {
-                    int bitPesan = Integer.parseInt(msgInBinary.charAt(i) + "", 10);
-                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
-                                                         this.primeNumber);
-                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
-                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
-                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
-                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
-
-                    if (siklusRGB > 3) {
-                        siklusRGB = 1;
-                    }
-                    //jika hasil parity even
-                    if (ParityChecker.generateParity(r,g,b) == 0) {
-                        if (bitPesan == 1) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { // no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    else { //hasil parity odd
-                        if (bitPesan == 0) { //lakukan Reverse
-                            if (siklusRGB == 1) { //ubah R
-                                r = ParityChecker.takeChannelRGBtoReverse(r);
-                            }
-                            else if (siklusRGB == 2) { //ubah G
-                                g = ParityChecker.takeChannelRGBtoReverse(g);
-                            }
-                            else if (siklusRGB == 3) { //ubah B
-                                b = ParityChecker.takeChannelRGBtoReverse(b);
-                            }
-                            siklusRGB += 1;
-                        } else { //no change
-                        }
-                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
-                    }
-                    pixelIterator += 1;
-                }
-                updateProgressBar(0.95d);
-                penyisipan = true;
-                stopCountTime();
-            } catch (Exception exceptionEmbedding) {
-                penyisipan = false;
-                AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
-                        "Embedding Proses",
-                        "Terjadi kesalahan saat proses penyisipan pesan" +
-                        "Detail error: " + exceptionEmbedding.getMessage(),
-                        ButtonType.OK
-                );
-            }
-
-            if (penyisipan && createStegoImage()) {
-                imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
-                imgViewStego.setFitWidth(292);
-                this.btnEmbedMessage.setDisable(true);
-                btnSaveStegoImg.setDisable(false);
-                this.hasData = true;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(150);
-                            progressBar.setProgress(1.00);
-                            Thread.sleep(250);
-                            progressBar.setVisible(false);
-                        } catch (Exception e) {}
-                    }
-                });
-            }
         }
     }
 
@@ -585,13 +375,12 @@ public class EmbeddingController implements Initializable {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
         boolean res = false;
         fileChooser.setInitialFileName(this.imgOriName.substring(0, this.imgOriName.lastIndexOf('.'))
-                                        + "_" + this.textLength + "_stego");
+                                        + "_" + this.textLength + "_stego_");
 
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            //String selected_desc = fileChooser.getSelectedExtensionFilter().getDescription();
+
             String extension = "bmp";
-            boolean sukses = true;
             if (file.getName().endsWith(".bmp"))
                 extension = "bmp";
             else
@@ -668,7 +457,238 @@ public class EmbeddingController implements Initializable {
         }
     }
 
-    private void startCountTime() throws Exception {
+    private void doEmbedding () throws Exception {
+        boolean konversiMsg = false, konversiKunci = false, penyisipan = false;
+        char[] arrKunci = txtInputPass.getText().toCharArray();
+        String msgInBinary = "";
+        String kunciInBinary = "";
+        String msgLengthInfoInBinary = KonversiData.paddingInLeftBinaryString(
+                Integer.toBinaryString(this.nOfChiperLenOnByte),
+                this.xnm
+        );
+        try {
+            progressBar.setProgress(0.09d);
+            for (ArrayList<Integer> data: this.dataEncrypt) {
+                for (int i = 0; i < data.size(); i += 1) {
+                    msgInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString(data.get(i)),8);
+                }
+            }
+            for (int i = 0; i < arrKunci.length; i += 1) {
+                kunciInBinary += KonversiData.paddingInLeftBinaryString(Integer.toBinaryString((int)arrKunci[i]), 8);
+            }
+            kunciInBinary = KonversiData.paddingInRightBinaryString(kunciInBinary, NK_ON_BYTE);
+            updateProgressBar(0.12d);
+            Thread.sleep(250);
+            konversiMsg = true;
+            konversiKunci = true;
+        } catch (Exception except) {
+            AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                    "Konversi Msg to binary",
+                    "Terjadi kesalahan ketika proses konversi chipertext ke dalam notasi binary",
+                    ButtonType.OK
+            );
+        }
+
+        if (konversiMsg && konversiKunci) {
+            this.gemodNumber = Matematik.gemodFinder(this.primeNumber.intValue());
+
+            try {
+                //lakukan counter
+                startCountTime();
+                int pixelIterator = 1;
+                BigInteger gemodNums = new BigInteger(this.gemodNumber + "", 10);
+                byte siklusRGB = 1;
+
+                updateProgressBar(0.22d);
+
+                //for untuk sisip informasi panjang pesan
+                for (int i = 0; i < msgLengthInfoInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(msgLengthInfoInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                            this.primeNumber);
+                    //int argb = this.rgbDataOfImage[random.intValue()];
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                } //end for untuk sisip informasi panjang pesan
+                updateProgressBar(0.32d);
+                Thread.sleep(250);
+
+                //for untuk sisi kunci
+                for (int i = 0; i < kunciInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(kunciInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                            this.primeNumber);
+                    //int argb = this.rgbDataOfImage[random.intValue()];
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                } //END FOR SISI KUNCI
+                updateProgressBar(0.56d);
+                Thread.sleep(150);
+                //for untuk sisip pesan chiper
+                for (int i = 0; i < msgInBinary.length(); i += 1) {
+                    int bitPesan = Integer.parseInt(msgInBinary.charAt(i) + "", 10);
+                    BigInteger random = gemodNums.modPow(new BigInteger(pixelIterator + "", 10),
+                            this.primeNumber);
+                    int a = (this.rgbDataOfImage[random.intValue()]>>24)&0x000000FF;
+                    int r = (this.rgbDataOfImage[random.intValue()]>>16)&0x000000FF;
+                    int g = (this.rgbDataOfImage[random.intValue()]>>8)&0x000000FF;
+                    int b = (this.rgbDataOfImage[random.intValue()])&0x000000FF;
+
+                    if (siklusRGB > 3) {
+                        siklusRGB = 1;
+                    }
+                    //jika hasil parity even
+                    if (ParityChecker.generateParity(r,g,b) == 0) {
+                        if (bitPesan == 1) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { // no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    else { //hasil parity odd
+                        if (bitPesan == 0) { //lakukan Reverse
+                            if (siklusRGB == 1) { //ubah R
+                                r = ParityChecker.takeChannelRGBtoReverse(r);
+                            }
+                            else if (siklusRGB == 2) { //ubah G
+                                g = ParityChecker.takeChannelRGBtoReverse(g);
+                            }
+                            else if (siklusRGB == 3) { //ubah B
+                                b = ParityChecker.takeChannelRGBtoReverse(b);
+                            }
+                            siklusRGB += 1;
+                        } else { //no change
+                        }
+                        this.rgbDataOfImage[random.intValue()] = ((a << 24) | (r << 16) | (g << 8) | b);
+                    }
+                    pixelIterator += 1;
+                }
+                updateProgressBar(0.95d);
+                penyisipan = true;
+                stopCountTime();
+            } catch (Exception exceptionEmbedding) {
+                penyisipan = false;
+                AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
+                        "Embedding Proses",
+                        "Terjadi kesalahan saat proses penyisipan pesan" +
+                                "Detail error: " + exceptionEmbedding.getMessage(),
+                        ButtonType.OK
+                );
+            }
+
+            if (penyisipan && createStegoImage()) {
+                imgViewStego.setImage(SwingFXUtils.toFXImage(this.stegoImage, null));
+                imgViewStego.setFitWidth(292);
+                this.btnEmbedMessage.setDisable(true);
+                btnSaveStegoImg.setDisable(false);
+                this.hasData = true;
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(150);
+                            progressBar.setProgress(1.00d);
+                            Thread.sleep(250);
+                            progressBar.setVisible(false);
+                        } catch (Exception e) {}
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void startCountTime() throws Exception {
         processTimer = true;
         taskTimer = new Task<Void>() {
             @Override
@@ -676,19 +696,32 @@ public class EmbeddingController implements Initializable {
                 int counter = 0;
                 short detik = 0;
                 while (processTimer) {
-                    if (counter > 59) {
-
-                        txtfieldDetik.setText(
-                                (detik < 10) ? ("0" + detik) : ("" + detik)
-                        );
-                        counter = 0;
-                    }
                     counter += 1;
-                    if (counter < 10) {
-                        txtfieldMs.setText("0" + counter);
+                    if (counter > 59) {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                txtfieldDetik.setText(
+                                        (detik < 10) ? ("0" + detik) : ("" + detik)
+                                );
+                            }
+                        });
+                        wait(10);
+                        counter = 0;
                     } else {
-                        txtfieldMs.setText(counter + "");
+                        int finalCounter = counter;
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (finalCounter < 10) {
+                                    txtfieldMs.setText("0" + finalCounter);
+                                } else {
+                                    txtfieldMs.setText(finalCounter + "");
+                                }
+                            }
+                        });
                     }
+                    Thread.sleep(50);
                 }
                 notify();
                 return null;
@@ -699,7 +732,8 @@ public class EmbeddingController implements Initializable {
         threadTimer.start();
     }
 
-    private void stopCountTime() throws Exception {
+    @Override
+    public void stopCountTime() throws Exception {
         if (threadTimer.isAlive()) {
             threadTimer.interrupt();
             threadTimer = null;
@@ -888,7 +922,7 @@ public class EmbeddingController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Task<Void> task = new Task<Void>() {
+        Task<Void> tasks = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 btnBrowseText.setGraphic(
@@ -912,7 +946,7 @@ public class EmbeddingController implements Initializable {
             }
         };
         try {
-            new Thread(task).start();
+            new Thread(tasks).start();
         } catch (Exception e) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                     "Inisialisasi Gambar",

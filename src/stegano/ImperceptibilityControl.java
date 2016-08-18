@@ -125,7 +125,7 @@ public class ImperceptibilityControl implements Initializable {
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
         Image image = null;
 
-        File file = fc.showOpenDialog(null);
+        File file = fc.showOpenDialog(Main.mainStage);
 
         if (file != null) {
             String infoStegoImage = "";
@@ -157,8 +157,7 @@ public class ImperceptibilityControl implements Initializable {
                 else {
                     this.btnCalculateMSEPSNR.setDisable(false);
                 }
-                //this.btnCalculateMSEPSNR.setDisable(false);
-                this.btnShowHistogram.setDisable(false);
+
             }
             catch (MalformedURLException malformedURLException) {
                 AlertInfo.showAlertWarningMessage(
@@ -198,6 +197,7 @@ public class ImperceptibilityControl implements Initializable {
                 this.txtfieldMSE.setText(this.mseVal + "");
                 this.txtfieldPSNR.setText(this.psnrVal + "");
                 this.hasData = true;
+                btnShowHistogram.setDisable(false);
                 btnSave.setDisable(false);
             }
         }
@@ -291,24 +291,25 @@ public class ImperceptibilityControl implements Initializable {
                 new AreaChart<>(xAxis,yAxis);
         final AreaChart<Number,Number> acStego =
                 new AreaChart<>(xAxisStego,yAxisStego);
-        acOri.setTitle("Histogram Original Image");
+        acOri.setTitle("Histogram Original Image" + "\n" + "(" + oriImageName + ")");
         //acOri.setPrefWidth(446.6);
         acOri.setLayoutX(10.2);
         acOri.setLayoutY(122.2);
 
-        acStego.setTitle("Histogram Stego Image");
+        acStego.setTitle("Histogram Stego Image" + "\n" + "(" + stegoImageName + ")");
         //acStego.setPrefWidth(446.8);
         acStego.setLayoutX(552.8);
         acStego.setLayoutY(122.2);
+
+
+        Label labelPsnr = new Label("(PSNR : " + psnrVal + ")");
+        labelPsnr.setLayoutX(484.5);
+        labelPsnr.setLayoutY(94.6);
 
         ScrollPane scrollPane = new ScrollPane();
         AnchorPane anchorPane = new AnchorPane();
         anchorPane.setPrefSize(850, 650);
         scrollPane.setPrefSize(anchorPane.getPrefWidth() + 100, anchorPane.getPrefHeight() + 10);
-
-        Button button = new Button("Testing");
-        button.setLayoutX(10.2);
-        button.setLayoutY(4.2);
 
         try {
             grayscaleOriImage = PengolahanCitra.getGrayscaleDataRGB(this.imageOri);
@@ -369,10 +370,10 @@ public class ImperceptibilityControl implements Initializable {
             }
 
             acOri.getStylesheets().add(getClass().getClassLoader().getResource("css/Chart.css").toString());
-
+            acStego.getStylesheets().add(getClass().getClassLoader().getResource("css/Chart.css").toString());
             acOri.getData().addAll(seriesOri);
             acStego.getData().addAll(seriesStego);
-            anchorPane.getChildren().addAll(acOri, acStego);
+            anchorPane.getChildren().addAll(labelPsnr, acOri, acStego);
             scrollPane.setContent(anchorPane);
             Scene dialogScene = new Scene(scrollPane, 850, 650);
             dialog.setTitle("Histrogram : Grayscale");
@@ -442,6 +443,7 @@ public class ImperceptibilityControl implements Initializable {
             btnMainMenu.setGraphic(
                     new ImageView(new Image(MainController.resouresDir.toURI().toURL().toString() + "arrowleft16.png"))
             );
+            btnShowHistogram.setDisable(true);
         } catch (MalformedURLException e) {
             AlertInfo.showAlertErrorMessage("Informasi Aplikasi",
                     "Kesalahan Akeses File",
